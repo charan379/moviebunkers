@@ -1,7 +1,14 @@
 const Joi = require("joi");
 
-// newUser schema
+const options = {
+  abortEarly: false,
+  stripUnknown: true,
+};
 
+/**
+ * newUserSchema
+ * 
+ */
 const newUserSchema = Joi.object({
   userName: Joi.string().min(5).max(16).required(),
   email: Joi.string().email().required(),
@@ -9,6 +16,28 @@ const newUserSchema = Joi.object({
   role: Joi.string().required(),
 });
 
-exports.validateNewUser = async (userDTO)=>{
-    return newUserSchema.validate(userDTO, {abortEarly: false, stripUnknown: true})
+/**
+ * 
+ * @param {Object} userDTO 
+ * @returns userDTO object and error if any
+ */
+exports.validateNewUser = async (userDTO) => {
+  return newUserSchema.validate(userDTO, options);
+};
+
+/**
+ * loginSchema
+ */
+const loginSchema = Joi.object({
+  userName: Joi.string().min(5).max(16).required(),
+  password: Joi.string().min(8).max(16).required(),
+})
+
+/**
+ * 
+ * @param {Object} loginDTO 
+ * @returns 
+ */
+exports.validateLoginObject = async (loginDTO) => {
+  return loginSchema.validate(loginDTO, options)
 }
