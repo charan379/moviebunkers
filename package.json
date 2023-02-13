@@ -1,18 +1,40 @@
 {
-  "name": "server",
-  "version": "0.0.0",
+  "name": "moviebunkers",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^16.0.3",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
+    "joi": "^17.7.1",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.8.3",
     "morgan": "~1.9.1",
     "pug": "2.0.0-beta11",
     "stylus": "^0.54.8"
+  },
+  "description": "moviebunkers app server",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/charan379/moviebunkers.git"
+  },
+  "keywords": [
+    "moviebunkers"
+  ],
+  "author": "charan379",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/charan379/moviebunkers/issues"
+  },
+  "homepage": "https://github.com/charan379/moviebunkers#readme",
+  "devDependencies": {
+    "eslint": "^8.34.0"
   }
 }
