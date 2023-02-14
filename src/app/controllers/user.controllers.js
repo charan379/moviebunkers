@@ -1,7 +1,5 @@
-const userRepository = require("../repository/user.repository");
-const { generateHash } = require("../utils/bcrypt");
-const { UserException } = require("../utils/Exceptions");
-const errorResponse = require("../utils/ErrorResponse");
+const { MovieBunkersException } = require("../utils/Exceptions");
+const ErrorResponse = require("../utils/ErrorResponse");
 const {
   newUserService,
   userLoginService,
@@ -22,7 +20,6 @@ exports.newUserController = async (req, res, next) => {
      * destructure userObj into {_id, userName, email, role } after creating new user
      */
     const { _id, userName, email, role } = await newUserService(req.body);
-
     /**
      * send HttpResponse with status code 200 and json obj in format of
      * {
@@ -40,21 +37,21 @@ exports.newUserController = async (req, res, next) => {
       .json({ success: true, user: { _id, userName, email, role } }); // Http Response in json formart
   } catch (error) {
     // catch if there was any error
-    if (error instanceof UserException) {
+    if (error instanceof MovieBunkersException) {
       /**
        * if occurred error is an instance of UserException
        *
        *  */
       res
-        .status(400) // HttpStatus code 400
-        .json(errorResponse(error.message)); // Http Response in json format
+        .status(error.httpCode) // HttpStatus code
+        .json(ErrorResponse(error)); // Http Response in json format
     } else {
       /**
        * if any other error is occurred then
        */
       res
         .status(500) // HttpStatus code 500
-        .json(errorResponse(error.message)); // Http Response in json format
+        .json(ErrorResponse(error)); // Http Response in json format
     }
   }
 };
@@ -89,24 +86,37 @@ exports.userLoginController = async (req, res, next) => {
      */
     res
       .status(200) // HttpCode 200
-      .json({ success: true, loginDetails: { userName, email, role, token } }); // HttpResponse in json format
+      // .json({ success: true, loginDetails: { userName, email, role, token } }); // HttpResponse in json format
+      .json({
+        success: true,
+        token: token,
+        userDetails: { userName, email, role },
+      });
   } catch (error) {
     // catch if there was any error
-    if (error instanceof UserException) {
+    if (error instanceof MovieBunkersException) {
       /**
        * if occurred error is an instance of UserException
        *
        *  */
       res
-        .status(400) // HttpStatus code 400
-        .json(errorResponse(error.message)); // Http Response in json format
+        .status(error.httpCode) // HttpStatus code
+        .json(ErrorResponse(error)); // Http Response in json format
     } else {
       /**
        * if any other error is occurred then
        */
       res
         .status(500) // HttpStatus code 500
-        .json(errorResponse(error.message)); // Http Response in json format
+        .json(ErrorResponse(error)); // Http Response in json format
     }
   }
+};
+
+/**
+ * test
+ */
+
+exports.testToken = async (req, res, next) => {
+  res.status(200).json({ ...req.authentication });
 };

@@ -1,3 +1,11 @@
+const {
+  UserEmailAlreadyExists,
+  UserNameAlreadyExists,
+  JoiInvalidNewUser,
+  JoiInvalidLogin,
+  UserNameNotFound,
+  InvalidUserPassword,
+} = require("../errors/UserErrors");
 const userRepository = require("../repository/user.repository");
 const { generateHash, validateHash } = require("../utils/bcrypt");
 const { UserException } = require("../utils/Exceptions");
@@ -22,7 +30,7 @@ exports.newUserService = async (requestBoby) => {
    * if Joi validation errors present then throw a new error of UserException instance
    */
   if (error) {
-    throw new UserException(error.message);
+    throw new UserException(JoiInvalidNewUser(error.message));
   }
 
   /**
@@ -32,9 +40,7 @@ exports.newUserService = async (requestBoby) => {
     /**
      * if user with same userName already exists then thorw new UserException
      */
-    throw new UserException(
-      "User already exists with userName : " + userDTO.userName
-    );
+    throw new UserException(UserNameAlreadyExists(userDTO.userName));
   }
 
   /**
@@ -44,9 +50,7 @@ exports.newUserService = async (requestBoby) => {
     /**
      * if user with same email already exists then thorw new UserException
      */
-    throw new UserException(
-      "User already exists with email : " + userDTO.email
-    );
+    throw new UserException(UserEmailAlreadyExists(userDTO.email));
   }
 
   /** if above all condition passed then
@@ -78,7 +82,7 @@ exports.userLoginService = async (requestBoby) => {
    * if Joi validation errors present then throw a new error of UserException instance
    */
   if (error) {
-    throw new UserException(error.message);
+    throw new UserException(JoiInvalidLogin(error.message));
   }
 
   /**
@@ -90,26 +94,26 @@ exports.userLoginService = async (requestBoby) => {
    * if userDTO is null then user Not found
    */
   if (userDTO === null) {
-    throw new UserException(
-      "No User found with userName : " + requestBoby.userName
-    );
+    throw new UserException(UserNameNotFound(requestBoby.userName));
   }
 
   /**
    * if user found then validate given password matches with passwordHash in db
    */
   if (!(await validateHash(requestBoby.password, userDTO.password))) {
-    throw new UserException(
-      "Given password is Invalid for userName : " + requestBoby.userName
-    );
+    throw new UserException(InvalidUserPassword(requestBoby.userName));
   }
 
   /**
-   * if all above conditions are passed then generate a valid jwt-token 
+   * if all above conditions are passed then generate a valid jwt-token
    *
    */
 
-    let token = await generateJwtToken({userName: userDTO.userName, email: userDTO.email, role: userDTO.role})
+  let token = await generateJwtToken({
+    userName: userDTO.userName,
+    email: userDTO.email,
+    role: userDTO.role,
+  });
 
   /**
    * if all above conditions are passed then return Valid loginDetails with jwt-token of access

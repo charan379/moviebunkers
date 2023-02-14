@@ -1,11 +1,29 @@
-class UserException extends Error {
-  constructor(message, errorCode, httpCode) {
-    super(message);
-    this.name = 'UserException';
-    this.errorCode = errorCode;
-    this.httpCode = httpCode;
+class MovieBunkersException extends Error {
+  constructor(errorObject) {
+    super(errorObject.message);
+    this.name = "MovieBunkersException";
+    this.code = errorObject.code;
+    this.reason = errorObject.reason;
+    this.httpCode = errorObject.httpCode;
   }
 }
 
+class UserException extends MovieBunkersException {
+  constructor(errorObject) {
+    super(errorObject);
+    this.name = "UserException";
+  }
+}
 
-module.exports = {UserException};
+class AuthorizationException extends MovieBunkersException {
+  constructor(errorObject) {
+    super(errorObject);
+    this.name = "AuthorizationException";
+  }
+}
+
+module.exports = {
+  MovieBunkersException,
+  UserException,
+  AuthorizationException,
+};
