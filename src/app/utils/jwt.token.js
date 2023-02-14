@@ -9,14 +9,29 @@ const { AuthorizationException } = require("./Exceptions");
  */
 exports.generateJwtToken = async (userObj) => {
   let token;
+  /**
+   * try to create hwt token
+   */
   try {
+    /**
+     * create new jwt token and store in token variable
+     */
     token = jwt.sign({ ...userObj }, "secretkeyappearshere", {
       expiresIn: "1h",
     });
+    /**
+     * catch if any error thrown by above process
+     */
   } catch (error) {
+    /**
+     * throw error with below message
+     */
     throw new Error("Error! Something went wrong. With Generating Token");
   }
 
+  /**
+   * If no errors were thrown then return signed jwt token
+   */
   return token;
 };
 
@@ -27,18 +42,41 @@ exports.generateJwtToken = async (userObj) => {
  */
 exports.verifyJwtToken = async (token) => {
   let deCodedToken;
+  /**
+   * try to verify jwt token
+   */
   try {
+    /**
+     * verify jwt token and store it in deCodedToken variable
+     */
     deCodedToken = jwt.verify(token, "secretkeyappearshere");
+
+    /**
+     * catch if any error is thrown by above process
+     */
   } catch (error) {
+    /**
+     * if thrown error is " invalid token "
+     */
     if (error.message === "invalid token") {
       throw new AuthorizationException(InvalidToken(error.message));
     }
+
+    /**
+     * if thrown error is " jwt expired "
+     */
     if (error.message === "jwt expired") {
       throw new AuthorizationException(ExpiredToken(error.message));
     }
 
+    /**
+     * If any other error is thrown 
+     */
     throw new Error(error);
   }
 
+  /**
+   * if no errors are thrown than return de-coded token details
+   */
   return deCodedToken;
 };

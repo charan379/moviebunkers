@@ -12,7 +12,9 @@ const connectDb = async () => {
   });
 };
 
-
+/**
+ * establish mongoose db connection
+ */
 const establishDbConnection = async ()=> {
     await connectDb();
     const db = mongoose.connection;

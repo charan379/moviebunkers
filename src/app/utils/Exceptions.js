@@ -1,3 +1,6 @@
+/**
+ * MovieBunkersException
+ */
 class MovieBunkersException extends Error {
   constructor(errorObject) {
     super(errorObject.message);
@@ -8,6 +11,9 @@ class MovieBunkersException extends Error {
   }
 }
 
+/**
+ * UserException
+ */
 class UserException extends MovieBunkersException {
   constructor(errorObject) {
     super(errorObject);
@@ -15,6 +21,9 @@ class UserException extends MovieBunkersException {
   }
 }
 
+/**
+ * AuthorizationException
+ */
 class AuthorizationException extends MovieBunkersException {
   constructor(errorObject) {
     super(errorObject);
@@ -22,6 +31,9 @@ class AuthorizationException extends MovieBunkersException {
   }
 }
 
+/**
+ * exports
+ */
 module.exports = {
   MovieBunkersException,
   UserException,

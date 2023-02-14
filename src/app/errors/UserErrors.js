@@ -1,5 +1,11 @@
 const { HttpCodes } = require("../constants/HttpCodes");
 
+
+/**
+ * UserNameAlreadyExists Error
+ * @param {String} info 
+ * @returns Error Object
+ */
 exports.UserNameAlreadyExists = (info) => {
   return {
     code: "USER_UNAE",
@@ -9,6 +15,11 @@ exports.UserNameAlreadyExists = (info) => {
   };
 };
 
+/**
+ * UserEmailAlreadyExists Error
+ * @param {String} info 
+ * @returns Error Object
+ */
 exports.UserEmailAlreadyExists = (info) => {
   return {
     code: "USER_UEAE",
@@ -18,6 +29,11 @@ exports.UserEmailAlreadyExists = (info) => {
   };
 };
 
+/**
+ * UserNameNotFound Error
+ * @param {String} info 
+ * @returns Error Object
+ */
 exports.UserNameNotFound = (info) => {
   return {
     code: "USER_UNNF",
@@ -27,6 +43,11 @@ exports.UserNameNotFound = (info) => {
   };
 };
 
+/**
+ * InvalidUserPassword Error
+ * @param {String} info 
+ * @returns Error Object
+ */
 exports.InvalidUserPassword = (info) => {
   return {
     code: "USER_IUP",
@@ -35,6 +56,12 @@ exports.InvalidUserPassword = (info) => {
     httpCode: HttpCodes.OK.code,
   };
 };
+
+/**
+ * JoiInvalidNewUser Error
+ * @param {String} info 
+ * @returns Error Object
+ */
 exports.JoiInvalidNewUser = (info) => {
   return {
     code: "USER_JOI_NEW",
@@ -44,6 +71,11 @@ exports.JoiInvalidNewUser = (info) => {
   };
 };
 
+/**
+ * JoiInvalidLogin Error
+ * @param {String} info 
+ * @returns Error Object
+ */
 exports.JoiInvalidLogin = (info) => {
   return {
     code: "USER_JOI_LOGIN",

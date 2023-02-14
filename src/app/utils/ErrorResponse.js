@@ -1,3 +1,8 @@
+/**
+ * 
+ * @param {ErrorObject} error 
+ * @returns error response
+ */
 function ErrorResponse(error) {
   return {
     success: false,

@@ -39,7 +39,7 @@ exports.newUserController = async (req, res, next) => {
     // catch if there was any error
     if (error instanceof MovieBunkersException) {
       /**
-       * if occurred error is an instance of UserException
+       * if occurred error is an instance of MovieBunkersException
        *
        *  */
       res
@@ -96,7 +96,7 @@ exports.userLoginController = async (req, res, next) => {
     // catch if there was any error
     if (error instanceof MovieBunkersException) {
       /**
-       * if occurred error is an instance of UserException
+       * if occurred error is an instance of MovieBunkersException
        *
        *  */
       res

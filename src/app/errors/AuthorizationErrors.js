@@ -1,5 +1,9 @@
 const { HttpCodes } = require("../constants/HttpCodes");
-
+/**
+ * AuthTokenEmpty Error
+ * @param {String} info 
+ * @returns Error Object
+ */
 exports.AuthTokenEmpty = (info) => {
   return {
     code: "AUTH_ATE",
@@ -9,6 +13,11 @@ exports.AuthTokenEmpty = (info) => {
   };
 };
 
+/**
+ * InvalidToken Error
+ * @param {String} info 
+ * @returns Error Object
+ */
 exports.InvalidToken = (info) => {
   return {
     code: "AUTH_IT",
@@ -18,6 +27,11 @@ exports.InvalidToken = (info) => {
   };
 };
 
+/**
+ * ExpiredToken Error
+ * @param {String} info 
+ * @returns Error Object
+ */
 exports.ExpiredToken = (info) => {
   return {
     code: "AUTH_ET",
@@ -27,6 +41,11 @@ exports.ExpiredToken = (info) => {
   };
 };
 
+/**
+ * AccessNotPermitted Error
+ * @param {String} info 
+ * @returns Error Object
+ */
 exports.AccessNotPermitted = (info) => {
   return {
     code: "AUTH_ANP",

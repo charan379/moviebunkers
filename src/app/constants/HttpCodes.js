@@ -1,3 +1,7 @@
+/**
+ * HttpCodes enum
+ */
+
 exports.HttpCodes = {
   OK: {
     code: 200,
