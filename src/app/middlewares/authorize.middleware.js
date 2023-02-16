@@ -1,5 +1,5 @@
 const { authorizationlevel } = require("../constants/authorization.levels");
-const { AccessNotPermitted } = require("../errors/AuthorizationErrors");
+const { AccessNotPermitted, AuthTokenEmpty } = require("../errors/AuthorizationErrors");
 const ErrorResponse = require("../utils/ErrorResponse");
 const {
   AuthorizationException,
@@ -27,13 +27,18 @@ exports.authorize = (Role) => {
        */
       try {
         //Authorization: 'Bearer TOKEN'
-        const token = req.headers.authorization.split(" ")[1];
+        const authHeader = req.headers.authorization;
 
+        if (!authHeader) {
+          throw new AuthorizationException(AuthTokenEmpty("Token Not Provided"));
+        }
+
+        const token = authHeader.split(" ")[1];
         /**
          * if token is empty or not provided throw error
          */
         if (!token) {
-          throw new AuthorizationException("Token Not Provided");
+          throw new AuthorizationException(AuthTokenEmpty("Token Not Provided"));
         }
 
         /**
