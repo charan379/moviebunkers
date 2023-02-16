@@ -4,6 +4,7 @@ const {
   newUserService,
   userLoginService,
 } = require("../service/users.service");
+const SuccessResponse = require("../utils/SuccessResponse");
 
 /**
  *
@@ -34,7 +35,7 @@ exports.newUserController = async (req, res, next) => {
      */
     res
       .status(200) // HttpStatus code 200
-      .json({ success: true, user: { _id, userName, email, role } }); // Http Response in json formart
+      .json(SuccessResponse({ user: { _id, userName, email, role } })); // Http Response in json formart
   } catch (error) {
     // catch if there was any error
     if (error instanceof MovieBunkersException) {
@@ -87,11 +88,12 @@ exports.userLoginController = async (req, res, next) => {
     res
       .status(200) // HttpCode 200
       // .json({ success: true, loginDetails: { userName, email, role, token } }); // HttpResponse in json format
-      .json({
-        success: true,
-        token: token,
-        userDetails: { userName, email, role },
-      });
+      .json(
+        SuccessResponse({
+          token: token,
+          userDetails: { userName, email, role },
+        })
+      );
   } catch (error) {
     // catch if there was any error
     if (error instanceof MovieBunkersException) {

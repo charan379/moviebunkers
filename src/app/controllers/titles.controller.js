@@ -1,19 +1,21 @@
 const titlesService = require("../service/titles.service");
 const ErrorResponse = require("../utils/ErrorResponse");
 const { MovieBunkersException } = require("../utils/Exceptions");
+const SuccessResponse = require("../utils/SuccessResponse");
 
 exports.addNewMovie = async (req, res, next) => {
   try {
     const { _id, title, title_type } = await titlesService.newTitle(req.body);
 
-    res.status(200).json({
-      success: true,
-      movie: {
-        _id,
-        title,
-        title_type,
-      },
-    });
+    res.status(200).json(
+      SuccessResponse({
+        movie: {
+          _id,
+          title,
+          title_type,
+        },
+      })
+    );
   } catch (error) {
     // catch if there was any error
     if (error instanceof MovieBunkersException) {
