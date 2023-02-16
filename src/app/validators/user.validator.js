@@ -2,7 +2,7 @@ const Joi = require("joi");
 const { Roles } = require("../constants/UserRoles");
 
 /**
- * joi option
+ * joi options
  */
 const options = {
   abortEarly: false,
