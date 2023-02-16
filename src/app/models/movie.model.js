@@ -3,222 +3,108 @@ const mongoose = require("mongoose");
 // movieSchema
 const movieSchema = new mongoose.Schema(
   {
+    // title_type
     title_type: {
       type: String,
-      enum: ["tv", "movie"],
+      enum: ["movie"],
       required: [true, "titile required"],
     },
+    // source
     source: {
       type: String,
       enum: ["tmdb", "imdb", "custom"],
     },
+    // imdb_id
     imdb_id: {
       type: String,
       trim: true,
       index: {
         unique: true,
-        partialFilterExpression: {imdb_id: {$type: 'string'}},
-      }
+        partialFilterExpression: { imdb_id: { $type: "string" } },
+      },
     },
+    // tmdb_id
     tmdb_id: {
       type: Number,
       trim: true,
       index: {
         unique: true,
-        partialFilterExpression: {tmdb_id: {$type: 'int'}},
-      }
+        partialFilterExpression: { tmdb_id: { $type: "int" } },
+      },
     },
-    
+    // title
     title: {
       type: String,
       required: [true, "title is Required"],
     },
+    // original_title
     original_title: {
       type: String,
       required: [true, "originalTitle is Required"],
     },
+    // original_language
     original_language: {
-      type: {
-        "639_1_code": {
-          type: String,
-          required: [true, "639_1_code is required"],
-        },
-        english_name: {
-          type: String,
-          required: [true, "english_name is required"],
-        },
-        native_name: {
-          type: String,
-        },
-      },
-      _id: false
+      type: Object,
+      _id: false,
     },
     languages: {
-      type: [
-        {
-          "639_1_code": {
-            type: String,
-            required: [true, "639_1_code is required"],
-          },
-          english_name: {
-            type: String,
-            required: [true, "english_name is required"],
-          },
-          native_name: {
-            type: String,
-          },
-        },
-      ],
+      type: [Object],
+      _id: false,
     },
+    // tagline
     tagline: {
       type: String,
     },
+    // poster_path
     poster_path: {
       type: String,
     },
+    // year
     year: {
       type: Number,
     },
+    // runtime
     runtime: {
       type: String,
     },
+    // genres
     genres: {
-      type: [
-        {
-          id: {
-            type: Number,
-          },
-          name: {
-            type: String,
-            default: "unknown",
-          },
-        },
-      ],
-      _id: false,
-      default: {},
+      type: [String],
+      default: ["unknown"],
     },
+    // overview
     overview: {
       type: String,
     },
+    // production_companies
     production_companies: {
-      type: [
-        {
-          name: {
-            type: String,
-          },
-        },
-      ],
-      _id: false,
+      type: [String],
     },
+    // production_countries
     production_countries: {
-      type: [
-        {
-          iso_3166_1: {
-            type: String,
-          },
-          name: {
-            type: String,
-          },
-        },
-      ],
+      type: [String],
       _id: false,
     },
+    // status
     status: {
       type: String,
       default: "unknown",
     },
+    // release_date
     release_date: {
       type: Date,
     },
+    // providers
     providers: {
       type: [String],
     },
+    // directors
     directors: {
       type: [String],
     },
+    // cast
     cast: {
-      type: [
-        {
-          name: {
-            type: String,
-          },
-          character: {
-            type: String,
-          },
-        },
-      ],
-      _id: false,
-    },
-    in_production: {
-      type: Boolean,
-    },
-    created_by: {
-      type: [
-        {
-          name: {
-            type: String,
-          },
-        },
-      ],
-      _id: false,
-    },
-    last_aired_date: {
-      type: Date,
-    },
-    last_episode_aired: {
-      type: Object,
-    },
-    next_episode_to_air: {
-      type: Object,
-    },
-    networks: {
-      type: [
-        {
-          name: {
-            type: String,
-          },
-          origin_country: {
-            type: String,
-          },
-        },
-      ],
-      _id: false,
-    },
-    number_of_seasons: {
-      type: Number,
-    },
-    number_of_episodes: {
-      type: Number,
-    },
-    seasons: {
-      type: [
-        {
-          air_date: {
-            type: Date,
-          },
-          episode_count: {
-            type: Number,
-          },
-          id: {
-            type: Number,
-          },
-          name: {
-            type: String,
-          },
-          overview: {
-            type: String,
-          },
-          poster_path: {
-            type: String,
-          },
-          season_number: {
-            type: Number,
-          },
-          tmdb_show_id: {
-            type: Number,
-          },
-        },
-      ],
+      type: [Object],
       _id: false,
     },
     added_by: {
@@ -231,6 +117,9 @@ const movieSchema = new mongoose.Schema(
     },
   },
   {
+    collection: "titles",
+  },
+  {
     timestamps: {
       createdAt: true,
       updatedAt: true,
@@ -239,6 +128,6 @@ const movieSchema = new mongoose.Schema(
 );
 
 // movieModel
-const MovieModel = mongoose.model("movies", movieSchema);
+const MovieModel = mongoose.model("movie", movieSchema);
 
 module.exports = MovieModel;
