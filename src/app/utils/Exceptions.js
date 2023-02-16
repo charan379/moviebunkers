@@ -32,10 +32,43 @@ class AuthorizationException extends MovieBunkersException {
 }
 
 /**
+ * TitleException
+ */
+class TitleException extends MovieBunkersException {
+  constructor(errorObject) {
+    super(errorObject);
+    this.name = "TitleException";
+  }
+}
+
+/**
+ * MovieException
+ */
+class MovieException extends MovieBunkersException {
+  constructor(errorObject) {
+    super(errorObject);
+    this.name = "MovieException";
+  }
+}
+
+/**
+ * TvException
+ */
+class TvException extends MovieBunkersException {
+  constructor(errorObject) {
+    super(errorObject);
+    this.name = "TvException";
+  }
+}
+
+/**
  * exports
  */
 module.exports = {
   MovieBunkersException,
   UserException,
   AuthorizationException,
+  TitleException,
+  MovieException,
+  TvException,
 };
