@@ -6,7 +6,6 @@ const SuccessResponse = require("../utils/SuccessResponse");
 exports.addNewMovie = async (req, res, next) => {
   try {
     const { _id, title, title_type } = await titlesService.newTitle(req.body);
-
     res.status(200).json(
       SuccessResponse({
         movie: {

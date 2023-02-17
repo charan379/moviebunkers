@@ -8,8 +8,8 @@ const indexRouter = require("./app/routes/index");
 const usersRouter = require("./app/routes/users.router");
 const titlesRouter = require("./app/routes/titles.router");
 const establishDbConnection = require("./app/utils/db");
-const swaggerJSDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
+const { swaggerDocs } = require("./app/swagger/swagger.options");
 const app = express();
 
 // db connection
@@ -19,35 +19,8 @@ establishDbConnection();
 app.set("views", path.join(__dirname, "./app/views"));
 app.set("view engine", "pug");
 
-
 // swagger API Documentation
-
-const swaggerOptions = {
-  swaggerDefinition: {
-    openapi: "3.0.3",
-    info: {
-      title: "moviebunkers",
-      description:
-        "moviebunkers app server",
-      version: "1.0.0",
-      contact: {
-        name: "charan379",
-        url: "#",
-      },
-      license: {
-        name: "GNU Affero General Public License",
-        url: "https://www.gnu.org/licenses/agpl-3.0.en.html",
-      },
-      servers: ["http://localhost:3000"],
-    },
-  },
-  apis: [path.join(process.cwd(),"./src/app/routes/*.js")],
-};
-
-const swaggerDocs = swaggerJSDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
-
 
 app.use(logger("dev"));
 app.use(express.json());

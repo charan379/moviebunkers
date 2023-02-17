@@ -9,7 +9,39 @@ router.get("/", function (req, res, next) {
   res.render("index", { title: "movies" });
 });
 
-router.post("/newTitle", authorize(Roles.MODERATOR), titlesController.addNewMovie);
 
+/**
+ * @swagger
+ * /titles/newTitle:
+ *  post:
+ *   tags:
+ *     - Titles
+ *   summary: API to create new title
+ *   description: create a title for valid title object
+ *   requestBody:
+ *      content:
+ *        application/json:
+ *          description: movie
+ *          schema:
+ *              #$ref: '#/components/schemas/movieSchema'
+ *              #$ref: '#/components/schemas/tvSchema'
+ *              oneOf:
+ *                  - $ref: '#/components/schemas/movieSchema'
+ *                  - $ref: '#/components/schemas/tvSchema'
+ *          examples:
+ *             newMovie:
+ *                $ref: '#/components/examples/newMovieExample'
+ *             newTv:
+ *                $ref: '#/components/examples/newTvExample'
+ *                
+ *   responses:
+ *       200:
+ *          description: Success
+ *       404:
+ *          description: Invalid new title
+
+ *      
+ */
+router.post("/newTitle", authorize(Roles.MODERATOR), titlesController.addNewMovie);
 
 module.exports = router;
