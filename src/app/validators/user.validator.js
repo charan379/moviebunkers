@@ -17,7 +17,8 @@ const newUserSchema = Joi.object({
   userName: Joi.string().min(5).max(16).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(8).max(16).required(),
-  role: Joi.string().valid(...Object.values(Roles)),
+  // role: Joi.string().valid(...Object.values(Roles)),
+  role: Joi.string().valid(Roles.USER),
 });
 
 /**
