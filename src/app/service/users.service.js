@@ -20,7 +20,7 @@ const {
  * @param {Object} requestBoby - newUser request body
  * @returns newUser Object with _id
  */
-exports.newUserService = async (requestBoby) => {
+exports.newUser = async (requestBoby) => {
   /**
    * destructure value, error into {userDTO, error} from Joi object validation
    */
@@ -70,7 +70,45 @@ exports.newUserService = async (requestBoby) => {
   }));
 };
 
-exports.userLoginService = async (requestBoby) => {
+exports.findAll = async (requestQuery) => {
+  let query = {};
+  let page = 1;
+  let limit = 4;
+  // role
+  if (requestQuery.role) {
+    query = { ...query, role: requestQuery.role };
+  }
+
+  // status
+  if (requestQuery.status) {
+    query = { ...query, status: requestQuery.status };
+  }
+
+  // userName
+  if (requestQuery.userName) {
+    query = { ...query, userName: requestQuery.userName };
+  }
+
+  // email
+  if (requestQuery.email) {
+    query = { ...query, email: requestQuery.email };
+  }
+
+  // page
+  if (requestQuery.page) {
+    page = requestQuery.page;
+  }
+
+  // limit
+  if (requestQuery.limit) {
+    limit = requestQuery.limit;
+  }
+  const userList = await userRepository.findAllUsers(query, page, limit);
+
+  return userList;
+};
+
+exports.userLogin = async (requestBoby) => {
   /**
    * destructure value, error into {loginDTO, error} from Joi object validation
    */

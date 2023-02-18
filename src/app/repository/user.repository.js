@@ -1,6 +1,32 @@
 const UserModel = require("../models/user.model");
 
 /**
+ * find all users
+ * @param {String} userName
+ * @returns userObject or null
+ */
+exports.findAllUsers = async (query, page, limit) => {
+  const projection = {
+    password: 0,
+    _id: 0,
+    __v: 0,
+  };
+
+  const usersCount = await UserModel.find(query).countDocuments();
+
+  const userList = await UserModel.find(query, projection)
+    .limit(limit * 1)
+    .skip((page - 1) * limit);
+
+  const result = {
+    currentPage: page,
+    totalPages: Math.ceil(usersCount / limit),
+    list: userList,
+  };
+  return result;
+};
+
+/**
  * find user by userName
  * @param {String} userName
  * @returns userObject or null

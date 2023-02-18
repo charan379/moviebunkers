@@ -30,8 +30,13 @@ router.get("/", function (req, res, next) {
 
  *      
  */
-router.post("/newUser", userControllers.newUserController);
+router.post("/newUser", userControllers.newUser);
 
+router.get(
+  "/get-all-users",
+  authorize(Roles.SUPERADMIN),
+  userControllers.getAllUsers
+);
 
 /**
  * @swagger
@@ -51,10 +56,10 @@ router.post("/newUser", userControllers.newUserController);
  *          description: Success
  *       404:
  *          description: Invalid new user
- *                  
- *      
+ *
+ *
  */
-router.post("/login", userControllers.userLoginController);
+router.post("/login", userControllers.userLogin);
 
 router.get("/test", authorize(Roles.ADMIN), userControllers.testToken);
 module.exports = router;

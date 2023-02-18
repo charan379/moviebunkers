@@ -1,9 +1,6 @@
 const { MovieBunkersException } = require("../utils/Exceptions");
 const ErrorResponse = require("../utils/ErrorResponse");
-const {
-  newUserService,
-  userLoginService,
-} = require("../service/users.service");
+const usersService = require("../service/users.service");
 const SuccessResponse = require("../utils/SuccessResponse");
 
 /**
@@ -12,7 +9,7 @@ const SuccessResponse = require("../utils/SuccessResponse");
  * @param {HttpResponse} res
  * @param {Function} next
  */
-exports.newUserController = async (req, res, next) => {
+exports.newUser = async (req, res, next) => {
   /**
    * try creating newUser
    */
@@ -20,7 +17,7 @@ exports.newUserController = async (req, res, next) => {
     /**
      * destructure userObj into {_id, userName, email, role } after creating new user
      */
-    const { _id, userName, email, role } = await newUserService(req.body);
+    const { _id, userName, email, role } = await usersService.newUser(req.body);
     /**
      * send HttpResponse with status code 200 and json obj in format of
      * {
@@ -57,13 +54,38 @@ exports.newUserController = async (req, res, next) => {
   }
 };
 
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    const userList = await usersService.findAll(req.query);
+    res.status(200).json(SuccessResponse(userList));
+  } catch (error) {
+    // catch if there was any error
+    if (error instanceof MovieBunkersException) {
+      /**
+       * if occurred error is an instance of MovieBunkersException
+       *
+       *  */
+      res
+        .status(error.httpCode) // HttpStatus code
+        .json(ErrorResponse(error)); // Http Response in json format
+    } else {
+      /**
+       * if any other error is occurred then
+       */
+      res
+        .status(500) // HttpStatus code 500
+        .json(ErrorResponse(error)); // Http Response in json format
+    }
+  }
+};
+
 /**
  *
  * @param {HttpRequest} req
  * @param {HttpResponse} res
  * @param {Function} next
  */
-exports.userLoginController = async (req, res, next) => {
+exports.userLogin = async (req, res, next) => {
   /**
    * try to login with given credentials
    */
@@ -71,7 +93,9 @@ exports.userLoginController = async (req, res, next) => {
     /**
      * destructure user loginDetails into { userName, email, role, token } after login
      */
-    const { userName, email, role, token } = await userLoginService(req.body);
+    const { userName, email, role, token } = await usersService.userLogin(
+      req.body
+    );
 
     /**
      * send HttpResponse with status code 200 and json obj in format of
