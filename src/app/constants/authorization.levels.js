@@ -3,7 +3,8 @@
  */
 
 exports.authorizationlevel = Object.freeze({
-  Admin: 10,
-  Moderator: 9,
+  SuperAdmin: 99,
+  Admin: 9,
+  Moderator: 8,
   User: 1,
 });
