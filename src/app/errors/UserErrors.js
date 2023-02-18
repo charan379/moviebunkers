@@ -84,3 +84,18 @@ exports.JoiInvalidLogin = (info) => {
     httpCode: HttpCodes.BAD_REQUEST.code,
   };
 };
+
+
+/**
+ * UserNotFound Error
+ * @param {String} info 
+ * @returns Error Object
+ */
+exports.UserNotFound = (info) => {
+  return {
+    code: "USER_UNF",
+    message: "User Not Found",
+    reason: info,
+    httpCode: HttpCodes.NOT_FOUND.code,
+  };
+};
