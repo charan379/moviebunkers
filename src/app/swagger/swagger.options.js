@@ -1,7 +1,7 @@
 const swaggerJSDoc = require("swagger-jsdoc");
 const path = require("path");
 const swaggerSchemas = require("./swagger.schemas");
-const {newMovieExample,newTvExample} = require("./swagger.examples");
+const { newMovieExample, newTvExample } = require("./swagger.examples");
 
 const swaggerOptions = {
   swaggerDefinition: {
@@ -21,11 +21,11 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
+        url: "http://localhost:3000/api",
         description: "Local Server",
       },
       {
-        url: "http://localhost:3010",
+        url: "http://localhost:3010/api",
         description: "Local Server",
       },
     ],
@@ -50,7 +50,8 @@ const swaggerOptions = {
       },
       schemas: swaggerSchemas,
       examples: {
-        newMovieExample,newTvExample
+        newMovieExample,
+        newTvExample,
       },
     },
 
