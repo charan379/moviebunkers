@@ -2,7 +2,10 @@ const {
   InvalidTitleType,
   TitleAlreadyExists,
 } = require("../errors/TitleErrros");
-const { TitleException } = require("../utils/Exceptions");
+const {
+  TitleException,
+  MovieBunkersException,
+} = require("../utils/Exceptions");
 const movieService = require("./movies.service");
 const tvService = require("./tv.service");
 const titlesRepository = require("../repository/titles.repository");
@@ -38,5 +41,14 @@ exports.newTitle = async (requestBody) => {
 
   if (title_type === "tv") {
     return await tvService.addNewTv(requestBody);
+  }
+};
+
+exports.findAllMinimal = async () => {
+  const result = await titlesRepository.findAllMinimal();
+  if (result.length > 0) {
+    return result;
+  } else {
+    throw new MovieBunkersException(TitleNotFound("get all"));
   }
 };

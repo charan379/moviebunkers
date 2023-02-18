@@ -9,7 +9,6 @@ router.get("/", function (req, res, next) {
   res.render("index", { title: "movies" });
 });
 
-
 /**
  * @swagger
  * /titles/newTitle:
@@ -42,6 +41,11 @@ router.get("/", function (req, res, next) {
 
  *      
  */
-router.post("/newTitle", authorize(Roles.MODERATOR), titlesController.addNewMovie);
+router.post(
+  "/newTitle",
+  authorize(Roles.MODERATOR),
+  titlesController.addNewMovie
+);
 
+router.get("/getAllTitles", titlesController.getAllTitles);
 module.exports = router;
