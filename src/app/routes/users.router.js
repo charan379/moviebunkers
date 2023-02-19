@@ -32,10 +32,17 @@ router.get("/", function (req, res, next) {
  */
 router.post("/newUser", userControllers.newUser);
 
+// get all users
 router.get(
   "/get-all-users",
   authorize(Roles.SUPERADMIN),
   userControllers.getAllUsers
+);
+
+router.put(
+  "/update-user/:userName",
+  authorize(Roles.ADMIN),
+  userControllers.updateUser
 );
 
 /**

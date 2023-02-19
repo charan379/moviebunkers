@@ -49,5 +49,15 @@ exports.validateLoginObject = async (loginDTO) => {
   return loginSchema.validate(loginDTO, options);
 };
 
+const userUpdateSchema = Joi.object({
+  status: Joi.string().valid(...Object.values(UserStatus)),
+  role: Joi.string().valid(...[Roles.MODERATOR, Roles.USER, Roles.ADMIN]),
+});
+
+exports.validateUserUpdateObject = async (userUpdateDTO) => {
+  return userUpdateSchema.validate(userUpdateDTO, options);
+};
+
 exports.newUserSchema = newUserSchema;
 exports.loginSchema = loginSchema;
+exports.userUpdateSchema = userUpdateSchema;

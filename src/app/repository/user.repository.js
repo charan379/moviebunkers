@@ -5,7 +5,7 @@ const UserModel = require("../models/user.model");
  * @param {String} userName
  * @returns userObject or null
  */
-exports.findAllUsers = async (query, page, limit) => {
+exports.findAllUsers = async (query, sort, page, limit) => {
   const projection = {
     password: 0,
     _id: 0,
@@ -16,6 +16,7 @@ exports.findAllUsers = async (query, page, limit) => {
 
   const userList = await UserModel.find(query, projection)
     .limit(limit * 1)
+    .sort(sort)
     .skip((page - 1) * limit);
 
   const result = {
@@ -51,4 +52,17 @@ exports.findByEmail = async (email) => {
  */
 exports.newUser = async (userDTO) => {
   return UserModel.create(userDTO);
+};
+
+// updateUserStatus
+exports.updateUser = async (userName, update) => {
+  const projection = {
+    password: 0,
+    _id: 0,
+    __v: 0,
+  };
+
+  await UserModel.findOneAndUpdate({ userName: userName }, { $set: update });
+
+  return UserModel.findOne({ userName: userName }, projection);
 };

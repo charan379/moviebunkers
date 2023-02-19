@@ -1,3 +1,4 @@
+const { UserStatus } = require("../constants/UserStatus");
 const {
   UserEmailAlreadyExists,
   UserNameAlreadyExists,
@@ -5,14 +6,18 @@ const {
   JoiInvalidLogin,
   UserNameNotFound,
   InvalidUserPassword,
+  JoiInvalidUserUpdate,
+  UserNotFound,
 } = require("../errors/UserErrors");
 const userRepository = require("../repository/user.repository");
 const { generateHash, validateHash } = require("../utils/bcrypt");
-const { UserException } = require("../utils/Exceptions");
+const { buildSortObj } = require("../utils/build.sort.object");
+const { UserException, MovieBunkersException } = require("../utils/Exceptions");
 const { generateJwtToken } = require("../utils/jwt.token");
 const {
   validateNewUser,
   validateLoginObject,
+  validateUserUpdateObject,
 } = require("../validators/user.validator");
 
 /**
@@ -72,6 +77,7 @@ exports.newUser = async (requestBoby) => {
 
 exports.findAll = async (requestQuery) => {
   let query = {};
+  let sort = {createdAt: 'desc'};
   let page = 1;
   let limit = 4;
   // role
@@ -103,9 +109,33 @@ exports.findAll = async (requestQuery) => {
   if (requestQuery.limit) {
     limit = requestQuery.limit;
   }
-  const userList = await userRepository.findAllUsers(query, page, limit);
+
+  // sort_by
+  if (requestQuery.sort_by) {
+    sort = await buildSortObj(requestQuery.sort_by);
+  }
+  const userList = await userRepository.findAllUsers(query, sort, page, limit);
 
   return userList;
+};
+
+exports.updateUser = async (userName, requestBoby) => {
+  const { value: updateDTO, error: error } = await validateUserUpdateObject(
+    requestBoby
+  );
+
+  if (error) {
+    throw new UserException(JoiInvalidUserUpdate(error.message));
+  }
+
+  const user = await userRepository.findByUserName(userName);
+
+  if (!user) {
+    throw new UserException(UserNotFound(userName));
+  }
+
+  const result = await userRepository.updateUser(userName, updateDTO);
+  return result;
 };
 
 exports.userLogin = async (requestBoby) => {

@@ -1,9 +1,8 @@
 const { HttpCodes } = require("../constants/HttpCodes");
 
-
 /**
  * UserNameAlreadyExists Error
- * @param {String} info 
+ * @param {String} info
  * @returns Error Object
  */
 exports.UserNameAlreadyExists = (info) => {
@@ -17,7 +16,7 @@ exports.UserNameAlreadyExists = (info) => {
 
 /**
  * UserEmailAlreadyExists Error
- * @param {String} info 
+ * @param {String} info
  * @returns Error Object
  */
 exports.UserEmailAlreadyExists = (info) => {
@@ -31,7 +30,7 @@ exports.UserEmailAlreadyExists = (info) => {
 
 /**
  * UserNameNotFound Error
- * @param {String} info 
+ * @param {String} info
  * @returns Error Object
  */
 exports.UserNameNotFound = (info) => {
@@ -45,7 +44,7 @@ exports.UserNameNotFound = (info) => {
 
 /**
  * InvalidUserPassword Error
- * @param {String} info 
+ * @param {String} info
  * @returns Error Object
  */
 exports.InvalidUserPassword = (info) => {
@@ -59,7 +58,7 @@ exports.InvalidUserPassword = (info) => {
 
 /**
  * JoiInvalidNewUser Error
- * @param {String} info 
+ * @param {String} info
  * @returns Error Object
  */
 exports.JoiInvalidNewUser = (info) => {
@@ -73,7 +72,7 @@ exports.JoiInvalidNewUser = (info) => {
 
 /**
  * JoiInvalidLogin Error
- * @param {String} info 
+ * @param {String} info
  * @returns Error Object
  */
 exports.JoiInvalidLogin = (info) => {
@@ -85,10 +84,9 @@ exports.JoiInvalidLogin = (info) => {
   };
 };
 
-
 /**
  * UserNotFound Error
- * @param {String} info 
+ * @param {String} info
  * @returns Error Object
  */
 exports.UserNotFound = (info) => {
@@ -97,5 +95,14 @@ exports.UserNotFound = (info) => {
     message: "User Not Found",
     reason: info,
     httpCode: HttpCodes.NOT_FOUND.code,
+  };
+};
+
+exports.JoiInvalidUserUpdate = (info) => {
+  return {
+    code: "USER_JIUU",
+    message: "Invalid User Update",
+    reason: info,
+    httpCode: HttpCodes.BAD_REQUEST.code,
   };
 };
