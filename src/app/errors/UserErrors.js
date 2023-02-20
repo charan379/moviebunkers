@@ -57,6 +57,20 @@ exports.InvalidUserPassword = (info) => {
 };
 
 /**
+ * InactiveUser Error
+ * @param {String} info
+ * @returns Error Object
+ */
+exports.InactiveUser = (info) => {
+  return {
+    code: "USER_IU",
+    message: "Inactive User",
+    reason: "User is Inactive : " + info,
+    httpCode: HttpCodes.OK.code,
+  };
+};
+
+/**
  * JoiInvalidNewUser Error
  * @param {String} info
  * @returns Error Object
