@@ -1,6 +1,13 @@
 const TvModel = require("../models/tv.model");
 
-//  add new tv
-exports.newTv = async (tvObj) => {
+/**
+ * 
+ * @param {Object} tvObj 
+ * @returns 
+ */
+exports.createTv = async (tvObj) => {
+  /**
+   * create new tv document and return it
+   */
   return TvModel.create(tvObj);
 };
