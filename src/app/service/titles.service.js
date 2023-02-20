@@ -1,5 +1,4 @@
 const {
-  InvalidTitleType,
   TitleAlreadyExists,
   InvalidNewTitle,
 } = require("../errors/TitleErrros");
