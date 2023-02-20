@@ -13,12 +13,12 @@ const {
 const userRepository = require("../repository/user.repository");
 const { generateHash, validateHash } = require("../utils/bcrypt");
 const { buildSortObj } = require("../utils/build.sort.object");
-const { UserException, MovieBunkersException } = require("../utils/Exceptions");
+const { UserException } = require("../utils/Exceptions");
 const { generateJwtToken } = require("../utils/jwt.token");
 const {
   validateNewUser,
-  validateLoginObject,
-  validateUserUpdateObject,
+  validateLogin,
+  validateUserUpdate,
 } = require("../validators/user.validator");
 
 /**
@@ -70,72 +70,126 @@ exports.newUser = async (requestBoby) => {
    * and create newUser with userDTO object
    * then await for result and return newUser object
    */
-  return (newUser = await userRepository.newUser({
+  return (newUser = await userRepository.createUser({
     ...userDTO,
     password: hashedPassword,
   }));
 };
 
+/**
+ * findAll users based on given query
+ * @param {Object} requestQuery
+ * @returns
+ */
 exports.findAll = async (requestQuery) => {
-  let query = {};
-  let sort = { createdAt: "desc" };
-  let page = 1;
-  let limit = 5;
+  /**
+   * default values
+   */
+  let query = {}; // query object
+  let sort = { createdAt: "desc" }; // sort object
+  let page = 1; // page number to to retrived
+  let limit = 5; // number of results to retirved per page
 
+  // non query fields ( non keys ) of user document which will come with request query
   const nonQueryFields = ["sort_by", "page", "limit", "minimal"];
 
+  // copy  requestQuery to query
   query = { ...requestQuery };
 
+  // remove all non query fields (non-keys) form query object {}
   nonQueryFields.forEach((element) => {
+    //delete key
     delete query[element];
   });
 
-  // page
+  /**
+   * if page value provided in requestQuery
+   */
   if (requestQuery.page) {
-    page = requestQuery.page;
+    page = requestQuery.page; // change default page number
   }
 
-  // limit
+  /**
+   * if limit value provided in requestQuery
+   */
   if (requestQuery.limit) {
-    limit = requestQuery.limit;
+    limit = requestQuery.limit; // change default limit value
   }
 
-  // sort_by
+  /**
+   * if sort options are provided in requestQuery
+   */
   if (requestQuery.sort_by) {
+    /**
+     * retrive sort option as an object
+     * and
+     * change the sort value with retived sort object
+     */
     sort = await buildSortObj(requestQuery.sort_by);
   }
 
-  const userList = await userRepository.findAllUsers(query, sort, page, limit);
-
-  return userList;
+  /**
+   * finally find all users with query, sort options , page, limit and retrun
+   * Array<Users>
+   */
+  return await userRepository.findAllUsers(query, sort, page, limit);
 };
 
+/**
+ * update user
+ * @param {string} userName
+ * @param {Object} requestBoby
+ * @returns
+ */
 exports.updateUser = async (userName, requestBoby) => {
-  const { value: updateDTO, error: error } = await validateUserUpdateObject(
+  /**
+   * validate request body using joi validators
+   * if it was as requried
+   * store cleaned requestBody in updateDTO,
+   * if there were any any errors store in error variable
+   */
+  const { value: updateDTO, error: error } = await validateUserUpdate(
     requestBoby
   );
 
+  /**
+   * if there were any errors then throw exception
+   */
   if (error) {
     throw new UserException(JoiInvalidUserUpdate(error.message));
   }
 
+  /**
+   * if no errors were thrown
+   * find if user with given userName really exists in our DB , and store in user variable
+   */
   const user = await userRepository.findByUserName(userName);
 
+  /**
+   * if user not found , then throw exception
+   */
   if (!user) {
     throw new UserException(UserNotFound(userName));
   }
 
-  const result = await userRepository.updateUser(userName, updateDTO);
-  return result;
+  /**
+   * if user found and no erros were thrown then update user
+   * and
+   * return updated user object
+   */
+  return await userRepository.updateUser(userName, updateDTO);
 };
 
+/**
+ * user login
+ * @param {Object} requestBoby 
+ * @returns 
+ */
 exports.userLogin = async (requestBoby) => {
   /**
    * destructure value, error into {loginDTO, error} from Joi object validation
    */
-  const { value: loginDTO, error: error } = await validateLoginObject(
-    requestBoby
-  );
+  const { value: loginDTO, error: error } = await validateLogin(requestBoby);
 
   /**
    * if Joi validation errors present then throw a new error of UserException instance
@@ -156,10 +210,6 @@ exports.userLogin = async (requestBoby) => {
     throw new UserException(UserNameNotFound(requestBoby.userName));
   }
 
-  if (userDTO.status === UserStatus.INACTIVE) {
-    throw new UserException(InactiveUser(userDTO.userName));
-  }
-
   /**
    * if user found then validate given password matches with passwordHash in db
    */
@@ -168,11 +218,17 @@ exports.userLogin = async (requestBoby) => {
   }
 
   /**
+   * if retrived user status is Inactive then thrown exception
+   */
+  if (userDTO.status === UserStatus.INACTIVE) {
+    throw new UserException(InactiveUser(userDTO.userName));
+  }
+
+  /**
    * if all above conditions are passed then generate a valid jwt-token
    *
    */
-
-  let token = await generateJwtToken({
+  const token = await generateJwtToken({
     userName: userDTO.userName,
     email: userDTO.email,
     role: userDTO.role,
@@ -183,5 +239,5 @@ exports.userLogin = async (requestBoby) => {
    * if all above conditions are passed then return Valid loginDetails with jwt-token of access
    *
    */
-  return {token};
+  return { token };
 };
