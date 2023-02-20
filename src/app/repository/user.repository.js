@@ -57,7 +57,7 @@ exports.findByEmail = async (email) => {
  * @param {Object} userDTO
  * @returns created userOnbect
  */
-exports.newUser = async (userDTO) => {
+exports.createUser = async (userDTO) => {
   // create new user with userDTO and return created document
   return UserModel.create(userDTO);
 };
@@ -79,9 +79,13 @@ exports.updateUser = async (userName, update) => {
     __v: 0,
   };
 
-  // findOne user with given userName then update user
+  /**
+   * findOne user with given userName then update user
+   */
   await UserModel.findOneAndUpdate({ userName: userName }, { $set: update });
 
-  // after updating user , return the user document with given userName
+  /**
+   * after updating user , return the user document with given userName
+   */
   return UserModel.findOne({ userName: userName }, projection);
 };
