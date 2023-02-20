@@ -90,13 +90,19 @@ exports.findAll = async (requestQuery) => {
   let page = 1; // page number to to retrived
   let limit = 5; // number of results to retirved per page
 
-  // non query fields ( non keys ) of user document which will come with request query
+  /**
+   * non query fields ( non keys ) of user document which will come with request query
+   */
   const nonQueryFields = ["sort_by", "page", "limit", "minimal"];
 
-  // copy  requestQuery to query
+  /**
+   * copy requestQuery to query
+   */
   query = { ...requestQuery };
 
-  // remove all non query fields (non-keys) form query object {}
+  /**
+   * remove all non query fields (non-keys) form query object {}
+   */
   nonQueryFields.forEach((element) => {
     //delete key
     delete query[element];
