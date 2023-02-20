@@ -1,22 +1,50 @@
 const TitleModel = require("../models/titles.model");
 
-// find titles by _id
+/**
+ * find title by objectId _id
+ * @param {ObjectId} id
+ * @returns
+ */
 exports.findById = async (id) => {
+  /**
+   * find title by _id and return it
+   */
   return TitleModel.findById(id);
 };
 
-// get title by tmdb_id
+/**
+ * find title by tmdb_id
+ * @param {Number} tmdb_id
+ * @returns
+ */
 exports.findByTmdbId = async (tmdb_id) => {
+  /**
+   * find title by tmdb_id and return it
+   */
   return TitleModel.findOne({ tmdb_id: tmdb_id });
 };
 
-// get title by imdb_id
+/**
+ * find title by imdb_id
+ * @param {String} imdb_id
+ * @returns
+ */
 exports.findByImdbId = async (imdb_id) => {
+  /**
+   * find title by imdb_id and return it
+   */
   return TitleModel.findOne({ imdb_id: imdb_id });
 };
 
-// get all titles in db with minimal projection
+/**
+ * find all titles by given query
+ * @param {Object} param0
+ * @returns
+ */
 exports.findAllTitles = async ({ query, minimal, sort, page, limit }) => {
+  /**
+   * Minimal Projection
+   */
   const Minimalprojection = {
     _id: 1,
     title_type: 1,
@@ -28,21 +56,32 @@ exports.findAllTitles = async ({ query, minimal, sort, page, limit }) => {
     year: 1,
   };
 
+  /**
+   * count total documents found for given query
+   * and
+   * store count in a variable titlesCount
+   */
   const titlesCount = await TitleModel.find(query).countDocuments();
 
+  /**
+   * retrive all documents with given query
+   * and
+   * store it in titlesList variable
+   */
   const titlesList = await TitleModel.find(
     query,
-    minimal === "true" ? Minimalprojection : {}
+    minimal === "true" ? Minimalprojection : {} // if minimal = true then retrive minimal else retrive all
   )
-    .limit(limit * 1)
-    .sort(sort)
-    .skip((page - 1) * limit);
+    .limit(limit * 1) // number documents to be retrived
+    .sort(sort) // sort options object {}
+    .skip((page - 1) * limit); // number of documents to be skipped
 
-  const result = {
+  return {
+    // current page number
     currentPage: page,
+    // total pages found for given query
     totalPages: Math.ceil(titlesCount / limit),
+    // current page result Array<Title>
     list: titlesList,
   };
-
-  return result;
 };
