@@ -41,3 +41,17 @@ exports.InvalidTitleType = (info) => {
     httpCode: HttpCodes.BAD_REQUEST.code,
   };
 };
+
+/**
+ * InvalidNewTitle Error
+ * @param {String} info
+ * @returns Error Object
+ */
+exports.InvalidNewTitle = (info) => {
+  return {
+    code: "TITLE_IVNT",
+    message: "Can't Create new title",
+    reason: info,
+    httpCode: HttpCodes.BAD_REQUEST.code,
+  };
+};
