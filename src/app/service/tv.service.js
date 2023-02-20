@@ -3,12 +3,31 @@ const { TvException } = require("../utils/Exceptions");
 const { validateTvObject } = require("../validators/tv.validator");
 const tvRepository = require("../repository/tv.repository");
 
-exports.addNewTv = async (requestBody) => {
+/**
+ * newTv
+ * @param {Object} requestBody
+ * @returns
+ */
+exports.newTv = async (requestBody) => {
+  /**
+   * validate requestBody
+   * and
+   * store cleaned body in tvDTO
+   * store errors in error
+   */
   const { value: tvDTO, error: error } = await validateTvObject(requestBody);
 
+  /**
+   * if errors persist throw exception
+   */
   if (error) {
     throw new TvException(JoiInvalidTv(error.message));
   }
 
-  return (newTv = await tvRepository.newTv({ ...tvDTO }));
+  /**
+   * create new tv
+   * and
+   * return it
+   */
+  return await tvRepository.createTv({ ...tvDTO });
 };
