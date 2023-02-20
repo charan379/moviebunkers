@@ -11,7 +11,7 @@ router.get("/", function (req, res, next) {
 
 /**
  * @swagger
- * /users/newUser:
+ * /users/new-user:
  *  post:
  *   tags:
  *     - Users
@@ -30,7 +30,7 @@ router.get("/", function (req, res, next) {
 
  *      
  */
-router.post("/newUser", userControllers.newUser);
+router.post("/new-user", userControllers.newUser);
 
 // get all users
 router.get(
