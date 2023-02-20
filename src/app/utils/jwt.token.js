@@ -17,7 +17,7 @@ exports.generateJwtToken = async (userObj) => {
      * create new jwt token and store in token variable
      */
     token = jwt.sign({ ...userObj }, "secretkeyappearshere", {
-      expiresIn: "1h",
+      expiresIn: "1d",
     });
     /**
      * catch if any error thrown by above process
