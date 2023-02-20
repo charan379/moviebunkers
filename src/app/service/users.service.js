@@ -8,6 +8,7 @@ const {
   InvalidUserPassword,
   JoiInvalidUserUpdate,
   UserNotFound,
+  InactiveUser,
 } = require("../errors/UserErrors");
 const userRepository = require("../repository/user.repository");
 const { generateHash, validateHash } = require("../utils/bcrypt");
@@ -77,28 +78,17 @@ exports.newUser = async (requestBoby) => {
 
 exports.findAll = async (requestQuery) => {
   let query = {};
-  let sort = {createdAt: 'desc'};
+  let sort = { createdAt: "desc" };
   let page = 1;
-  let limit = 4;
-  // role
-  if (requestQuery.role) {
-    query = { ...query, role: requestQuery.role };
-  }
+  let limit = 5;
 
-  // status
-  if (requestQuery.status) {
-    query = { ...query, status: requestQuery.status };
-  }
+  const nonQueryFields = ["sort_by", "page", "limit", "minimal"];
 
-  // userName
-  if (requestQuery.userName) {
-    query = { ...query, userName: requestQuery.userName };
-  }
+  query = { ...requestQuery };
 
-  // email
-  if (requestQuery.email) {
-    query = { ...query, email: requestQuery.email };
-  }
+  nonQueryFields.forEach((element) => {
+    delete query[element];
+  });
 
   // page
   if (requestQuery.page) {
@@ -114,6 +104,7 @@ exports.findAll = async (requestQuery) => {
   if (requestQuery.sort_by) {
     sort = await buildSortObj(requestQuery.sort_by);
   }
+
   const userList = await userRepository.findAllUsers(query, sort, page, limit);
 
   return userList;
@@ -165,6 +156,10 @@ exports.userLogin = async (requestBoby) => {
     throw new UserException(UserNameNotFound(requestBoby.userName));
   }
 
+  if (userDTO.status === UserStatus.INACTIVE) {
+    throw new UserException(InactiveUser(userDTO.userName));
+  }
+
   /**
    * if user found then validate given password matches with passwordHash in db
    */
@@ -181,16 +176,12 @@ exports.userLogin = async (requestBoby) => {
     userName: userDTO.userName,
     email: userDTO.email,
     role: userDTO.role,
+    status: userDTO.status,
   });
 
   /**
    * if all above conditions are passed then return Valid loginDetails with jwt-token of access
    *
    */
-  return (loginDetails = {
-    userName: userDTO.userName,
-    email: userDTO.email,
-    role: userDTO.role,
-    token: token,
-  });
+  return {token};
 };

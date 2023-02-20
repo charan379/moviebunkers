@@ -118,9 +118,7 @@ exports.userLogin = async (req, res, next) => {
     /**
      * destructure user loginDetails into { userName, email, role, token } after login
      */
-    const { userName, email, role, token } = await usersService.userLogin(
-      req.body
-    );
+    const result = await usersService.userLogin(req.body);
 
     /**
      * send HttpResponse with status code 200 and json obj in format of
@@ -137,12 +135,7 @@ exports.userLogin = async (req, res, next) => {
     res
       .status(200) // HttpCode 200
       // .json({ success: true, loginDetails: { userName, email, role, token } }); // HttpResponse in json format
-      .json(
-        SuccessResponse({
-          token: token,
-          userDetails: { userName, email, role },
-        })
-      );
+      .json(SuccessResponse(result));
   } catch (error) {
     // catch if there was any error
     if (error instanceof MovieBunkersException) {
