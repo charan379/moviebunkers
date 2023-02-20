@@ -5,11 +5,6 @@ exports.findById = async (id) => {
   return TitleModel.findById(id);
 };
 
-// get all titles in db
-exports.findAll = async () => {
-  return TitleModel.find({});
-};
-
 // get title by tmdb_id
 exports.findByTmdbId = async (tmdb_id) => {
   return TitleModel.findOne({ tmdb_id: tmdb_id });
@@ -21,8 +16,8 @@ exports.findByImdbId = async (imdb_id) => {
 };
 
 // get all titles in db with minimal projection
-exports.findAllMinimal = async () => {
-  const projection = {
+exports.findAllTitles = async ({ query, minimal, sort, page, limit }) => {
+  const Minimalprojection = {
     _id: 1,
     title_type: 1,
     source: 1,
@@ -32,5 +27,22 @@ exports.findAllMinimal = async () => {
     poster_path: 1,
     year: 1,
   };
-  return TitleModel.find({}, projection);
+
+  const titlesCount = await TitleModel.find(query).countDocuments();
+
+  const titlesList = await TitleModel.find(
+    query,
+    minimal === "true" ? Minimalprojection : {}
+  )
+    .limit(limit * 1)
+    .sort(sort)
+    .skip((page - 1) * limit);
+
+  const result = {
+    currentPage: page,
+    totalPages: Math.ceil(titlesCount / limit),
+    list: titlesList,
+  };
+
+  return result;
 };

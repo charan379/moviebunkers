@@ -10,6 +10,7 @@ const movieService = require("./movies.service");
 const tvService = require("./tv.service");
 const titlesRepository = require("../repository/titles.repository");
 const { json } = require("express");
+const { buildSortObj } = require("../utils/build.sort.object");
 
 exports.newTitle = async (requestBody) => {
   const title_type = requestBody.title_type;
@@ -44,11 +45,42 @@ exports.newTitle = async (requestBody) => {
   }
 };
 
-exports.findAllMinimal = async () => {
-  const result = await titlesRepository.findAllMinimal();
-  if (result.length > 0) {
-    return result;
-  } else {
-    throw new MovieBunkersException(TitleNotFound("get all"));
+exports.findAll = async (requestQuery) => {
+  let query = {};
+  let sort = { createdAt: "desc" };
+  let page = 1;
+  let limit = 5;
+  let minimal = 'false';
+
+  const nonQueryFields = ["sort_by", "page", "limit", "minimal"];
+
+  query = { ...requestQuery };
+
+  nonQueryFields.forEach((element) => {
+    delete query[element];
+  });
+
+  // page
+  if (requestQuery.page) {
+    page = requestQuery.page;
   }
+
+  // limit
+  if (requestQuery.limit) {
+    limit = requestQuery.limit;
+  }
+
+  // sort_by
+  if (requestQuery.sort_by) {
+    sort = await buildSortObj(requestQuery.sort_by);
+  }
+
+  // minimal
+  if (requestQuery.minimal) {
+    minimal = requestQuery.minimal;
+  }
+
+  const result = await titlesRepository.findAllTitles({query,minimal,sort, page, limit});
+
+  return result;
 };

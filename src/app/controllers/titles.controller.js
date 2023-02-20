@@ -38,8 +38,8 @@ exports.addNewMovie = async (req, res, next) => {
 
 exports.getAllTitles = async (req, res, next) => {
   try {
-    const result = await titlesService.findAllMinimal();
-    res.status(200).json(SuccessResponse([...result]));
+    const result = await titlesService.findAll(req.query);
+    res.status(200).json(SuccessResponse(result));
   } catch (error) {
     // catch if there was any error
     if (error instanceof MovieBunkersException) {
