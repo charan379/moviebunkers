@@ -45,7 +45,7 @@ const loginSchema = Joi.object({
  * @param {Object} loginDTO
  * @returns
  */
-exports.validateLoginObject = async (loginDTO) => {
+exports.validateLogin = async (loginDTO) => {
   return loginSchema.validate(loginDTO, options);
 };
 
@@ -54,7 +54,7 @@ const userUpdateSchema = Joi.object({
   role: Joi.string().valid(...[Roles.MODERATOR, Roles.USER, Roles.ADMIN]),
 });
 
-exports.validateUserUpdateObject = async (userUpdateDTO) => {
+exports.validateUserUpdate = async (userUpdateDTO) => {
   return userUpdateSchema.validate(userUpdateDTO, options);
 };
 
