@@ -12,7 +12,7 @@ router.use("/titles", titlesRouter);
  * unknown route
  */
 router.use("/*", function (req, res, next) {
-  res.status(404).json(ErrorResponse("Requested Endpoint doesn't exit"));
+  res.status(404).json(ErrorResponse("Requested api Endpoint doesn't exit"));
 });
 
 
