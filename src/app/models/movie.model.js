@@ -108,12 +108,10 @@ const movieSchema = new mongoose.Schema(
       _id: false,
     },
     added_by: {
-      type: Object,
-      _id: false,
+      type: String,
     },
     last_modified_by: {
-      type: Object,
-      _id: false,
+      type: String,
     },
   },
   {

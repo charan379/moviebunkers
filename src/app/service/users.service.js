@@ -147,14 +147,14 @@ exports.findAll = async (requestQuery) => {
  * @param {Object} requestBoby
  * @returns
  */
-exports.updateUser = async (userName, requestBoby) => {
+exports.updateUser = async (userName, requestBoby, authentication) => {
   /**
    * validate request body using joi validators
    * if it was as requried
    * store cleaned requestBody in updateDTO,
    * if there were any any errors store in error variable
    */
-  const { value: updateDTO, error: error } = await validateUserUpdate(
+  let { value: updateDTO, error: error } = await validateUserUpdate(
     requestBoby
   );
 
@@ -179,6 +179,10 @@ exports.updateUser = async (userName, requestBoby) => {
   }
 
   /**
+   * append titleDTO with last_modified_by userName
+   */
+  updateDTO = { ...updateDTO, last_modified_by: authentication.userName };
+  /**
    * if user found and no erros were thrown then update user
    * and
    * return updated user object
@@ -188,8 +192,8 @@ exports.updateUser = async (userName, requestBoby) => {
 
 /**
  * user login
- * @param {Object} requestBoby 
- * @returns 
+ * @param {Object} requestBoby
+ * @returns
  */
 exports.userLogin = async (requestBoby) => {
   /**

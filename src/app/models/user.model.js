@@ -28,6 +28,9 @@ const userSchema = new mongoose.Schema(
       enum: Object.values(Roles),
       default: Roles.USER,
     },
+    last_modified_by: {
+      type: String,
+    },
   },
   {
     timestamps: {

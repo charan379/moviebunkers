@@ -108,7 +108,8 @@ exports.updateUser = async (req, res, next) => {
      */
     const updatedUser = await usersService.updateUser(
       req.params.userName,
-      req.body
+      req.body,
+      req.authentication
     );
 
     /**
@@ -178,12 +179,4 @@ exports.userLogin = async (req, res, next) => {
         .json(ErrorResponse(error)); // Http Response in json format
     }
   }
-};
-
-
-/**
- * test
- */
-exports.testToken = async (req, res, next) => {
-  res.status(200).json({ ...req.authentication });
 };

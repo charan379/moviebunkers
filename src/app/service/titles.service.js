@@ -15,14 +15,14 @@ const { TitleSources } = require("../constants/TitleSources");
  * @param {Object} requestBody
  * @returns
  */
-exports.newTitle = async (requestBody) => {
+exports.newTitle = async (requestBody, authentication) => {
   /**
    * validate requestBody
    * and
    * store requestBody in titleDTO
    * errors in error
    */
-  const { value: titleDTO, error: error } = await validateTitleObject(
+  let { value: titleDTO, error: error } = await validateTitleObject(
     requestBody
   );
 
@@ -91,13 +91,16 @@ exports.newTitle = async (requestBody) => {
       );
     }
   }
-
+  /**
+   * append titleDTO with added_by userName
+   */
+  titleDTO = { ...titleDTO, added_by: authentication.userName };
   /**
    * if title_type === movie
    * then add new movie and return it
    */
   if (title_type === "movie") {
-    return await movieService.newMovie(requestBody);
+    return await movieService.newMovie(titleDTO);
   }
 
   /**
@@ -105,7 +108,7 @@ exports.newTitle = async (requestBody) => {
    * then add new tv and return it
    */
   if (title_type === "tv") {
-    return await tvService.newTv(requestBody);
+    return await tvService.newTv(titleDTO);
   }
 };
 
@@ -175,7 +178,7 @@ exports.findAll = async (requestQuery) => {
     minimal = requestQuery.minimal; // change default minimal value
   }
 
-   /**
+  /**
    * finally find all title with query, sort options , page, limit , minimal  and retrun
    * Array<Titles>
    */

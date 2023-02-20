@@ -44,7 +44,7 @@ router.get("/", function (req, res, next) {
 router.post(
   "/newTitle",
   authorize(Roles.MODERATOR),
-  titlesController.addNewMovie
+  titlesController.newTitle
 );
 
 router.get("/getAllTitles", titlesController.getAllTitles);

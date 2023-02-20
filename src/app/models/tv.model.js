@@ -149,13 +149,11 @@ const tvSchema = new mongoose.Schema(
     },
     // added_by
     added_by: {
-      type: Object,
-      _id: false,
+      type: String,
     },
     // last_modified_by
     last_modified_by: {
-      type: Object,
-      _id: false,
+      type: String,
     },
   },
   {

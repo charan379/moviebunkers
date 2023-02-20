@@ -3,18 +3,29 @@ const ErrorResponse = require("../utils/ErrorResponse");
 const { MovieBunkersException } = require("../utils/Exceptions");
 const SuccessResponse = require("../utils/SuccessResponse");
 
-exports.addNewMovie = async (req, res, next) => {
+/**
+ * newTitle create new title
+ * @param {HttpRequest} req
+ * @param {HttpResponse} res
+ * @param {Function} next
+ */
+exports.newTitle = async (req, res, next) => {
+  /**
+   * try to create new title
+   */
   try {
-    const { _id, title, title_type } = await titlesService.newTitle(req.body);
-    res.status(200).json(
-      SuccessResponse({
-        movie: {
-          _id,
-          title,
-          title_type,
-        },
-      })
-    );
+    /**
+     * create new title
+     * and
+     * get _id, title, title_type from created title
+     */
+    const { _id, title, title_type } = await titlesService.newTitle(req.body, req.authentication);
+
+    /**
+     * respond with status code 200
+     * and json body as response
+     */
+    res.status(201).json(SuccessResponse({ _id, title, title_type }));
   } catch (error) {
     // catch if there was any error
     if (error instanceof MovieBunkersException) {
@@ -36,10 +47,27 @@ exports.addNewMovie = async (req, res, next) => {
   }
 };
 
+/**
+ * getAllTitles
+ * @param {HttpRequest} req 
+ * @param {HttpResponse} res 
+ * @param {Function} next
+ */
 exports.getAllTitles = async (req, res, next) => {
+  /**
+   * try to get all titles
+   */
   try {
-    const result = await titlesService.findAll(req.query);
-    res.status(200).json(SuccessResponse(result));
+    /**
+     * get all titles and store it in variable titlesList
+     */
+    const titlesList = await titlesService.findAll(req.query);
+    /**
+     * respond with status code 200
+     * and
+     * response body in json format
+     */
+    res.status(200).json(SuccessResponse(titlesList));
   } catch (error) {
     // catch if there was any error
     if (error instanceof MovieBunkersException) {

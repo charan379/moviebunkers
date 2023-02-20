@@ -68,5 +68,4 @@ router.put(
  */
 router.post("/login", userControllers.userLogin);
 
-router.get("/test", authorize(Roles.ADMIN), userControllers.testToken);
 module.exports = router;
