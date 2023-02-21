@@ -5,7 +5,7 @@ const UserModel = require("../models/user.model");
  * @param {String} userName
  * @returns userObject or null
  */
-exports.findAll = async (query, sort, page, limit) => {
+exports.findAll = async ({query, sort, page, limit}) => {
   /**
    * key values to be retived
    */

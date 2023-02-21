@@ -154,7 +154,7 @@ exports.findAll = async (requestQuery) => {
    * finally find all users with query, sort options , page, limit and retrun
    * Array<Users>
    */
-  return await userRepository.findAll(query, sort, page, limit);
+  return await userRepository.findAll({query, sort, page, limit});
 };
 
 /**
