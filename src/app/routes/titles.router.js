@@ -4,14 +4,14 @@ const router = express.Router();
 const titlesController = require("../controllers/titles.controller");
 const { Roles } = require("../constants/UserRoles");
 
-/* GET home page. */
-router.get("/", function (req, res, next) {
-  res.render("index", { title: "movies" });
-});
+// /* GET home page. */
+// router.get("/", function (req, res, next) {
+//   res.render("index", { title: "movies" });
+// });
 
 /**
  * @swagger
- * /titles/newTitle:
+ * /titles/new-title:
  *  post:
  *   tags:
  *     - Titles
@@ -38,14 +38,13 @@ router.get("/", function (req, res, next) {
  *          description: Success
  *       404:
  *          description: Invalid new title
-
  *      
  */
 router.post(
-  "/newTitle",
+  "/new-title",
   authorize(Roles.MODERATOR),
   titlesController.newTitle
 );
 
-router.get("/getAllTitles", titlesController.getAllTitles);
+router.get("/get-all-titles", titlesController.getAllTitles);
 module.exports = router;

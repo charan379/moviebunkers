@@ -1,5 +1,7 @@
 const Joi = require("joi");
-const { emailSchema } = require("./joi.schemas");
+const { Roles } = require("../constants/UserRoles");
+const { UserStatus } = require("../constants/UserStatus");
+const { emailSchema, userNameSchema } = require("./joi.schemas");
 
 /**
  * joi options
@@ -10,20 +12,20 @@ const options = {
   allowUnknown: true,
 };
 
-exports.getAllUsersQueryParams = {
+const getAllUsersQueryParams = {
   role: Joi.string().valid(...Object.values(Roles)),
   status: Joi.string().valid(...Object.values(UserStatus)),
   email: emailSchema,
-  page: pageSchema,
+  page: Joi.number().integer().example(1),
   userName: userNameSchema,
-  limit: limitSchema,
-  sort_by: sortBySchema,
+  limit: Joi.number().integer().example(5),
+  sort_by: Joi.string().example("role.desc"),
 };
 
-exports.getAllUsersQuerySchema = Joi.object({
-  ...this.getAllUsersQueryParams,
+const getAllUsersQuerySchema = Joi.object({
+  ...getAllUsersQueryParams,
 });
 
 exports.validateGetAllUsersQueryObject = async (queryObject) => {
-  return ggetAllUsersQuerySchema.validate(queryObject, options);
+  return getAllUsersQuerySchema.validate(queryObject, options);
 };

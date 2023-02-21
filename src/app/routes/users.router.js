@@ -4,10 +4,10 @@ const router = express.Router();
 const userControllers = require("../controllers/user.controllers");
 const { authorize } = require("../middlewares/authorize.middleware");
 
-/* GET users listing. */
-router.get("/", function (req, res, next) {
-  res.send("working");
-});
+// /* GET users listing. */
+// router.get("/", function (req, res, next) {
+//   res.send("working");
+// });
 
 /**
  * @swagger
@@ -27,18 +27,85 @@ router.get("/", function (req, res, next) {
  *          description: Success
  *       404:
  *          description: Invalid new user
-
- *      
  */
 router.post("/new-user", userControllers.newUser);
 
-// get all users
+/**
+ * @swagger
+ * /users/get-all-users:
+ *  get:
+ *   tags:
+ *     - Users
+ *   summary: API to to get all users
+ *   description: return users for given query
+ *   parameters:
+ *      - in: query
+ *        name: role
+ *        schema:
+ *          type: string
+ *          enum: ['Admin','User','Moderator']
+ *      - in: query
+ *        name: status
+ *        schema:
+ *          type: string
+ *          enum: ['Active', 'Inactive']
+ *      - in: query
+ *        name: email
+ *        schema:
+ *          type: email
+ *      - in: query
+ *        name: userName
+ *        schema:
+ *         type: string
+ *      - in: query
+ *        name: page
+ *        schema:
+ *          type: integer
+ *      - in: query
+ *        name: limit
+ *        schema:
+ *          type: integer
+ *      - in: query
+ *        name: sort_by
+ *        schema:
+ *          type: string
+ *
+ *   responses:
+ *       200:
+ *          description: Success
+ *       404:
+ *          description: Invalid new user
+ */
 router.get(
   "/get-all-users",
   authorize(Roles.SUPERADMIN),
   userControllers.getAllUsers
 );
 
+/**
+ * @swagger
+ * /users/update-user/{userName}:
+ *  put:
+ *   tags:
+ *     - Users
+ *   summary: API to update user role, status
+ *   description: can update user status and role
+ *   parameters:
+ *     - in: path
+ *       name: userName
+ *       schema:
+ *          type: string
+ *   requestBody:
+ *      content:
+ *        application/json:
+ *          schema:
+ *              $ref: '#/components/schemas/userUpdateSchema'
+ *   responses:
+ *       200:
+ *          description: Success
+ *       404:
+ *          description: Invalid new user
+ */
 router.put(
   "/update-user/:userName",
   authorize(Roles.ADMIN),
@@ -63,8 +130,7 @@ router.put(
  *          description: Success
  *       404:
  *          description: Invalid new user
- *
- *
+ *   security: []
  */
 router.post("/login", userControllers.userLogin);
 

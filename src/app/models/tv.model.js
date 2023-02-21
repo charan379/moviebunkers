@@ -67,6 +67,14 @@ const tvSchema = new mongoose.Schema(
     runtime: {
       type: String,
     },
+    // ratting
+    ratting: {
+      type: Number
+    },
+    // age_ratting
+    age_ratting: {
+      type: Number
+    },
     // genres
     genres: {
       type: [String],
@@ -157,13 +165,11 @@ const tvSchema = new mongoose.Schema(
     },
   },
   {
-    collection: "titles",
-  },
-  {
     timestamps: {
       createdAt: true,
       updatedAt: true,
     },
+    collection: "titles",
   }
 );
 

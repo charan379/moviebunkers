@@ -10,16 +10,20 @@ const {
   UserNotFound,
   InactiveUser,
 } = require("../errors/UserErrors");
+const {
+  validateGetAllUsersQueryObject,
+} = require("../validators/getAllUsers.validator");
 const userRepository = require("../repository/user.repository");
 const { generateHash, validateHash } = require("../utils/bcrypt");
 const { buildSortObj } = require("../utils/build.sort.object");
-const { UserException } = require("../utils/Exceptions");
+const { UserException, MovieException } = require("../utils/Exceptions");
 const { generateJwtToken } = require("../utils/jwt.token");
 const {
   validateNewUser,
   validateLogin,
   validateUserUpdate,
 } = require("../validators/user.validator");
+const { InvalidQuery } = require("../errors/CommonErrors");
 
 /**
  * newUser Service function
@@ -91,6 +95,18 @@ exports.findAll = async (requestQuery) => {
   let limit = 5; // number of results to retirved per page
 
   /**
+   * validate request query
+   */
+  let { value: queryDTO, error: error } = await
+    validateGetAllUsersQueryObject(requestQuery);
+
+    /**
+     * if any errors in request query then throw error
+     */
+    if(error){
+      throw new MovieException(InvalidQuery(error.message))
+    }
+  /**
    * non query fields ( non keys ) of user document which will come with request query
    */
   const nonQueryFields = ["sort_by", "page", "limit", "minimal"];
@@ -98,7 +114,7 @@ exports.findAll = async (requestQuery) => {
   /**
    * copy requestQuery to query
    */
-  query = { ...requestQuery };
+  query = { ...queryDTO };
 
   /**
    * remove all non query fields (non-keys) form query object {}
@@ -111,34 +127,34 @@ exports.findAll = async (requestQuery) => {
   /**
    * if page value provided in requestQuery
    */
-  if (requestQuery.page) {
-    page = requestQuery.page; // change default page number
+  if (queryDTO.page) {
+    page = queryDTO.page; // change default page number
   }
 
   /**
    * if limit value provided in requestQuery
    */
-  if (requestQuery.limit) {
-    limit = requestQuery.limit; // change default limit value
+  if (queryDTO.limit) {
+    limit = queryDTO.limit; // change default limit value
   }
 
   /**
    * if sort options are provided in requestQuery
    */
-  if (requestQuery.sort_by) {
+  if (queryDTO.sort_by) {
     /**
      * retrive sort option as an object
      * and
      * change the sort value with retived sort object
      */
-    sort = await buildSortObj(requestQuery.sort_by);
+    sort = await buildSortObj(queryDTO.sort_by);
   }
 
   /**
    * finally find all users with query, sort options , page, limit and retrun
    * Array<Users>
    */
-  return await userRepository.findAllUsers(query, sort, page, limit);
+  return await userRepository.findAll(query, sort, page, limit);
 };
 
 /**

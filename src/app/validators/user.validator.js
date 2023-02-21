@@ -1,6 +1,11 @@
 const Joi = require("joi");
 const { Roles } = require("../constants/UserRoles");
 const { UserStatus } = require("../constants/UserStatus");
+const {
+  passwordSchema,
+  userNameSchema,
+  emailSchema,
+} = require("./joi.schemas");
 
 /**
  * joi options
@@ -15,9 +20,9 @@ const options = {
  *
  */
 const newUserSchema = Joi.object({
-  userName: Joi.string().min(5).max(16).required().example("user00001"),
-  email: Joi.string().email().required().example("user00001@gmail.com"),
-  password: Joi.string().min(8).max(16).required().example("!5tr0ng@pa55w0rd"),
+  userName: userNameSchema.required(),
+  email: emailSchema.required(),
+  password: passwordSchema.required(),
   // role: Joi.string().valid(...Object.values(Roles)),
   role: Joi.string().valid(Roles.USER),
   status: Joi.string().valid(UserStatus.ACTIVE),
@@ -36,8 +41,8 @@ exports.validateNewUser = async (userDTO) => {
  * loginSchema
  */
 const loginSchema = Joi.object({
-  userName: Joi.string().min(5).max(16).required().example("user00001"),
-  password: Joi.string().min(8).max(16).required().example("!5tr0ng@pa55w0rd"),
+  userName: userNameSchema.required(),
+  password: passwordSchema.required(),
 });
 
 /**

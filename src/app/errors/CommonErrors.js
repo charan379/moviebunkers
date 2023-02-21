@@ -13,3 +13,17 @@ exports.NotFound404 = (info) => {
     httpCode: HttpCodes.NOT_FOUND.code,
   };
 };
+
+/**
+ * InvalidQuery Error
+ * @param {String} info
+ * @returns Error Object
+ */
+exports.InvalidQuery = (info) => {
+  return {
+    code: "COM_IQ",
+    message: "Request query is invalid",
+    reason: "erros : " + info,
+    httpCode: HttpCodes.BAD_REQUEST.code,
+  };
+};

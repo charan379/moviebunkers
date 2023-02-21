@@ -35,39 +35,51 @@ const movieSchema = Joi.object({
   // languages
   languages: Joi.array().items(languageSchema),
   // tagline
-  tagline: Joi.string().example("Mischief. Mayhem. Soap"),
+  tagline: Joi.string().example("Mischief. Mayhem. Soap").allow(null).allow(""),
   // poster_path
-  poster_path: Joi.string().example(
-    "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg"
-  ),
+  poster_path: Joi.string()
+    .example("https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg")
+    .allow(null)
+    .allow(""),
   // year
   year: Joi.number().integer().example(1999),
   // runtime
   runtime: Joi.number().integer().example(139),
+  // ratting
+  ratting: Joi.number().allow(null).allow(""),
+  // age_ratting
+  age_ratting: Joi.number(),
   // genres
-  genres: Joi.array().items(Joi.string().example("Thriller")),
+  genres: Joi.array().items(Joi.string().example("Thriller")).allow(null),
   // overview
-  overview: Joi.string().example(
-    'A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy. Their concept catches on, with underground "fight clubs" forming in every town, until an eccentric gets in the way and ignites an out-of-control spiral toward oblivion.'
-  ),
+  overview: Joi.string()
+    .example(
+      'A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy. Their concept catches on, with underground "fight clubs" forming in every town, until an eccentric gets in the way and ignites an out-of-control spiral toward oblivion.'
+    )
+    .allow(null)
+    .allow(""),
   // production_companies
-  production_companies: Joi.array().items(
-    Joi.string().example("20th Century Fox")
-  ),
+  production_companies: Joi.array()
+    .items(Joi.string().example("20th Century Fox"))
+    .allow(null),
   // production_countries
-  production_countries: Joi.array().items(
-    Joi.string().example("United States of America")
-  ),
+  production_countries: Joi.array()
+    .items(Joi.string().example("United States of America"))
+    .allow(null),
   // status
   status: Joi.string().example("Released"),
   // release_date
   release_date: Joi.date().example("1999-10-15"),
   // providers
-  providers: Joi.array().items(Joi.string().example("Amazon Prime")),
+  providers: Joi.array()
+    .items(Joi.string().example("Amazon Prime"))
+    .allow(null),
   // directors
-  directors: Joi.array().items(Joi.string().example("David Fincher")),
+  directors: Joi.array()
+    .items(Joi.string().example("David Fincher"))
+    .allow(null),
   // cast
-  cast: Joi.array().items(castSchema),
+  cast: Joi.array().items(castSchema).allow(null),
   // added_by
   added_by: Joi.string().example("user001"),
   // last_modified_by
