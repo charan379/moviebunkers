@@ -2,13 +2,17 @@ const {
   TitleAlreadyExists,
   InvalidNewTitle,
 } = require("../errors/TitleErrros");
-const { TitleException } = require("../utils/Exceptions");
+const { TitleException, MovieException } = require("../utils/Exceptions");
 const movieService = require("./movies.service");
 const tvService = require("./tv.service");
 const titlesRepository = require("../repository/titles.repository");
 const { buildSortObj } = require("../utils/build.sort.object");
 const { validateTitleObject } = require("../validators/title.validator");
 const { TitleSources } = require("../constants/TitleSources");
+const {
+  validateGetAllTitlesQueryObject,
+} = require("../validators/getAlltitles.validator");
+const { InvalidQuery } = require("../errors/CommonErrors");
 
 /**
  * new title
@@ -128,6 +132,21 @@ exports.findAll = async (requestQuery) => {
   let minimal = "false"; // projection type to be retrived
 
   /**
+   * validate request query
+   */
+
+  let { value: queryDTO, error: error } = await validateGetAllTitlesQueryObject(
+    requestQuery
+  );
+
+  /**
+   * if any errors in request query then throw error
+   */
+  if (error) {
+    throw new MovieException(InvalidQuery(error.message));
+  }
+
+  /**
    * non query fields ( non keys ) of user document which will come with request query
    */
   const nonQueryFields = ["sort_by", "page", "limit", "minimal"];
@@ -135,7 +154,7 @@ exports.findAll = async (requestQuery) => {
   /**
    * copy requestQuery to query
    */
-  query = { ...requestQuery };
+  query = { ...queryDTO };
 
   /**
    * remove all non query fields (non-keys) form query object {}
@@ -148,41 +167,41 @@ exports.findAll = async (requestQuery) => {
   /**
    * if page value provided in requestQuery
    */
-  if (requestQuery.page) {
-    page = requestQuery.page; // change default page number
+  if (queryDTO.page) {
+    page = queryDTO.page; // change default page number
   }
 
   /**
    * if limit value provided in requestQuery
    */
-  if (requestQuery.limit) {
-    limit = requestQuery.limit; // change default limit value
+  if (queryDTO.limit) {
+    limit = queryDTO.limit; // change default limit value
   }
 
   /**
    * if sort options are provided in requestQuery
    */
-  if (requestQuery.sort_by) {
+  if (queryDTO.sort_by) {
     /**
      * retrive sort option as an object
      * and
      * change the sort value with retived sort object
      */
-    sort = await buildSortObj(requestQuery.sort_by);
+    sort = await buildSortObj(queryDTO.sort_by);
   }
 
   /**
    * if minimal projection is true
    */
-  if (requestQuery.minimal) {
-    minimal = requestQuery.minimal; // change default minimal value
+  if (queryDTO.minimal) {
+    minimal = queryDTO.minimal; // change default minimal value
   }
 
   /**
    * finally find all title with query, sort options , page, limit , minimal  and retrun
    * Array<Titles>
    */
-  return await titlesRepository.findAllTitles({
+  return await titlesRepository.findAll({
     query,
     minimal,
     sort,

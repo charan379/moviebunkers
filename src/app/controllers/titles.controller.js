@@ -1,3 +1,4 @@
+const { json } = require("express");
 const titlesService = require("../service/titles.service");
 const ErrorResponse = require("../utils/ErrorResponse");
 const { MovieBunkersException } = require("../utils/Exceptions");
@@ -19,7 +20,10 @@ exports.newTitle = async (req, res, next) => {
      * and
      * get _id, title, title_type from created title
      */
-    const { _id, title, title_type } = await titlesService.newTitle(req.body, req.authentication);
+    const { _id, title, title_type } = await titlesService.newTitle(
+      req.body,
+      req.authentication
+    );
 
     /**
      * respond with status code 200
@@ -49,8 +53,8 @@ exports.newTitle = async (req, res, next) => {
 
 /**
  * getAllTitles
- * @param {HttpRequest} req 
- * @param {HttpResponse} res 
+ * @param {HttpRequest} req
+ * @param {HttpResponse} res
  * @param {Function} next
  */
 exports.getAllTitles = async (req, res, next) => {

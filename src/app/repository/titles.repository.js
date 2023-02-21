@@ -41,7 +41,7 @@ exports.findByImdbId = async (imdb_id) => {
  * @param {Object} param0
  * @returns
  */
-exports.findAllTitles = async ({ query, minimal, sort, page, limit }) => {
+exports.findAll = async ({ query, minimal, sort, page, limit }) => {
   /**
    * Minimal Projection
    */
@@ -54,6 +54,7 @@ exports.findAllTitles = async ({ query, minimal, sort, page, limit }) => {
     title: 1,
     poster_path: 1,
     year: 1,
+    ratting: 1,
   };
 
   /**
@@ -70,7 +71,7 @@ exports.findAllTitles = async ({ query, minimal, sort, page, limit }) => {
    */
   const titlesList = await TitleModel.find(
     query,
-    minimal === "true" ? Minimalprojection : {} // if minimal = true then retrive minimal else retrive all
+    minimal === true ? Minimalprojection : {} // if minimal = true then retrive minimal else retrive all
   )
     .limit(limit * 1) // number documents to be retrived
     .sort(sort) // sort options object {}
