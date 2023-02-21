@@ -97,15 +97,15 @@ exports.findAll = async (requestQuery) => {
   /**
    * validate request query
    */
-  let { value: queryDTO, error: error } = await
-    validateGetAllUsersQueryObject(requestQuery);
-
-    /**
-     * if any errors in request query then throw error
-     */
-    if(error){
-      throw new MovieException(InvalidQuery(error.message))
-    }
+  let { value: queryDTO, error: error } = await validateGetAllUsersQueryObject(
+    requestQuery
+  );
+  /**
+   * if any errors in request query then throw error
+   */
+  if (error) {
+    throw new MovieException(InvalidQuery(error.message));
+  }
   /**
    * non query fields ( non keys ) of user document which will come with request query
    */
@@ -154,7 +154,7 @@ exports.findAll = async (requestQuery) => {
    * finally find all users with query, sort options , page, limit and retrun
    * Array<Users>
    */
-  return await userRepository.findAll({query, sort, page, limit});
+  return await userRepository.findAll({ query, sort, page, limit });
 };
 
 /**
