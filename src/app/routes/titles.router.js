@@ -46,5 +46,46 @@ router.post(
   titlesController.newTitle
 );
 
+
+/**
+ * @swagger
+ * /titles/get-all-titles:
+ *  get:
+ *   tags:
+ *     - Titles
+ *   summary: API to to get all titles
+ *   description: return list of titles for given query
+ *   parameters:
+ *      - in: query
+ *        name: search
+ *        schema:
+ *          type: string
+ *      - in: query
+ *        name: minimal
+ *        schema:
+ *          type: boolean
+ *      - in: query
+ *        name: year
+ *        schema:
+ *          type: number
+ *      - in: query
+ *        name: page
+ *        schema:
+ *          type: integer
+ *      - in: query
+ *        name: limit
+ *        schema:
+ *          type: integer
+ *      - in: query
+ *        name: sort_by
+ *        schema:
+ *          type: string
+ *
+ *   responses:
+ *       200:
+ *          description: Success
+ *       404:
+ *          description: Invalid new user
+ */
 router.get("/get-all-titles", titlesController.getAllTitles);
 module.exports = router;
