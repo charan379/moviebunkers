@@ -79,9 +79,11 @@ exports.findAll = async ({ query, minimal, sort, page, limit }) => {
 
   return {
     // current page number
-    currentPage: page,
+    page: page,
     // total pages found for given query
-    totalPages: Math.ceil(titlesCount / limit),
+    total_pages: Math.ceil(titlesCount / limit),
+    // total results
+    total_results: titlesCount,
     // current page result Array<Title>
     list: titlesList,
   };

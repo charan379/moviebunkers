@@ -5,7 +5,7 @@ const UserModel = require("../models/user.model");
  * @param {String} userName
  * @returns userObject or null
  */
-exports.findAll = async ({query, sort, page, limit}) => {
+exports.findAll = async ({ query, sort, page, limit }) => {
   /**
    * key values to be retived
    */
@@ -26,8 +26,9 @@ exports.findAll = async ({query, sort, page, limit}) => {
 
   // return retrived users list along with currentPage, totalPages, Array<user> list
   return {
-    currentPage: page,
-    totalPages: Math.ceil(usersCount / limit),
+    page: page,
+    total_pages: Math.ceil(usersCount / limit),
+    total_results: usersCount,
     list: userList,
   };
 };
@@ -48,7 +49,7 @@ exports.findByUserName = async (userName) => {
  * @returns userObject or null
  */
 exports.findByEmail = async (email) => {
-    //retun user document which is found for given email
+  //retun user document which is found for given email
   return UserModel.findOne({ email: email });
 };
 
@@ -66,10 +67,9 @@ exports.createUser = async (userDTO) => {
  * update user with given update object {}
  * @param {*} userName userName index
  * @param {*} update object
- * @returns 
+ * @returns
  */
 exports.updateUser = async (userName, update) => {
-
   /**
    * key values to be retived
    */
