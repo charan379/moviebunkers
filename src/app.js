@@ -9,6 +9,7 @@ const apiRouter = require("./app/routes/api.router");
 const establishDbConnection = require("./app/utils/db");
 const swaggerUi = require("swagger-ui-express");
 const { swaggerDocs } = require("./app/swagger/swagger.options");
+const { Config } = require("./config");
 const app = express();
 
 // db connection
@@ -24,13 +25,13 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser(Config.COOKIE_SECRET));
 app.use(stylus.middleware(path.join(__dirname, "../public")));
 app.use(express.static(path.join(__dirname, "../public")));
 
 // routes
 app.use("/", indexRouter);
-app.use('/api', apiRouter);
+app.use("/api", apiRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
