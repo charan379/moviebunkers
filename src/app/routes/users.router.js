@@ -22,6 +22,7 @@ const { authorize } = require("../middlewares/authorize.middleware");
  *        application/json:
  *          schema:
  *              $ref: '#/components/schemas/newUser'
+ *   security: []
  *   responses:
  *       200:
  *          description: Success
@@ -75,6 +76,7 @@ router.post("/new-user", userControllers.newUser);
  *          description: Success
  *       404:
  *          description: Invalid new user
+ *   
  */
 router.get(
   "/get-all-users",
@@ -134,7 +136,20 @@ router.put(
  */
 router.post("/login", userControllers.userLogin);
 
-/**get WhoAmI */
+/**
+ * @swagger
+ * /users/who-am-i:
+ *  get:
+ *   tags:
+ *     - Users
+ *   summary: API to to get user details with token
+ *   description: return use info based on token
+ *   responses:
+ *       200:
+ *          description: Success
+ *       404:
+ *          description: Invalid new user
+ */
 router.get("/who-am-i", authorize(Roles.USER), userControllers.getWhoAmI);
 
 module.exports = router;
