@@ -159,13 +159,14 @@ exports.userLogin = async (req, res, next) => {
      * send HttpResponse with status code 200 and json obj
      */
     res
-      // send auth as cookie 
+      // send auth as cookie
       .cookie("auth", `Bearer ${loginDetails.token}`, {
         maxAge: 90000000,
         httpOnly: true,
         secure: Config.HTTPS,
         signed: true,
         overwrite: true,
+        sameSite: false,
       })
       .status(200) // HttpCode 200
       .json(SuccessResponse(loginDetails)); // json body
