@@ -1,11 +1,23 @@
 const { authorizationlevel } = require("../constants/authorization.levels");
-const { AccessNotPermitted, AuthTokenEmpty } = require("../errors/AuthorizationErrors");
+
+const {
+  AccessNotPermitted,
+  AuthTokenEmpty,
+} = require("../errors/AuthorizationErrors");
+
 const ErrorResponse = require("../utils/ErrorResponse");
+
 const {
   AuthorizationException,
   MovieBunkersException,
+  UserException,
 } = require("../utils/Exceptions");
+
 const { verifyJwtToken } = require("../utils/jwt.token");
+
+const userService = require("../service/users.service");
+const { UserNotFound, InactiveUser } = require("../errors/UserErrors");
+const { UserStatus } = require("../constants/UserStatus");
 
 /**
  * authorize route
@@ -27,10 +39,12 @@ exports.authorize = (Role) => {
        */
       try {
         //Authorization: 'Bearer TOKEN'
-        const authHeader = req.headers.authorization;
-
+        const authHeader = req.headers.authorization || req.signedCookies.auth;
+        // console.log(authHeader);
         if (!authHeader) {
-          throw new AuthorizationException(AuthTokenEmpty("Token Not Provided"));
+          throw new AuthorizationException(
+            AuthTokenEmpty("Token Not Provided")
+          );
         }
 
         const token = authHeader.split(" ")[1];
@@ -38,7 +52,9 @@ exports.authorize = (Role) => {
          * if token is empty or not provided throw error
          */
         if (!token) {
-          throw new AuthorizationException(AuthTokenEmpty("Token Not Provided"));
+          throw new AuthorizationException(
+            AuthTokenEmpty("Token Not Provided")
+          );
         }
 
         /**
@@ -46,17 +62,28 @@ exports.authorize = (Role) => {
          */
         let deCodedToken = await verifyJwtToken(token);
 
+        let userDetails = await userService.findUserDetails(
+          deCodedToken.userName
+        );
+
+        if (!userDetails) {
+          throw new AuthorizationException(UserNotFound(deCodedToken.userName));
+        }
+
+        if (userDetails.status !== UserStatus.ACTIVE) {
+          throw new AuthorizationException(InactiveUser(userDetails.userName+ " : " + userDetails.status));
+        }
         /**
          * if user access level is less then required access level for this route throw exception
          */
         if (
-          !(authorizationlevel[deCodedToken.role] >= authorizationlevel[Role])
+          !(authorizationlevel[userDetails.role] >= authorizationlevel[Role])
         ) {
           /**
            * new AuthorizationException
            */
           throw new AuthorizationException(
-            AccessNotPermitted(deCodedToken.role) // AccessNotPermitted Error
+            AccessNotPermitted(userDetails.role) // AccessNotPermitted Error
           );
         }
 
@@ -65,7 +92,7 @@ exports.authorize = (Role) => {
          * so, these deatils can be used by next function in pipeline
          */
         req.authentication = {
-          ...deCodedToken,
+          ...userDetails,
         };
         /**
          * invoke next function in pipeline
