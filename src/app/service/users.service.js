@@ -158,6 +158,22 @@ exports.findAll = async (requestQuery) => {
 };
 
 /**
+ * find user details by user name
+ * @param {string} userName
+ * @returns
+ */
+exports.findUserDetails = async (userName) => {
+  const userDetails = await userRepository.findByUserName(userName, {
+    password: 0,
+  });
+
+  if (!userDetails) {
+    throw new UserException(UserNotFound(userName));
+  }
+
+  return userDetails;
+};
+/**
  * update user
  * @param {string} userName
  * @param {Object} requestBoby
@@ -246,8 +262,8 @@ exports.userLogin = async (requestBoby) => {
   /**
    * if retrived user status is Inactive then thrown exception
    */
-  if (userDTO.status === UserStatus.INACTIVE) {
-    throw new UserException(InactiveUser(userDTO.userName));
+  if (userDTO.status !== UserStatus.ACTIVE) {
+    throw new UserException(InactiveUser(userDTO.userName+ " : "+ userDTO.status));
   }
 
   /**
@@ -256,9 +272,9 @@ exports.userLogin = async (requestBoby) => {
    */
   const token = await generateJwtToken({
     userName: userDTO.userName,
-    email: userDTO.email,
-    role: userDTO.role,
-    status: userDTO.status,
+    // email: userDTO.email,
+    // role: userDTO.role,
+    // status: userDTO.status,
   });
 
   /**
