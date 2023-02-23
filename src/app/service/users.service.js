@@ -163,15 +163,26 @@ exports.findAll = async (requestQuery) => {
  * @returns
  */
 exports.findUserDetails = async (userName) => {
+  /**
+   * get user details from userRepository
+   */
   const userDetails = await userRepository.findByUserName(userName, {
-    password: 0,
+    password: 0, // don't retrive password
   });
+
+  /**
+   * if user not found throw error
+   */
   if (!userDetails) {
     throw new UserException(UserNotFound(userName));
   }
 
+  /**
+   * if no errors were thrown then return userDetails
+   */
   return userDetails;
 };
+
 /**
  * update user
  * @param {string} userName
@@ -242,27 +253,29 @@ exports.userLogin = async (requestBoby) => {
   /**
    * find user with given userName and store it in userDTO Variable
    */
-  const userDTO = await userRepository.findByUserName(requestBoby.userName);
+  const userDTO = await userRepository.findByUserName(loginDTO.userName);
 
   /**
    * if userDTO is null then user Not found
    */
   if (userDTO === null) {
-    throw new UserException(UserNameNotFound(requestBoby.userName));
+    throw new UserException(UserNameNotFound(loginDTO.userName));
   }
 
   /**
    * if user found then validate given password matches with passwordHash in db
    */
-  if (!(await validateHash(requestBoby.password, userDTO.password))) {
-    throw new UserException(InvalidUserPassword(requestBoby.userName));
+  if (!(await validateHash(loginDTO.password, userDTO.password))) {
+    throw new UserException(InvalidUserPassword(loginDTO.userName));
   }
 
   /**
    * if retrived user status is Inactive then thrown exception
    */
   if (userDTO.status !== UserStatus.ACTIVE) {
-    throw new UserException(InactiveUser(userDTO.userName+ " : "+ userDTO.status));
+    throw new UserException(
+      InactiveUser(userDTO.userName + " : " + userDTO.status)
+    );
   }
 
   /**

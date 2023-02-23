@@ -10,7 +10,7 @@ exports.UserNameAlreadyExists = (info) => {
     code: "USER_UNAE",
     message: "User with same username already exits",
     reason: "Username : " + info,
-    httpCode: HttpCodes.OK.code,
+    httpCode: HttpCodes.BAD_REQUEST.code,
   };
 };
 
@@ -24,7 +24,7 @@ exports.UserEmailAlreadyExists = (info) => {
     code: "USER_UEAE",
     message: "User with same email already exits",
     reason: "email : " + info,
-    httpCode: HttpCodes.OK.code,
+    httpCode: HttpCodes.BAD_REQUEST.code,
   };
 };
 
@@ -38,7 +38,7 @@ exports.UserNameNotFound = (info) => {
     code: "USER_UNNF",
     message: "User Not Found",
     reason: "Invalid UserName : " + info,
-    httpCode: HttpCodes.BAD_REQUEST.code,
+    httpCode: HttpCodes.NOT_FOUND.code,
   };
 };
 
@@ -52,7 +52,7 @@ exports.InvalidUserPassword = (info) => {
     code: "USER_IUP",
     message: "Password Incorrect",
     reason: "Invalid Password for : " + info,
-    httpCode: HttpCodes.OK.code,
+    httpCode: HttpCodes.BAD_REQUEST.code,
   };
 };
 
@@ -66,7 +66,7 @@ exports.InactiveUser = (info) => {
     code: "USER_IU",
     message: "Inactive User",
     reason: "User is Inactive : " + info,
-    httpCode: HttpCodes.OK.code,
+    httpCode: HttpCodes.UNATHORIZED.code,
   };
 };
 

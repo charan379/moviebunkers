@@ -10,7 +10,7 @@ exports.TitleNotFound = (info) => {
     code: "TITLE_TNF",
     message: "No Titles Found ",
     reason: "Query : " + info,
-    httpCode: HttpCodes.OK.code,
+    httpCode: HttpCodes.NOT_FOUND.code,
   };
 };
 
@@ -24,7 +24,7 @@ exports.TitleAlreadyExists = (info) => {
     code: "TITLE_TAE",
     message: "Title already exists can't create new one",
     reason: info,
-    httpCode: HttpCodes.OK.code,
+    httpCode: HttpCodes.BAD_REQUEST.code,
   };
 };
 

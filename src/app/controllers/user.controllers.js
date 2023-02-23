@@ -25,7 +25,7 @@ exports.newUser = async (req, res, next) => {
      * send HttpResponse with status code 200 and json obj
      */
     res
-      .status(200) // HttpStatus code 200
+      .status(201) // HttpStatus code 200
       .json(SuccessResponse({ user: { userName, email, role, status } })); // Http Response in json formart
   } catch (error) {
     // catch if there was any error

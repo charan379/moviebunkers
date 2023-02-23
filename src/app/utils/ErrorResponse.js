@@ -1,3 +1,5 @@
+const { HttpCodes } = require("../constants/HttpCodes");
+
 /**
  * 
  * @param {ErrorObject} error 
@@ -6,10 +8,10 @@
 function ErrorResponse(error) {
   return {
     success: false,
+    httpCode: error.httpCode,
     error: {
-      name: error.name,
-      code: error.code,
-      httpCode: error.httpCode,
+      name: error.name || 'Unknown Error',
+      code: error.code || HttpCodes.INTERNAL_SERVER_ERROR,
       message: error.message,
       reason: error.reason,
     },
