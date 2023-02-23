@@ -134,4 +134,7 @@ router.put(
  */
 router.post("/login", userControllers.userLogin);
 
+/**get WhoAmI */
+router.get("/who-am-i", authorize(Roles.USER), userControllers.getWhoAmI);
+
 module.exports = router;
