@@ -71,7 +71,9 @@ exports.authorize = (Role) => {
         }
 
         if (userDetails.status !== UserStatus.ACTIVE) {
-          throw new AuthorizationException(InactiveUser(userDetails.userName+ " : " + userDetails.status));
+          throw new AuthorizationException(
+            InactiveUser(userDetails.userName + " : " + userDetails.status)
+          );
         }
         /**
          * if user access level is less then required access level for this route throw exception
@@ -92,7 +94,7 @@ exports.authorize = (Role) => {
          * so, these deatils can be used by next function in pipeline
          */
         req.authentication = {
-          ...userDetails,
+          userName : userDetails.userName,
         };
         /**
          * invoke next function in pipeline
