@@ -166,7 +166,6 @@ exports.findUserDetails = async (userName) => {
   const userDetails = await userRepository.findByUserName(userName, {
     password: 0,
   });
-
   if (!userDetails) {
     throw new UserException(UserNotFound(userName));
   }
