@@ -2,6 +2,7 @@ const swaggerJSDoc = require("swagger-jsdoc");
 const path = require("path");
 const swaggerSchemas = require("./swagger.schemas");
 const { newMovieExample, newTvExample } = require("./swagger.examples");
+const { Config } = require("../../config");
 
 const swaggerOptions = {
   swaggerDefinition: {
@@ -21,12 +22,12 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "http://localhost:3000/api",
-        description: "Local Server",
+        url: `${Config.HTTPS ? 'https' : 'http'}://localhost:${Config.PORT}/api`,
+        description: "Current Server",
       },
       {
-        url: "http://localhost:3010/api",
-        description: "Local Server",
+        url: "http://localhost:3000/api",
+        description: "Local Dev Server",
       },
     ],
 
