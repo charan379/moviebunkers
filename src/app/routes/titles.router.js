@@ -87,5 +87,5 @@ router.post(
  *       404:
  *          description: Invalid new user
  */
-router.get("/get-all-titles", titlesController.getAllTitles);
+router.get("/get-all-titles",authorize(Roles.USER), titlesController.getAllTitles);
 module.exports = router;
