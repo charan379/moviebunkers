@@ -2,6 +2,7 @@ const { MovieBunkersException } = require("../utils/Exceptions");
 const ErrorResponse = require("../utils/ErrorResponse");
 const usersService = require("../service/users.service");
 const SuccessResponse = require("../utils/SuccessResponse");
+const { Config } = require("../../config");
 
 /**
  *
@@ -158,8 +159,54 @@ exports.userLogin = async (req, res, next) => {
      * send HttpResponse with status code 200 and json obj
      */
     res
+      // send auth as cookie 
+      .cookie("auth", `Bearer ${loginDetails.token}`, {
+        maxAge: 90000000,
+        httpOnly: true,
+        secure: Config.HTTPS,
+        signed: true,
+        overwrite: true,
+      })
       .status(200) // HttpCode 200
       .json(SuccessResponse(loginDetails)); // json body
+  } catch (error) {
+    // catch if there was any error
+    if (error instanceof MovieBunkersException) {
+      /**
+       * if occurred error is an instance of MovieBunkersException
+       *
+       *  */
+      res
+        .status(error.httpCode) // HttpStatus code
+        .json(ErrorResponse(error)); // Http Response in json format
+    } else {
+      /**
+       * if any other error is occurred then
+       */
+      res
+        .status(500) // HttpStatus code 500
+        .json(ErrorResponse(error)); // Http Response in json format
+    }
+  }
+};
+
+exports.getWhoAmI = async (req, res, next) => {
+  /**
+   * try to find user details
+   */
+  try {
+    /**
+     * get user details from repository
+     */
+    const userDetails = await usersService.findUserDetails(
+      req.authentication.userName
+    );
+    /**
+     * send HttpResponse with status code 200 and json obj
+     */
+    res
+      .status(200) // HttpCode 200
+      .json(SuccessResponse(userDetails)); // json body
   } catch (error) {
     // catch if there was any error
     if (error instanceof MovieBunkersException) {
