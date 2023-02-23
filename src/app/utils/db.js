@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
-require("dotenv").config();
+const { Config } = require("../../config");
 mongoose.set("strictQuery", false);
 
 // mongoDB Connection
 const connectDb = async () => {
-  mongoose.connect(process.env.MongoDB_SERVER_STRING, {
+  mongoose.connect(Config.MongoDB_SERVER_STRING, {
     useNewUrlParser: true,
     // useCreateIndex: true, // deprecated on MongoDB v6+
     // useFindAndModify: false, // deprecated on MongoDB v6+
