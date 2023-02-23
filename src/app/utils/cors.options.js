@@ -1,11 +1,12 @@
 const { Config } = require("../../config");
 
-const allowedOrigins = Config.CORS_ORIGINS;
+const allowedOrigins = [...Config.CORS_ORIGINS, `${Config.HTTPS ? 'https' : 'http'}://localhost:${Config.PORT}`];
+
 const CorsOptions = {
   // exposedHeaders: ["*",'Authorization','Access-Control-Allow-Credentials','Access-Control-Expose-Headers','Access-Control-Allow-Origin',],
   exposedHeaders: ["Content-Length", "X-Foo", "X-Bar"],
   credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization", "x-csrf-token", "Cookie"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-csrf-token", "Cookie",'Accept'],
   maxAge: 600,
   origin: function (origin, callback) {
     // allow requests with no origin
