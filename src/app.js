@@ -10,6 +10,8 @@ const establishDbConnection = require("./app/utils/db");
 const swaggerUi = require("swagger-ui-express");
 const { swaggerDocs } = require("./app/swagger/swagger.options");
 const { Config } = require("./config");
+const cors = require("cors");
+const CorsOptions = require("./app/utils/cors.options");
 const app = express();
 
 // db connection
@@ -19,15 +21,16 @@ establishDbConnection();
 app.set("views", path.join(__dirname, "./app/views"));
 app.set("view engine", "pug");
 
-// swagger API Documentation
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
+app.use(cors(CorsOptions));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(Config.COOKIE_SECRET));
 app.use(stylus.middleware(path.join(__dirname, "../public")));
 app.use(express.static(path.join(__dirname, "../public")));
+
+// swagger API Documentation
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // routes
 app.use("/", indexRouter);
