@@ -38,9 +38,23 @@ exports.findAll = async ({ query, sort, page, limit }) => {
  * @param {String} userName
  * @returns userObject or null
  */
-exports.findByUserName = async (userName) => {
+exports.findByUserName = async (userName, fieldsSet) => {
+  /**
+   * key values to be retived
+   */
+  let projection = {
+    _id: 0,
+    __v: 0,
+  };
+  /**
+   * if projection fields provided explicitly
+   */
+  if (fieldsSet) {
+    projection = { ...projection, ...fieldsSet };
+  }
+
   //retun user document which is found for given userName
-  return UserModel.findOne({ userName: userName });
+  return UserModel.findOne({ userName: userName }, projection);
 };
 
 /**
