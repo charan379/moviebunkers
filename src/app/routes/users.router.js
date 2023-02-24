@@ -152,4 +152,20 @@ router.post("/login", userControllers.userLogin);
  */
 router.get("/who-am-i", authorize(Roles.USER), userControllers.getWhoAmI);
 
+/**
+ * @swagger
+ * /users/logout:
+ *  get:
+ *   tags:
+ *     - Users
+ *   summary: API to to logout clear auth cookie
+ *   description: return success message after logged out
+ *   responses:
+ *       200:
+ *          description: Success
+ *       404:
+ *          description: Invalid new user
+ */
+router.get("/logout", userControllers.logout);
+
 module.exports = router;
