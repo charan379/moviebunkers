@@ -228,3 +228,43 @@ exports.getWhoAmI = async (req, res, next) => {
     }
   }
 };
+
+/**
+ * Logout
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.logout = async (req, res, next) => {
+  /**
+   * try to logout remove auth cookie
+   */
+  try {
+    /**
+     * send HttpResponse with status code 200 and json obj
+     */
+    res
+      // send auth as cookie
+      .clearCookie("auth")
+      .status(200) // HttpCode 200
+      .json(SuccessResponse('Successfully logged out')); // json body
+  } catch (error) {
+    // catch if there was any error
+    if (error instanceof MovieBunkersException) {
+      /**
+       * if occurred error is an instance of MovieBunkersException
+       *
+       *  */
+      res
+        .status(error.httpCode) // HttpStatus code
+        .json(ErrorResponse(error)); // Http Response in json format
+    } else {
+      /**
+       * if any other error is occurred then
+       */
+      res
+        .status(500) // HttpStatus code 500
+        .json(ErrorResponse(error)); // Http Response in json format
+    }
+  }
+};
