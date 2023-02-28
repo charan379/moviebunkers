@@ -1,44 +1,44 @@
 {
   "name": "moviebunkers",
-  "version": "1.0.0",
+  "version": "2.0.1",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "ts-node --files -r tsconfig-paths/register server.ts ",
+    "dev": "set DEBUG=moviebunkers:* & nodemon --files -r tsconfig-paths/register server.ts"
   },
   "dependencies": {
-    "bcrypt": "^5.1.0",
-    "cookie-parser": "~1.4.4",
-    "cors": "^2.8.5",
-    "debug": "~2.6.9",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "http-errors": "~1.6.3",
-    "joi": "^17.7.1",
-    "joi-to-swagger": "^6.2.0",
-    "jsonwebtoken": "^9.0.0",
-    "mongoose": "^6.8.3",
-    "morgan": "~1.9.1",
-    "pug": "2.0.0-beta11",
-    "stylus": "^0.54.8",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^4.6.0"
+    "cookie-parser": "~1.4.6",
+    "debug": "~4.3.4",
+    "express": "~4.18.2",
+    "http-errors": "~2.0.0",
+    "inversify": "^6.0.1",
+    "joi": "^17.8.3",
+    "mongoose": "^6.10.0",
+    "morgan": "~1.10.0",
+    "pug": "^3.0.2",
+    "reflect-metadata": "^0.1.13",
+    "routing-controllers": "0.10.1",
+    "stylus": "0.59.0",
+    "typedi": "^0.10.0"
   },
-  "description": "moviebunkers app server",
-  "main": "app.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/charan379/moviebunkers.git"
-  },
-  "keywords": [
-    "moviebunkers"
-  ],
-  "author": "charan379",
-  "license": "AGPL-3.0-or-later",
-  "bugs": {
-    "url": "https://github.com/charan379/moviebunkers/issues"
-  },
-  "homepage": "https://github.com/charan379/moviebunkers#readme",
   "devDependencies": {
-    "eslint": "^8.34.0"
+    "@types/cookie-parser": "^1.4.3",
+    "@types/debug": "^4.1.7",
+    "@types/express": "^4.17.17",
+    "@types/http-errors": "^2.0.1",
+    "@types/morgan": "^1.9.4",
+    "@types/node": "^18.14.1",
+    "@types/stylus": "^0.48.38",
+    "@typescript-eslint/eslint-plugin": "^5.53.0",
+    "concurrently": "^7.6.0",
+    "eslint": "^8.34.0",
+    "eslint-config-standard-with-typescript": "^34.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^3.14.2",
+    "typescript": "^4.9.5"
   }
 }
