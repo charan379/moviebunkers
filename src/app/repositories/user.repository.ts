@@ -1,8 +1,10 @@
+import PageDTO from "@dto/page.dto";
+import { UserDTO } from "@dto/user.dto";
 import IUserRepository from "@repositories/interfaces/user.repository.interface";
 import { ProjectionFields } from "mongoose";
 import { Service } from "typedi";
-import IUser from "../models/interfaces/user.interface";
-import UserModel from "../models/user.modal";
+import IUser from "@models/interfaces/user.interface";
+import UserModel from "@models/user.model";
 import { FindAllQuery } from "./interfaces/custom.types.interfaces";
 
 @Service()
@@ -32,7 +34,7 @@ class UserRepository implements IUserRepository {
   ): Promise<IUser | null> {
     return this.userModel.findById(id, projection).lean().exec();
   }
-  
+
   /**
    * findByUserName()
    * @param userName 
@@ -64,17 +66,41 @@ class UserRepository implements IUserRepository {
    * @param projection 
    * @returns List<IUser>
    */
-  findAll(
+  async findAll(
     { query, sort, limit, page }: FindAllQuery,
     projection: ProjectionFields<IUser> = { _id: 0, password: 0, __v: 0 }
-  ): Promise<IUser[]> {
-    return this.userModel
+  ): Promise<PageDTO> {
+    // throw new Error("un inmp");
+
+    const total_results = await this.userModel.find({ ...query }).countDocuments().lean().exec();
+
+    const usersList: IUser[] = await this.userModel
       .find({ ...query }, projection)
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort({ ...sort })
       .lean()
       .exec();
+
+    const userDTOs: UserDTO[] = usersList.map(iuser => {
+      return {
+        userName: iuser.userName,
+        email: iuser.email,
+        status: iuser.status,
+        role: iuser.role,
+        last_modified_by: iuser?.last_modified_by,
+        createdAt: iuser.createdAt,
+        updatedAt: iuser.updatedAt,
+      }
+    })
+    const result: PageDTO = {
+      page: page,
+      total_pages: Math.ceil(total_results / limit),
+      total_results: total_results,
+      sort_order: sort,
+      list: userDTOs,
+    }
+    return result;
   }
 
   /**
@@ -83,8 +109,8 @@ class UserRepository implements IUserRepository {
    * @param user 
    * @returns IUser
    */
-  update(userName: string, user: Partial<IUser>): Promise<IUser | null> {
-    this.userModel
+  async update(userName: string, user: Partial<IUser>): Promise<IUser | null> {
+    await this.userModel
       .findOneAndUpdate({ userName: userName }, { $set: { ...user } })
       .exec();
 
