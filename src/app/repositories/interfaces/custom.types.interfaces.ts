@@ -1,5 +1,4 @@
-import IUser from "@src/app/models/interfaces/user.interface"
-import { FilterQuery, SortOrder, SortValues } from "mongoose"
+import { FilterQuery } from "mongoose"
 
 
 export type FindAllQuery = {
