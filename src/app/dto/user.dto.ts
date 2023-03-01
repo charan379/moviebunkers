@@ -1,5 +1,5 @@
-import UserRoles from "@src/app/constants/user.roles.enum";
-import UserStatus from "@src/app/constants/user.status.enum";
+import UserRoles from "@constants/user.roles.enum";
+import UserStatus from "@constants/user.status.enum";
 
 
 export interface UserDTO {
@@ -21,9 +21,18 @@ export interface NewUserDTO {
 }
 
 export interface FindAllUsersQueryDTO {
-    query? : Object,
-    minimal? : boolean,
-    sort? : Object,
-    page? : number,
+    userName?: string,
+    email?: string,
+    status?: UserStatus,
+    role?: UserRoles
+    minimal?: boolean,
+    sort_by?: string,
+    page?: number,
     limit?: number
+}
+
+export interface UpdateUserDTO {
+    role?: UserRoles.USER | UserRoles.MODERATOR,
+    status?: UserStatus,
+    last_modified_by?: string,
 }
