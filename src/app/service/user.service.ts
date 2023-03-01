@@ -36,19 +36,21 @@ export class UserService implements IUserService {
   async createUser(newUserDTO: NewUserDTO): Promise<UserDTO> {
 
     const userNameAlreadyExists = await this.userRepository.findByUserName(newUserDTO.userName);
+
     if (userNameAlreadyExists) throw new UserException("User Name already exits", HttpCodes.OK, `UserName: ${newUserDTO.userName} is already taken`);
 
     const emailAlreadyExits = await this.userRepository.findByEmail(newUserDTO.email);
+
     if (emailAlreadyExits) throw new UserException("Email already exits", HttpCodes.OK, `Email: ${newUserDTO.email} is already taken`);
 
     const hashedPassword: string = await generateHash(newUserDTO.password);
-    
-    const newUserDTOWithHashedPassword: NewUserDTO = {...newUserDTO, password: hashedPassword};
+
+    const newUserDTOWithHashedPassword: NewUserDTO = { ...newUserDTO, password: hashedPassword };
 
     const user = await this.userRepository.create(newUserDTOWithHashedPassword);
 
     if (!user) throw new UserException("User creation faield", HttpCodes.INTERNAL_SERVER_ERROR, `Unknown Reason contact developer`)
-    
+
     const userDTO: UserDTO = {
       userName: user.userName,
       email: user.email,
