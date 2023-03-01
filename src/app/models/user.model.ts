@@ -34,7 +34,7 @@ const userSchema: Schema = new Schema<IUser>(
     },
     role: {
       type: String,
-      enum: Object.values(UserRoles),
+      enum: [UserRoles.USER, UserRoles.MODERATOR],
       default: UserRoles.USER,
     },
     last_modified_by: {
