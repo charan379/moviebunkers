@@ -1,5 +1,5 @@
-import UserRoles from "@src/app/constants/user.roles.enum";
-import UserStatus from "@src/app/constants/user.status.enum";
+import UserRoles from "@constants/user.roles.enum";
+import UserStatus from "@constants/user.status.enum";
 
 interface IUser {
   userName: string;
