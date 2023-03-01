@@ -1,12 +1,13 @@
-import { UserDTO } from "@src/app/dto/user.dto";
-import { ObjectId } from "mongoose";
+import PageDTO from "@dto/page.dto";
+import { FindAllUsersQueryDTO, NewUserDTO, UpdateUserDTO, UserDTO } from "@dto/user.dto";
 
 interface IUserService {
-  getUserById(id: string): Promise<UserDTO | null>;
-  getUserByUserName(userName: string): Promise<UserDTO | null>;
-  getUserByEmail(email: string): Promise<UserDTO | null>;
-  getAllUsers(): Promise<UserDTO[]>;
-  updateUserByUserName(userName: string): Promise<UserDTO>;
+  getUserById(id: string): Promise<UserDTO>;
+  getUserByUserName(userName: string): Promise<UserDTO>;
+  getUserByEmail(email: string): Promise<UserDTO>;
+  getAllUsers(queryDTO: FindAllUsersQueryDTO): Promise<PageDTO>;
+  updateUserByUserName(userName: string, userUpdateDTO: UpdateUserDTO): Promise<UserDTO>;
+  createUser(newUserDTO: NewUserDTO): Promise<UserDTO>;
 }
 
 export default IUserService;
