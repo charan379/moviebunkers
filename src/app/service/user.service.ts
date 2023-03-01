@@ -1,6 +1,7 @@
 import PageDTO from "@dto/page.dto";
 import IUser from "@models/interfaces/user.interface";
 import { FindAllQuery } from "@repositories/interfaces/custom.types.interfaces";
+import { generateHash } from "@utils/bcrypt";
 import MongoSortBuilder from "@utils/mongo.sort.builder";
 import { FilterQuery } from "mongoose";
 import { Inject, Service } from "typedi";
@@ -27,16 +28,25 @@ export class UserService implements IUserService {
   }
 
 
+  /**
+   * createUser()
+   * @param newUserDTO 
+   * @returns 
+   */
   async createUser(newUserDTO: NewUserDTO): Promise<UserDTO> {
 
-    const userNameAlreadyExist = await this.userRepository.findByUserName(newUserDTO.userName);
-    if (userNameAlreadyExist) throw new UserException("User Name already exits", HttpCodes.OK, `UserName: ${newUserDTO.userName} is already taken`);
+    const userNameAlreadyExists = await this.userRepository.findByUserName(newUserDTO.userName);
+    if (userNameAlreadyExists) throw new UserException("User Name already exits", HttpCodes.OK, `UserName: ${newUserDTO.userName} is already taken`);
 
     const emailAlreadyExits = await this.userRepository.findByEmail(newUserDTO.email);
     if (emailAlreadyExits) throw new UserException("Email already exits", HttpCodes.OK, `Email: ${newUserDTO.email} is already taken`);
-newUserDTO
 
-    const user = await this.userRepository.create(newUserDTO);
+    const hashedPassword: string = await generateHash(newUserDTO.password);
+    
+    const newUserDTOWithHashedPassword: NewUserDTO = {...newUserDTO, password: hashedPassword};
+
+    const user = await this.userRepository.create(newUserDTOWithHashedPassword);
+
     if (!user) throw new UserException("User creation faield", HttpCodes.INTERNAL_SERVER_ERROR, `Unknown Reason contact developer`)
     
     const userDTO: UserDTO = {

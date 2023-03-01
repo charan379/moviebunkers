@@ -24,8 +24,7 @@ const userSchema: Schema = new Schema<IUser>(
     password: {
       type: String,
       required: [true, "password is required"],
-      minlength: 8,
-      maxlength: 18,
+      minlength: 50,
     },
     status: {
       type: String,
