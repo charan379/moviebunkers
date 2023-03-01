@@ -1,14 +1,14 @@
-import { UserDTO } from "@dto/user.dto";
+import { FindAllUsersQueryDTO, NewUserDTO, UpdateUserDTO, UserDTO } from "@dto/user.dto";
 import HttpCodes from "@constants/http.codes.enum";
-import MoviebunkersException from "@exceptions/moviebunkers.exception";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
-import { findAllUserQuerySchema } from "@joiSchemas/user.joi.schemas";
+import { emailSchema, findAllUserQuerySchema, newUserSchema, userNameSchema, userUpdateSchema } from "@joiSchemas/user.joi.schemas";
 import { UserService } from "@service/user.service";
 import JoiValidator from "@utils/joi.validator";
 import debugLogger from "debug";
 import { NextFunction, Request, Response, Router } from "express";
 
 import { Inject, Service } from "typedi";
+import PageDTO from "@dto/page.dto";
 
 function custMiddleWare(req: Request, res: Response, next: NextFunction) {
   console.log(req.baseUrl);
@@ -50,61 +50,118 @@ export class UserController {
 
     try {
 
-      // const queryDTO = await JoiValidator(findAllUserQuerySchema, req.query, { abortEarly: false, stripUnknown: true });
+      const queryDTO: FindAllUsersQueryDTO = await JoiValidator(findAllUserQuerySchema, req.query, { abortEarly: false, stripUnknown: true });
 
-      // throw new MoviebunkersException('testing exception', HttpCodes.NOT_FOUND)
-      res.status(200).json({ message: "getAllUsers - unimplemented" });
+      const users: PageDTO = await this.userService.getAllUsers(queryDTO);
+
+      res.status(HttpCodes.OK).json(users);
 
     } catch (error) {
-      console.log(error)
+      
       next(error);
     }
   }
 
   /**
-   * getUserById controller
+   * @Get("/id/:id") => getUserById() controller
    * @param req 
    * @param res 
    * @param next 
    */
   private async getUserById(req: Request, res: Response, next: NextFunction) {
     try {
+      // validate userId is mongooDB Object Id
+      const validId = await JoiValidator(ObjectIdSchema, req?.params?.id, { abortEarly: false, stripUnknown: true });
 
-      const validId = await JoiValidator(ObjectIdSchema, req?.params?.id, { abortEarly: false, stripUnknown: true })
-      // const userDTO: UserDTO
-      res.status(200).json({ message: 'getUserById' })
-    } catch (error) {
+      // ask userService.getUserById() method to return user for given id 
+      const userDTO: UserDTO = await this.userService.getUserById(validId);
+
+      // respond wiht code 200 and userDTO to client 
+      res.status(HttpCodes.OK).json(userDTO)
+
+    } catch (error) { // will catch if any errors are thrwon in process
+
+      // pass errror to next() function in chain probably error-handler or logger
       next(error)
     }
   }
 
+  /**
+   * Get("/:userName") => getUserByUserName() controller
+   * @param req 
+   * @param res 
+   * @param next 
+   */
   private async getUserByUserName(req: Request, res: Response, next: NextFunction) {
     try {
-      res.status(200).json({ message: "getUserByUserName" })
+      // validate userName
+      const validUserName = await JoiValidator(userNameSchema, req?.params?.userName, { abortEarly: false, stripUnknown: true });
+
+      const userDTO: UserDTO = await this.userService.getUserByUserName(validUserName);
+
+      res.status(HttpCodes.OK).json(userDTO);
+
     } catch (error) {
+
       next(error)
     }
   }
 
+  /**
+   * Get("/email/:email") => getUserByEmail() Controller
+   * @param req 
+   * @param res 
+   * @param next 
+   */
   private async getUserByEmail(req: Request, res: Response, next: NextFunction) {
     try {
-      res.status(200).json({ message: "getUserByEmail" })
+
+      const validEmail = await JoiValidator(emailSchema, req?.params?.email, { abortEarly: false, stripUnknown: true });
+
+      const userDTO: UserDTO = await this.userService.getUserByEmail(validEmail);
+
+      res.status(HttpCodes.OK).json(userDTO)
     } catch (error) {
+
       next(error)
     }
   }
 
-  private async createUser(req: Request, res: Response, next: NextFunction) {
+  private async createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      res.status(201).json({ message: "createUser" })
+      const validNewUser: NewUserDTO = await JoiValidator(newUserSchema, req.body, { abortEarly: false, stripUnknown: true });
+
+      const createdUser: UserDTO = await this.userService.createUser(validNewUser);
+
+      res.status(201).json(createdUser);
+
     } catch (error) {
+
       next(error)
     }
   }
 
+  /**
+   * updateUser ( role, status only)
+   * @param req 
+   * @param res 
+   * @param next 
+   */
   private async updateUser(req: Request, res: Response, next: NextFunction) {
     try {
-      res.status(201).json({ message: "updateUser" })
+
+      const validUserName = await JoiValidator(userNameSchema, req?.params?.userName, { abortEarly: false, stripUnknown: true });
+
+      const validUserUpdateBody = await JoiValidator(userUpdateSchema, req?.body, { abortEarly: false, stripUnknown: true });
+
+      const userUpdateDTO: UpdateUserDTO = {
+        ...validUserUpdateBody,
+        last_modified_by: "dev"
+      }
+
+      const userDTO: UserDTO = await this.userService.updateUserByUserName(validUserName, userUpdateDTO);
+
+      res.status(200).json(userDTO)
     } catch (error) {
       next(error)
     }
