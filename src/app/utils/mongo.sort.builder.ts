@@ -2,7 +2,7 @@
 
 export default async function MongoSortBuilder(sort_by: string) {
 
-    const elementRegex: RegExp = /(^[a-zA-Z0-9]\w+\.(desc|asc))/;
+    const elementRegex: RegExp = /(^[a-zA-Z0-9]\w+\.(desc$|asc$))/;
 
     let sortElementsObject: object = {};
 
@@ -17,5 +17,9 @@ export default async function MongoSortBuilder(sort_by: string) {
         }
     }
 
+    if (Object.keys(sortElementsObject).length === 0) return {createdAt: 'desc'};
+
     return sortElementsObject;
+
+    
 }
