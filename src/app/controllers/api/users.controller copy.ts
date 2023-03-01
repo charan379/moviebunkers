@@ -2,7 +2,7 @@ import { FindAllUsersQueryDTO, NewUserDTO } from "@src/app/dto/user.dto";
 import { ObjectId } from "@src/app/joiSchemas/common.joi.schemas";
 import { findAllUserQuerySchema, userRegistrationSchema } from "@src/app/joiSchemas/user.joi.schemas";
 import { UserService } from "@src/app/service/user.service";
-import JoiValidator from "@src/app/utils/joi.validator.joi";
+import JoiValidator from "@src/app/utils/joi.validator";
 import debugLogger from "debug";
 import { NextFunction, Request, Response } from "express";
 import {

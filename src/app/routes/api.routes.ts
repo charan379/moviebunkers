@@ -1,4 +1,4 @@
-import { UserController } from "@src/app/controllers/api/users.controller";
+import { UserController } from "@controllers/api/users.controller";
 import { Router } from "express";
 import Container from "typedi";
 

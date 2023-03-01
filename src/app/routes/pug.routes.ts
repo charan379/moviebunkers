@@ -3,7 +3,7 @@
 
 import express from "express";
 import Container from "typedi";
-import WebController from "../controllers/pug/web.controller";
+import WebController from "@controllers/pug/web.controller";
 
 
 const router = express.Router();

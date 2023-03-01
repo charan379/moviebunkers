@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export const ObjectId = Joi.string()
+export const ObjectIdSchema = Joi.string()
   .pattern(/^[0-9a-fA-F]{24}$/)
   .required()
   .messages({

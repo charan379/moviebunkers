@@ -4,8 +4,8 @@
  * Module dependencies.
  */
 
-import app from "@src/app";
-import Database from "@src/app/utils/db";
+import app from "@Applipcation";
+import Database from "@utils/db";
 import debugLogger from "debug";
 import http from "http";
 import { HttpError } from "http-errors";
