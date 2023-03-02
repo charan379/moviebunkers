@@ -4,6 +4,7 @@ import UserStatus from "@constants/user.status.enum";
 
 export interface UserDTO {
     userName: string;
+    password?: string;
     email: string;
     status: UserStatus;
     role: UserRoles;
@@ -35,4 +36,9 @@ export interface UpdateUserDTO {
     role?: UserRoles.USER | UserRoles.MODERATOR,
     status?: UserStatus,
     last_modified_by?: string,
+}
+
+export interface LoginDTO {
+    userName: string;
+    password: string;
 }
