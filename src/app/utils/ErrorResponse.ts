@@ -13,9 +13,8 @@ function ErrorResponse(error:  MoviebunkersException) {
     error: {
       name: error?.name ?? 'Unknown Error',
       status: error?.status ?? HttpCodes.INTERNAL_SERVER_ERROR,
-      message: error.message,
-      reason: error?.reason,
-      stack: error?.stack
+      message: error?.message ?? "empty message",
+      reason: error?.reason ?? "empty reason",
     },
   };
 }
