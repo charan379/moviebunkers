@@ -2,9 +2,11 @@ import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
 import CastDTO from "@dto/cast.dto";
 import LanguageDTO from "@dto/language.dto";
+import { Document } from "mongoose";
 
 
 
+// interface IMovie extends Document {
 interface IMovie {
     title_type: TitleType;
     source: TitleSource;
