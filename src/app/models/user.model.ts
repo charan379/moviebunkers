@@ -45,6 +45,7 @@ const userSchema: Schema = new Schema<IUser>(
       createdAt: true,
       updatedAt: true,
     },
+    collection: "users"
   }
 );
 
