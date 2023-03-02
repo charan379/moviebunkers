@@ -4,7 +4,7 @@ import mongoose, { Model, Schema } from "mongoose";
 import IMovie from "./interfaces/movie.interface";
 
 
-const movieSchema: Schema<IMovie> = new Schema<IMovie>(
+export const movieSchema: Schema<IMovie> = new Schema<IMovie>(
     {
         // title_type
         title_type: {
