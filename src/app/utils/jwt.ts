@@ -13,8 +13,14 @@ export async function generateJwtToken(userDTO: UserDTO): Promise<string> {
         algorithm: 'HS256',
     }
 
+    const payload: JwtPayload = {
+        sub: userDTO.userName,
+    }
+
     try {
-        token = jwt.sign({ userName: userDTO.userName }, "privateOrsecretKeyHere", signOptions);
+
+        token = jwt.sign(payload, "privateOrsecretKeyHere", signOptions);
+
     } catch (error: any) {
         throw new AuthorizationException('Failed to create token', HttpCodes.INTERNAL_SERVER_ERROR, `jwt token creation failed fro user: ${userDTO.userName}`, `UserDetails : ${userDTO} \n  Stack: ${error?.stack}`);
     }
@@ -32,21 +38,21 @@ export async function verifyJwtToken(jwtToken: string): Promise<JwtPayload | str
          * if thrown error is " invalid signature "
          */
         if (error?.message === "invalid signature") {
-            throw new AuthorizationException("Failed to decode token", HttpCodes.BAD_REQUEST, "token seams to me modified: invalid signature", `ReceivedToken: ${jwtToken} \n Stack: ${error?.stack}`);
+            throw new AuthorizationException("Unauthorized Please Login!", HttpCodes.BAD_REQUEST, "token seams to me modified: invalid signature", `ReceivedToken: ${jwtToken} \n Stack: ${error?.stack}`);
         }
 
         /**
          * if thrown error is " invalid token "
          */
         if (error.message === "invalid token") {
-            throw new AuthorizationException("Failed to decode token", HttpCodes.BAD_REQUEST, "token seams to me modified: invalid token", `ReceivedToken: ${jwtToken} \n Stack: ${error?.stack}`);
+            throw new AuthorizationException("Unauthorized Please Login!", HttpCodes.BAD_REQUEST, "token seams to me modified: invalid token", `ReceivedToken: ${jwtToken} \n Stack: ${error?.stack}`);
         }
 
         /**
          * if thrown error is " jwt expired "
          */
         if (error.message === "jwt expired") {
-            throw new AuthorizationException("Authentication Expired", HttpCodes.UNATHORIZED, "Token Expired Re-authenticate", `ReceivedToken: ${jwtToken} \n Stack: ${error?.stack}`);
+            throw new AuthorizationException("Authentication Expired Please Login!", HttpCodes.UNATHORIZED, "Token Expired Re-authenticate", `ReceivedToken: ${jwtToken} \n Stack: ${error?.stack}`);
         }
 
         /**
