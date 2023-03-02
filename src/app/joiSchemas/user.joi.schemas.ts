@@ -39,3 +39,8 @@ export const userUpdateSchema: Joi.ObjectSchema = Joi.object({
   status: Joi.string().valid(...Object.values(UserStatus)),
   role: Joi.string().valid(...[UserRoles.USER, UserRoles.MODERATOR]),
 });
+
+export const lgoinSchema: Joi.ObjectSchema = Joi.object({
+  userName: userNameSchema.required(),
+  password: passwordSchema.required(),
+})
