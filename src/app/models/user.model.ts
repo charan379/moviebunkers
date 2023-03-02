@@ -3,7 +3,7 @@ import UserRoles from "../constants/user.roles.enum";
 import UserStatus from "../constants/user.status.enum";
 import IUser from "./interfaces/user.interface";
 
-const userSchema: Schema = new Schema<IUser>(
+const userSchema: Schema<IUser> = new Schema<IUser>(
   {
     userName: {
       type: String,
