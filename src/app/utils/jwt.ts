@@ -22,7 +22,7 @@ export async function generateJwtToken(userDTO: UserDTO): Promise<string> {
         token = jwt.sign(payload, "privateOrsecretKeyHere", signOptions);
 
     } catch (error: any) {
-        throw new AuthorizationException('Failed to create token', HttpCodes.INTERNAL_SERVER_ERROR, `jwt token creation failed fro user: ${userDTO.userName}`, `UserDetails : ${userDTO} \n  Stack: ${error?.stack}`);
+        throw new AuthorizationException('Token Creation Failed', HttpCodes.INTERNAL_SERVER_ERROR, `jwt token creation failed for user: ${userDTO.userName}`, `@generateJwtToken.function(): UserDetails : ${userDTO}, ${error?.stack}`);
     }
     return token;
 }
@@ -38,27 +38,27 @@ export async function verifyJwtToken(jwtToken: string): Promise<JwtPayload | str
          * if thrown error is " invalid signature "
          */
         if (error?.message === "invalid signature") {
-            throw new AuthorizationException("Unauthorized Please Login!", HttpCodes.BAD_REQUEST, "token seams to me modified: invalid signature", `ReceivedToken: ${jwtToken} \n Stack: ${error?.stack}`);
+            throw new AuthorizationException("Unauthorized Please Login!", HttpCodes.BAD_REQUEST, "token probably be modified or signature changed: invalid signature", `@verifyJwtToken.function(): invalid signature, ReceivedToken: ${jwtToken} , ${error?.stack}`);
         }
 
         /**
          * if thrown error is " invalid token "
          */
         if (error.message === "invalid token") {
-            throw new AuthorizationException("Unauthorized Please Login!", HttpCodes.BAD_REQUEST, "token seams to me modified: invalid token", `ReceivedToken: ${jwtToken} \n Stack: ${error?.stack}`);
+            throw new AuthorizationException("Unauthorized Please Login!", HttpCodes.BAD_REQUEST, "token probably modified or signature changed: invalid token", `@verifyJwtToken.function(): invalid token, ReceivedToken: ${jwtToken} ,  ${error?.stack}`);
         }
 
         /**
          * if thrown error is " jwt expired "
          */
         if (error.message === "jwt expired") {
-            throw new AuthorizationException("Authentication Expired Please Login!", HttpCodes.UNATHORIZED, "Token Expired Re-authenticate", `ReceivedToken: ${jwtToken} \n Stack: ${error?.stack}`);
+            throw new AuthorizationException("Authentication Expired Please Login!", HttpCodes.UNATHORIZED, "Token Expired Re-authenticate", `@verifyJwtToken.function(): jwt expired, ReceivedToken: ${jwtToken} , ${error?.stack}`);
         }
 
         /**
          * If any other error is thrown 
          */
-        throw new AuthorizationException("Internal Server Error", HttpCodes.UNATHORIZED, "Unknown Error Occoured while decodeing token", `ReceivedToken: ${jwtToken} \n Stack: ${error?.stack}`);
+        throw new AuthorizationException("Internal Server Error", HttpCodes.UNATHORIZED, "Unknown Error Occoured while decodeing token", `@verifyJwtToken.function(): Unknown Error, ReceivedToken: ${jwtToken} , ${error?.stack}`);
     }
 
     /**

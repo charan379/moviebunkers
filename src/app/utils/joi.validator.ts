@@ -8,8 +8,7 @@ async function JoiValidator(joiSchema: Joi.ObjectSchema<any> | Joi.AnySchema , r
     const {value: DTO, error: errors} = await joiSchema.validate(requestBody, options);
 
     if (errors){
-        console.log(errors)
-        throw new ValidationException("Request Validation Failed", HttpCodes.BAD_REQUEST, errors.message, errors.stack )
+        throw new ValidationException("Request Validation Failed", HttpCodes.BAD_REQUEST, errors.message, `@JoiValidator.function(): requestBody: ${JSON.stringify(requestBody)},  ${errors.stack}` )
     }
 
     return DTO;
