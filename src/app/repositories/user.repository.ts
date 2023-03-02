@@ -1,7 +1,7 @@
 import PageDTO from "@dto/page.dto";
 import { UserDTO } from "@dto/user.dto";
 import IUserRepository from "@repositories/interfaces/user.repository.interface";
-import { ProjectionFields } from "mongoose";
+import { Model, ProjectionFields } from "mongoose";
 import { Service } from "typedi";
 import IUser from "@models/interfaces/user.interface";
 import UserModel from "@models/user.model";
@@ -12,8 +12,12 @@ class UserRepository implements IUserRepository {
   /**
    * userModel monggose
    */
-  private userModel = UserModel<IUser>;
+  private userModel: Model<IUser>;
 
+  constructor(){
+    this.userModel = UserModel;
+  }
+  
   /**
    * create()
    * @param user 
