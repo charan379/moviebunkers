@@ -10,33 +10,27 @@ import { NextFunction, Request, Response, Router } from "express";
 import { Inject, Service } from "typedi";
 import PageDTO from "@dto/page.dto";
 
-function custMiddleWare(req: Request, res: Response, next: NextFunction) {
-  console.log(req.baseUrl);
-  req.message = "hello world";
-  next()
-}
-
 @Service()
 export class UserController {
   private debug = debugLogger("moviebunkers:[UserController.class]");
 
-  public router = Router();
+  public router: Router = Router();
   private userService: UserService;
   constructor(@Inject() userService: UserService) {
     this.userService = userService;
 
     // get
-    this.router.get("/", custMiddleWare, this.getAllUsers.bind(this));
-    this.router.get("/id/:id", custMiddleWare, this.getUserById.bind(this));
-    this.router.get("/:userName", custMiddleWare, this.getUserByUserName.bind(this));
-    this.router.get("/email/:email", custMiddleWare, this.getUserByEmail.bind(this));
+    this.router.get("/", this.getAllUsers.bind(this));
+    this.router.get("/id/:id", this.getUserById.bind(this));
+    this.router.get("/:userName", this.getUserByUserName.bind(this));
+    this.router.get("/email/:email", this.getUserByEmail.bind(this));
 
 
     //post
-    this.router.post("/new", custMiddleWare, this.createUser.bind(this));
+    this.router.post("/new", this.createUser.bind(this));
 
     //put
-    this.router.put("/update/:userName", custMiddleWare, this.updateUser.bind(this))
+    this.router.put("/update/:userName", this.updateUser.bind(this))
 
   }
 
@@ -46,7 +40,7 @@ export class UserController {
    * @param res 
    * @param next 
    */
-  private async getAllUsers(req: Request, res: Response, next: NextFunction) {
+  private async getAllUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
 
     try {
 
@@ -57,7 +51,7 @@ export class UserController {
       res.status(HttpCodes.OK).json(users);
 
     } catch (error) {
-      
+
       next(error);
     }
   }
@@ -68,7 +62,7 @@ export class UserController {
    * @param res 
    * @param next 
    */
-  private async getUserById(req: Request, res: Response, next: NextFunction) {
+  private async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       // validate userId is mongooDB Object Id
       const validId = await JoiValidator(ObjectIdSchema, req?.params?.id, { abortEarly: false, stripUnknown: true });
@@ -92,7 +86,7 @@ export class UserController {
    * @param res 
    * @param next 
    */
-  private async getUserByUserName(req: Request, res: Response, next: NextFunction) {
+  private async getUserByUserName(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       // validate userName
       const validUserName = await JoiValidator(userNameSchema, req?.params?.userName, { abortEarly: false, stripUnknown: true });
@@ -113,7 +107,7 @@ export class UserController {
    * @param res 
    * @param next 
    */
-  private async getUserByEmail(req: Request, res: Response, next: NextFunction) {
+  private async getUserByEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
 
       const validEmail = await JoiValidator(emailSchema, req?.params?.email, { abortEarly: false, stripUnknown: true });
@@ -147,7 +141,7 @@ export class UserController {
    * @param res 
    * @param next 
    */
-  private async updateUser(req: Request, res: Response, next: NextFunction) {
+  private async updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
 
       const validUserName = await JoiValidator(userNameSchema, req?.params?.userName, { abortEarly: false, stripUnknown: true });
