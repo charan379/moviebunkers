@@ -11,12 +11,12 @@ const WinstonLogger = createLogger({
     defaultMeta: { service: 'moviebunkers' },
     transports: [
       new transports.File({
-        filename: 'logs/app.logs.json',
+        filename: 'logs/app.logs.log',
         format: format.combine(
           format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
           format.errors({ stack: true }),
           format.splat(),
-          format.json({ space: 2 })
+          format.json({ space: 0 })
         ),
       }),
       new transports.Console({
