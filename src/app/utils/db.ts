@@ -1,3 +1,4 @@
+import WinstonLogger from "@middlewares/winstonlogger.middleware";
 import mongoose, { ConnectOptions } from "mongoose";
 
 class Database {
@@ -16,7 +17,10 @@ class Database {
     const dbConnection = mongoose.connection;
     dbConnection.on(
       "error",
-      console.error.bind(console, "🔴  [MongoDB]: Connection Error : ")
+      (err)=> {
+        //  console.error.bind(console, "🔴  [MongoDB]: Connection Error : ");
+        WinstonLogger.error(err);
+      }
     );
     dbConnection.once("open", () => {
       console.info("🟢 [MongoDB]: MongoDB connection established successfully");
