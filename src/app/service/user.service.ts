@@ -72,7 +72,7 @@ export class UserService implements IUserService {
 
     const user = await this.userRepository.findById(id);
 
-    if (!user) throw new UserException("User not found for given id", HttpCodes.OK, `Id : ${id}`);
+    if (!user) throw new UserException("User Not Found", HttpCodes.NOT_FOUND, `User not found for given id : ${id}`, `@UserService.class: @getUserById.method() userId : ${id}`);
 
     const userDTO: UserDTO = {
       userName: user.userName,
@@ -96,10 +96,11 @@ export class UserService implements IUserService {
 
     const user = await this.userRepository.findByUserName(userName);
 
-    if (!user) throw new UserException("User not found for given userName", HttpCodes.OK, `userName : ${userName}`);
+    if (!user) throw new UserException("User Not Found", HttpCodes.NOT_FOUND, `user not found for given userName : ${userName}`,`@UserService.class: @getUserByUserName.method() userName : ${userName}`);
 
     const userDTO: UserDTO = {
       userName: user.userName,
+      password: user.password,
       email: user.email,
       status: user.status,
       role: user.role,
@@ -120,8 +121,7 @@ export class UserService implements IUserService {
 
     const user = await this.userRepository.findByEmail(email);
 
-    if (!user) throw new UserException("User not found for given email", HttpCodes.OK, `email : ${email}`);
-
+    if (!user) throw new UserException("User Not Found", HttpCodes.NOT_FOUND, `user not found for given email : ${email}`, `@UserService.class: @getUserByEmail.method() email : ${email}`);
 
     const userDTO: UserDTO = {
       userName: user.userName,
@@ -174,11 +174,11 @@ export class UserService implements IUserService {
 
     const user = await this.userRepository.findByUserName(userName);
 
-    if (!user) throw new UserException("User not found", HttpCodes.NOT_FOUND, `UserName: ${userName} not found`)
+    if (!user) throw new UserException("Update Failed: User Not Found", HttpCodes.NOT_FOUND, `user not found for given userName : ${userName}`, `@UserService.class: @updateUserByUserName.method() userName : ${userName}`)
 
     const updatedUser = await this.userRepository.update(user.userName, userUpdateDTO);
 
-    if (!updatedUser) throw new UserException("User updation failed", HttpCodes.INTERNAL_SERVER_ERROR, "Unknown Reason contact developer");
+    if (!updatedUser) throw new UserException("User Updation Failed", HttpCodes.INTERNAL_SERVER_ERROR, "Unknown Reason contact developer", `@UserService.class: @updateUserByUserName.method() userName: ${userName}, user: ${JSON.stringify(user)}, updateDTO: ${userUpdateDTO}`);
 
     const userDTO: UserDTO = {
       userName: updatedUser.userName,
