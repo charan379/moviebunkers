@@ -8,9 +8,10 @@ import debugLogger from "debug";
 import { NextFunction, Request, Response, Router } from "express";
 import { Inject, Service } from "typedi";
 import PageDTO from "@dto/page.dto";
+import WinstonLogger from "@middlewares/winstonlogger.middleware";
 
 @Service()
-export class UserController {
+class UserController {
   private debug = debugLogger("moviebunkers:[UserController.class]");
 
   public router: Router = Router();
@@ -161,3 +162,5 @@ export class UserController {
   }
 
 }
+
+export default UserController;
