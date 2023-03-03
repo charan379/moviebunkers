@@ -1,3 +1,5 @@
+import TitleType from "@constants/titile.types.enum";
+import TitleSource from "@constants/title.souces.enum";
 import Joi from "joi";
 
 export const languageSchema: Joi.ObjectSchema = Joi.object({
@@ -45,4 +47,15 @@ export const titleAuthorSchema: Joi.ObjectSchema = Joi.object({
     // last_modified_by
     last_modified_by: Joi.string().example("user002"),
 
+});
+
+export const newTitleInitialCheckSchema: Joi.ObjectSchema = Joi.object({
+    
+    title_type: Joi.string()
+        .valid(...Object.values(TitleType))
+        .required(),
+
+    source: Joi.string()
+        .valid(...Object.values(TitleSource))
+        .required(),
 });
