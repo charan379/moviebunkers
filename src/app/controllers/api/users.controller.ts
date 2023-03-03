@@ -6,7 +6,6 @@ import { UserService } from "@service/user.service";
 import JoiValidator from "@utils/joi.validator";
 import debugLogger from "debug";
 import { NextFunction, Request, Response, Router } from "express";
-
 import { Inject, Service } from "typedi";
 import PageDTO from "@dto/page.dto";
 
