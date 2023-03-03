@@ -14,10 +14,12 @@ import WinstonLogger from "@middlewares/winstonlogger.middleware";
 class UserController {
   private debug = debugLogger("moviebunkers:[UserController.class]");
 
-  public router: Router = Router();
+  public router: Router;
   private userService: UserService;
+
   constructor(@Inject() userService: UserService) {
     this.userService = userService;
+    this.router = Router();
 
     // get
     this.router.get("/", this.getAllUsers.bind(this));
