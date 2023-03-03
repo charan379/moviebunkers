@@ -10,6 +10,9 @@ import { Inject, Service } from "typedi";
 import PageDTO from "@dto/page.dto";
 import WinstonLogger from "@middlewares/winstonlogger.middleware";
 
+/**
+ * @Controller("/users") => UserController.class
+ */
 @Service()
 class UserController {
   private debug = debugLogger("moviebunkers:[UserController.class]");
@@ -37,7 +40,7 @@ class UserController {
   }
 
   /**
-   * getAll users unimplemented
+   * @Get("/") => getAllUsers() Controller
    * @param req 
    * @param res 
    * @param next 
@@ -59,7 +62,7 @@ class UserController {
   }
 
   /**
-   * @Get("/id/:id") => getUserById() controller
+   * @Get("/id/:id") => getUserById() Controller
    * @param req 
    * @param res 
    * @param next 
@@ -83,7 +86,7 @@ class UserController {
   }
 
   /**
-   * Get("/:userName") => getUserByUserName() controller
+   * Get("/:userName") => getUserByUserName() Controller
    * @param req 
    * @param res 
    * @param next 
@@ -123,6 +126,12 @@ class UserController {
     }
   }
 
+  /**
+   * Post("/new") => createUser() Controller
+   * @param req 
+   * @param res 
+   * @param next 
+   */
   private async createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const validNewUser: NewUserDTO = await JoiValidator(newUserSchema, req.body, { abortEarly: false, stripUnknown: true });
@@ -138,6 +147,7 @@ class UserController {
   }
 
   /**
+   * @Put("/update/:userName") => updateUser() Controller
    * updateUser ( role, status only)
    * @param req 
    * @param res 
