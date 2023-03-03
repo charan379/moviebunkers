@@ -14,10 +14,10 @@ class UserRepository implements IUserRepository {
    */
   private userModel: Model<IUser>;
 
-  constructor(){
+  constructor() {
     this.userModel = UserModel;
   }
-  
+
   /**
    * create()
    * @param user 
@@ -74,12 +74,10 @@ class UserRepository implements IUserRepository {
     { query, sort, limit, page }: FindAllQuery,
     projection: ProjectionFields<IUser> = { _id: 0, password: 0, __v: 0 }
   ): Promise<PageDTO> {
-    // throw new Error("un inmp");
 
     const total_results = await this.userModel.find({ ...query }).countDocuments().lean().exec();
 
-    const usersList: IUser[] = await this.userModel
-      .find({ ...query }, projection)
+    const usersList: IUser[] = await this.userModel.find({ ...query }, projection)
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort({ ...sort })
