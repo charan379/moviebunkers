@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const Config = Object.freeze({
   PORT: process.env.PORT || 3000,
+  DOMAIN_NAME: process.env.DOMAIN_NAME,
   MongoDB_SERVER_STRING: process.env.MongoDB_SERVER_STRING,
   HTTPS: process.env.HTTPS === "true" ? true : false,
   COOKIE_SECRET: process.env.COOKIE_SECRET,
