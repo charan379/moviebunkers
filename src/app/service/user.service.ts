@@ -72,7 +72,7 @@ export class UserService implements IUserService {
 
     const user = await this.userRepository.findById(id);
 
-    if (!user) throw new UserException("User Not Found", HttpCodes.NOT_FOUND, `User not found for given id : ${id}`, `@UserService.class: @getUserById.method() userId : ${id}`);
+    if (!user) throw new UserException("User Not Found !", HttpCodes.NOT_FOUND, `User not found for given id : ${id}`, `@UserService.class: @getUserById.method() userId : ${id}`);
 
     const userDTO: UserDTO = {
       userName: user.userName,
