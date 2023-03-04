@@ -8,6 +8,8 @@ import webRouter from '@routes/pug.routes'
 import apiRouter from '@routes/api.routes'
 import ErrorHandler from "@middlewares/errorHandler.middleware";
 import { ConsoleLogger } from "@middlewares/logger.middleware";
+import { swaggerDocs } from "./app/swagger/swagger.options";
+import swaggerUi from 'swagger-ui-express';
 
 const app: Application = express();
 
@@ -25,6 +27,9 @@ app.use(stylus.middleware(path.join(__dirname, "../public")));
 app.use(express.static(path.join(__dirname, "../public")));
 
 app.use(ConsoleLogger);
+
+// swagger API Documentation
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.use('/', webRouter);
 app.use("/api", apiRouter);
