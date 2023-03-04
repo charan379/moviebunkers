@@ -5,7 +5,9 @@ import JoiValidator from "@utils/joi.validator";
 import { CookieOptions, NextFunction, Request, Response, Router } from "express";
 import { Inject, Service } from "typedi";
 
-
+/**
+ * @Controller("/auth") => AuthController.class
+ */
 @Service()
 class AuthController {
 
@@ -23,6 +25,12 @@ class AuthController {
     }
 
 
+    /**
+     * @Post("/login") => login() Controller
+     * @param req 
+     * @param res 
+     * @param next 
+     */
     private async login(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const validLoginDTO: LoginDTO = await JoiValidator(lgoinSchema, req?.body, { allowUnknown: false, stripUnknown: true, abortEarly: false });
@@ -46,7 +54,12 @@ class AuthController {
         }
     }
 
-
+    /**
+     * @Get("/logout") => logout() Controller
+     * @param req 
+     * @param res 
+     * @param next 
+     */
     private async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
