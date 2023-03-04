@@ -1,6 +1,8 @@
+import UserRoles from "@constants/user.roles.enum";
 import TitleDTO from "@dto/title.dto";
 import baseTitleSchema from "@joiSchemas/base.joi.title.schema";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
+import Authorize from "@middlewares/authorization.middleware";
 import TitleService from "@service/title.service";
 import JoiValidator from "@utils/joi.validator";
 import { NextFunction, Request, Response, Router } from "express";
@@ -21,11 +23,60 @@ class TitleController {
         this.router = Router();
 
         //get
-        this.router.get("/", this.getAllTitles.bind(this));
-        this.router.get("/id/:id", this.getTitleById.bind(this));
+        this.router.get("/", Authorize([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER]), this.getAllTitles.bind(this));
+
+        /**
+         * @swagger
+         * /id/{id}:
+         *  get:
+         *   tags:
+         *     - Titles
+         *   summary: API to to title details base Id
+         *   description: return title details based on title ID
+         *   parameters:
+         *     - in: path
+         *       name: id
+         *       schema:
+         *          type: string
+         *   responses:
+         *       200:
+         *          description: Success
+         *       401:
+         *          description: Unauthorized
+         *       404: Not Found
+         */
+        this.router.get("/id/:id",Authorize([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER]), this.getTitleById.bind(this));
 
         //post
-        this.router.post("/new", this.createTitle.bind(this));
+        /**
+         * @swagger
+         * /titles/new:
+         *  post:
+         *   tags:
+         *     - Titles
+         *   summary: API to create new title
+         *   description: create a title for valid title object
+         *   requestBody:
+         *      content:
+         *        application/json:
+         *          description: movie
+         *          schema:
+         *              #$ref: '#/components/schemas/new_movie'
+         *              #$ref: '#/components/schemas/new_tv'
+         *              oneOf:
+         *                  - $ref: '#/components/schemas/new_movie'
+         *                  - $ref: '#/components/schemas/new_tv'
+         *                
+         *   responses:
+         *       200:
+         *          description: Success
+         *       400:
+         *          description: Invalid new title
+         *       401:
+         *          description: Unauthorized
+         *      
+         */
+        this.router.post("/new",Authorize([UserRoles.ADMIN, UserRoles.MODERATOR]),  this.createTitle.bind(this));
     }
 
     /**

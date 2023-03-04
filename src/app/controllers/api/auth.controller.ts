@@ -21,7 +21,7 @@ class AuthController {
         this.authService = authService;
 
         //login
-                /**
+        /**
          * @swagger
          * /auth/cookie-auth:
          *  post:
@@ -44,7 +44,7 @@ class AuthController {
         this.router.post("/cookie-auth", this.cookieAuth.bind(this));
 
         //logout
-                /**
+        /**
          * @swagger
          * /auth/logout:
          *  get:
