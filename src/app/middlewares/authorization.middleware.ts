@@ -22,7 +22,7 @@ export default function Authorize(allowedRoles: UserRoles[]) {
 
                 //Authorization: 'Bearer TOKEN' or In signedCookies auth: 'Bearer TOKEN'
                 const auth: string = req?.headers?.authorization || req?.signedCookies?.auth;
-                if (!auth) throw new AuthorizationException("Unauthorized Please Login!", HttpCodes.UNATHORIZED, "Token Not Provided at headers or cookies", `@Authorize.function(): Request : ${JSON.stringify(req)}`);
+                if (!auth) throw new AuthorizationException("Unauthorized Please Login!", HttpCodes.UNATHORIZED, "Token Not Provided at headers or cookies", `@Authorize.function(): Request Headers: ${JSON.stringify(req.headers)}, Request Signed Cookies: ${JSON.stringify(req.signedCookies)}`);
 
                 const authToken: string = auth.split(" ")[1];
                 if (!authToken) throw new AuthorizationException("Unauthorized Please Login!", HttpCodes.UNATHORIZED, "headers or cookies auth persists but not in format of: 'Bearer TOKEN' ", `@Authorize.function():  Token: ${authToken}`);
