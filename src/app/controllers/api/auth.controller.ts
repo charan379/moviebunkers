@@ -1,5 +1,8 @@
-import { LoginDTO } from "@dto/user.dto";
+import HttpCodes from "@constants/http.codes.enum";
+import UserRoles from "@constants/user.roles.enum";
+import { LoginDTO, UserDTO } from "@dto/user.dto";
 import { lgoinSchema } from "@joiSchemas/user.joi.schemas";
+import Authorize from "@middlewares/authorization.middleware";
 import { AuthService } from "@service/auth.service";
 import JoiValidator from "@utils/joi.validator";
 import { CookieOptions, NextFunction, Request, Response, Router } from "express";
@@ -18,10 +21,62 @@ class AuthController {
         this.authService = authService;
 
         //login
-        this.router.post("/login", this.login.bind(this));
+                /**
+         * @swagger
+         * /auth/cookie-auth:
+         *  post:
+         *   tags:
+         *     - Auth
+         *   summary: API to Login and set auth cookies
+         *   description: sets auth cookie for valid login
+         *   requestBody:
+         *      content:
+         *        application/json:
+         *          schema:
+         *              $ref: '#/components/schemas/login'
+         *   responses:
+         *       200:
+         *          description: Success
+         *       404:
+         *          description: user or password incorrect or not found
+         *   security: []
+         */
+        this.router.post("/cookie-auth", this.cookieAuth.bind(this));
 
         //logout
+                /**
+         * @swagger
+         * /auth/logout:
+         *  get:
+         *   tags:
+         *     - Auth
+         *   summary: API to logout
+         *   description: clears auth cookie
+         *   responses:
+         *       200:
+         *          description: Success
+         *       500:
+         *          description: Internal Server Error
+         *   security: []
+         */
         this.router.get("/logout", this.logout.bind(this));
+
+
+        /**
+         * @swagger
+         * /auth/who-am-i:
+         *  get:
+         *   tags:
+         *     - Auth
+         *   summary: API to to get user details with if user logged in
+         *   description: return user info based on login cookie
+         *   responses:
+         *       200:
+         *          description: Success
+         *       401:
+         *          description: Unauthorized
+         */
+        this.router.get("/who-am-i", Authorize([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER]), this.getWhoAmI.bind(this));
     }
 
 
@@ -31,7 +86,7 @@ class AuthController {
      * @param res 
      * @param next 
      */
-    private async login(req: Request, res: Response, next: NextFunction): Promise<void> {
+    private async cookieAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const validLoginDTO: LoginDTO = await JoiValidator(lgoinSchema, req?.body, { allowUnknown: false, stripUnknown: true, abortEarly: false });
 
@@ -45,7 +100,7 @@ class AuthController {
                 overwrite: true,
                 sameSite: false,
             } as CookieOptions)
-            .status(200)
+            .status(HttpCodes.OK)
             .json({ message: "Successfully Logged In" });
 
         } catch (error) {
@@ -64,13 +119,33 @@ class AuthController {
         try {
 
             res.clearCookie("auth")
-            .status(200)
+            .status(HttpCodes.OK)
             .json({ message: "Successfully Logged Out" })
 
         } catch (error) {
 
             next(error)
 
+        }
+    }
+
+    /**
+     * @Get("/who-am-i") => getWhoAmI() Controller
+     * @param req 
+     * @param res 
+     * @param next 
+     */
+    private async getWhoAmI(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userName: string | undefined = req?.userName;
+
+            const userDTO: UserDTO = await this.authService.WhoAmI(userName);
+
+            delete userDTO.password;
+      
+            res.status(HttpCodes.OK).json(userDTO);
+        } catch (error) {
+            next(error);
         }
     }
 
