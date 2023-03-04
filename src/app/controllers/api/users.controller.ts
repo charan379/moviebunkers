@@ -8,7 +8,8 @@ import debugLogger from "debug";
 import { NextFunction, Request, Response, Router } from "express";
 import { Inject, Service } from "typedi";
 import PageDTO from "@dto/page.dto";
-import WinstonLogger from "@middlewares/winstonlogger.middleware";
+import Authorize from "@middlewares/authorization.middleware";
+import UserRoles from "@constants/user.roles.enum";
 
 /**
  * @Controller("/users") => UserController.class
@@ -24,18 +25,166 @@ class UserController {
     this.userService = userService;
     this.router = Router();
 
-    // get
-    this.router.get("/", this.getAllUsers.bind(this));
-    this.router.get("/id/:id", this.getUserById.bind(this));
-    this.router.get("/:userName", this.getUserByUserName.bind(this));
-    this.router.get("/email/:email", this.getUserByEmail.bind(this));
+    /**
+     * @swagger
+     * /users:
+     *  get:
+     *   tags:
+     *     - Users
+     *   summary: API to to get all users
+     *   description: return users for given query
+     *   parameters:
+     *      - in: query
+     *        name: role
+     *        schema:
+     *          type: string
+     *          enum: ['Admin','User','Moderator']
+     *      - in: query
+     *        name: status
+     *        schema:
+     *          type: string
+     *          enum: ['Active', 'Inactive']
+     *      - in: query
+     *        name: email
+     *        schema:
+     *          type: email
+     *      - in: query
+     *        name: userName
+     *        schema:
+     *         type: string
+     *      - in: query
+     *        name: page
+     *        schema:
+     *          type: integer
+     *      - in: query
+     *        name: limit
+     *        schema:
+     *          type: integer
+     *      - in: query
+     *        name: sort_by
+     *        schema:
+     *          type: string
+     *
+     *   responses:
+     *       200:
+     *          description: Success
+     *       404:
+     *          description: Invalid new user
+     *   
+     */
+    this.router.get("/", Authorize([UserRoles.ADMIN]), this.getAllUsers.bind(this));
+
+    /**
+     * @swagger
+     * /users/id/{id}:
+     *  get:
+     *   tags:
+     *     - Users
+     *   summary: API to get user by id
+     *   description: returns user by object id
+     *   parameters:
+     *     - in: path
+     *       name: id
+     *       schema:
+     *          type: string
+     *   responses:
+     *       200:
+     *          description: Success
+     *       404:
+     *          description: User not found
+     */
+    this.router.get("/id/:id", Authorize([UserRoles.ADMIN]), this.getUserById.bind(this));
+
+    /**
+     * @swagger
+     * /users/{userName}:
+     *  get:
+     *   tags:
+     *     - Users
+     *   summary: API to get user by userName
+     *   description: returns user by userName
+     *   parameters:
+     *     - in: path
+     *       name: userName
+     *       schema:
+     *          type: string
+     *   responses:
+     *       200:
+     *          description: Success
+     *       404:
+     *          description: User not found
+     */
+    this.router.get("/:userName", Authorize([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER]), this.getUserByUserName.bind(this));
+
+    /**
+     * @swagger
+     * /users/email/{email}:
+     *  get:
+     *   tags:
+     *     - Users
+     *   summary: API to get user by email
+     *   description: returns user by email
+     *   parameters:
+     *     - in: path
+     *       name: email
+     *       schema:
+     *          type: string
+     *   responses:
+     *       200:
+     *          description: Success
+     *       404:
+     *          description: User not found
+     */
+    this.router.get("/email/:email", Authorize([UserRoles.ADMIN]), this.getUserByEmail.bind(this));
 
 
-    //post
-    this.router.post("/new", this.createUser.bind(this));
+    /**
+   * @swagger
+   * /users/new:
+   *  post:
+   *   tags:
+   *     - Users
+   *   summary: API to create new user
+   *   description: create a user for valid user object
+   *   requestBody:
+   *      content:
+   *        application/json:
+   *          schema:
+   *              $ref: '#/components/schemas/new_user'
+   *   security: []
+   *   responses:
+   *       201:
+   *          description: Success
+   *       401:
+   *          description: Invalid new user
+   */
+    this.router.post("/new", Authorize([UserRoles.ADMIN]), this.createUser.bind(this));
 
-    //put
-    this.router.put("/update/:userName", this.updateUser.bind(this))
+    /**
+     * @swagger
+     * /users/update/{userName}:
+     *  put:
+     *   tags:
+     *     - Users
+     *   summary: API to update user role, status
+     *   description: can update user status and role
+     *   parameters:
+     *     - in: path
+     *       name: userName
+     *       schema:
+     *          type: string
+     *   requestBody:
+     *      content:
+     *        application/json:
+     *          schema:
+     *              $ref: '#/components/schemas/update_user'
+     *   responses:
+     *       200:
+     *          description: Success
+     *       404:
+     *          description: User not found
+     */
+    this.router.put("/update/:userName", Authorize([UserRoles.ADMIN]), this.updateUser.bind(this))
 
   }
 
@@ -97,6 +246,8 @@ class UserController {
       const validUserName = await JoiValidator(userNameSchema, req?.params?.userName, { abortEarly: false, stripUnknown: true });
 
       const userDTO: UserDTO = await this.userService.getUserByUserName(validUserName);
+
+      delete userDTO.password;
 
       res.status(HttpCodes.OK).json(userDTO);
 
