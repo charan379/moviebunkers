@@ -38,6 +38,9 @@ export const swaggerOptions = {
             {
                 name: "Users",
             },
+            {
+                name: 'Auth'
+            }
         ],
 
         components: {
