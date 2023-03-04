@@ -1,4 +1,5 @@
 import WinstonLogger from "@middlewares/winstonlogger.middleware";
+import Config from "@Config";
 import mongoose, { ConnectOptions } from "mongoose";
 
 class Database {
@@ -6,7 +7,7 @@ class Database {
     console.info(
       "⚙️  [MongoDB]: waiting for MongoDB Connection to be established... "
     );
-    const uri = "mongodb://127.0.0.1:27017/moviebunkers";
+    const uri : string = Config?.MongoDB_SERVER_STRING as string;
     const options = {
       useNewUrlParser: true,
       useUnifiedTopology: true,
