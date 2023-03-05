@@ -2,10 +2,15 @@ import HttpCodes from "@constants/http.codes.enum";
 import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
 import MovieDTO from "@dto/movie.dto";
-import TitleDTO from "@dto/title.dto";
+import PageDTO from "@dto/page.dto";
+import TitleDTO, { FindAllTitlesQueryDTO } from "@dto/title.dto";
 import TvDTO from "@dto/Tv.dto";
 import TitleException from "@exceptions/title.exeception";
+import ITitle from "@models/interfaces/title.interface";
+import { FindAllQuery } from "@repositories/interfaces/custom.types.interfaces";
 import TitleRepository from "@repositories/title.repository";
+import MongoSortBuilder from "@utils/mongo.sort.builder";
+import { FilterQuery, ProjectionFields } from "mongoose";
 import { Inject, Service } from "typedi";
 import ITitleService from "./interfaces/title.service.interface";
 import MovieService from "./movie.service";
@@ -79,6 +84,52 @@ class TitleService implements ITitleService {
         const titleDTO: TitleDTO = title as TitleDTO;
         
         return titleDTO;
+    }
+
+    /**
+     * 
+     * @param queryDTO 
+     * @returns Promise<PageDTO>
+     */
+    async getAllTitles(queryDTO: FindAllTitlesQueryDTO): Promise<PageDTO> {
+
+        const query: FilterQuery<ITitle> = {
+            $and: [
+                {
+                    title: { $regex: new RegExp(`^${queryDTO.search ?? ""}`, "i")},
+                    title_type: { $regex: new RegExp(`^${queryDTO.title_type ?? ""}`, "i")},
+                    "original_language.ISO_639_1_code": { $regex: new RegExp(`^${queryDTO.language ?? ""}`, "i")},
+                    genres: { $regex: new RegExp(`${queryDTO.genre ?? ""}`, "i")}
+                }
+            ]
+        }
+
+        const minimalProjection : ProjectionFields<ITitle> = {
+            _id: 1,
+            title_type: 1,
+            title: 1,
+            ratting: 1,
+            year: 1,
+            poster_path: 1,
+            genres: 1,
+        }
+
+        const normalProjection: ProjectionFields<ITitle> = {
+            __v: 0,
+        }
+
+        const sort = queryDTO.sort_by ? await MongoSortBuilder(queryDTO.sort_by) : { createdAt: 'desc' };
+
+        const q: FindAllQuery = {
+          query,
+          sort: sort,
+          limit: queryDTO?.limit ?? 5,
+          page: queryDTO?.page ?? 1,
+        }
+        
+        const page: PageDTO = await this.titleRepository.findAll(q, queryDTO.minimal ? minimalProjection : normalProjection );
+
+        return page;
     }
 }
 
