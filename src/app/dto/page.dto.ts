@@ -1,3 +1,4 @@
+import TitleDTO from "./title.dto";
 import { UserDTO } from "./user.dto";
 
 export default  interface PageDTO {
@@ -5,5 +6,5 @@ export default  interface PageDTO {
     total_pages: number,
     total_results: number,
     sort_order?: Object,
-    list: UserDTO[] | any[],
+    list: any[],
 }
