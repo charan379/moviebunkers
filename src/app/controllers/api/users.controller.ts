@@ -31,7 +31,7 @@ class UserController {
      *  get:
      *   tags:
      *     - Users
-     *   summary: API to to get all users
+     *   summary: API to get all users
      *   description: return users for given query
      *   parameters:
      *      - in: query
@@ -68,8 +68,10 @@ class UserController {
      *   responses:
      *       200:
      *          description: Success
-     *       404:
-     *          description: Invalid new user
+     *       400:
+     *          description: Invalid query
+     *       401:
+     *          description: Unauthorized
      *   
      */
     this.router.get("/", Authorize([UserRoles.ADMIN]), this.getAllUsers.bind(this));
@@ -92,6 +94,10 @@ class UserController {
      *          description: Success
      *       404:
      *          description: User not found
+     *       400:
+     *          description: Invalid id
+     *       401:
+     *          description: Unauthorized
      */
     this.router.get("/id/:id", Authorize([UserRoles.ADMIN]), this.getUserById.bind(this));
 
@@ -113,6 +119,10 @@ class UserController {
      *          description: Success
      *       404:
      *          description: User not found
+     *       400:
+     *          description: Invalid userName
+     *       401:
+     *          description: Unauthorized
      */
     this.router.get("/:userName", Authorize([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER]), this.getUserByUserName.bind(this));
 
@@ -134,11 +144,15 @@ class UserController {
      *          description: Success
      *       404:
      *          description: User not found
+     *       400:
+     *          description: invalid email
+     *       401:
+     *          description: Unauthorized
      */
     this.router.get("/email/:email", Authorize([UserRoles.ADMIN]), this.getUserByEmail.bind(this));
 
 
-    /**
+  /**
    * @swagger
    * /users/new:
    *  post:
@@ -155,8 +169,10 @@ class UserController {
    *   responses:
    *       201:
    *          description: Success
-   *       401:
+   *       400:
    *          description: Invalid new user
+   *       401:
+   *          description: Unauthorized
    */
     this.router.post("/new", Authorize([UserRoles.ADMIN]), this.createUser.bind(this));
 
@@ -183,6 +199,10 @@ class UserController {
      *          description: Success
      *       404:
      *          description: User not found
+     *       401:
+     *          description: Unauthorized
+     *       400:
+     *          description: Invalid Update
      */
     this.router.put("/update/:userName", Authorize([UserRoles.ADMIN]), this.updateUser.bind(this))
 

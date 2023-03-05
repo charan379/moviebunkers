@@ -68,7 +68,7 @@ class AuthController {
          *  get:
          *   tags:
          *     - Auth
-         *   summary: API to to get user details with if user logged in
+         *   summary: API to get user details with if user logged in
          *   description: return user info based on login cookie
          *   responses:
          *       200:
