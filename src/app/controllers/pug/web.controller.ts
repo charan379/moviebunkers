@@ -15,6 +15,6 @@ export default class WebController {
   }
 
   private getIndex(req: Request, res: Response, next: NextFunction) {
-    res.render('index', { title: "moviebunkers v2.0" });
+    res.render('index', { title: "MovieBunkers - API" });
   }
 }
