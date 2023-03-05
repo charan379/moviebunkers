@@ -11,6 +11,8 @@ import { ConsoleLogger } from "@middlewares/logger.middleware";
 import { swaggerDocs } from "./app/swagger/swagger.options";
 import swaggerUi from 'swagger-ui-express';
 import Config from "@Config";
+import CorsOptions from "@utils/cors.options";
+import cors from 'cors';
 
 const app: Application = express();
 
@@ -20,6 +22,8 @@ app.set("env", Config.NODE_ENV);
 // view engine setup
 app.set("views", path.join(__dirname, "/app/views"));
 app.set("view engine", "pug");
+
+app.use(cors(CorsOptions));
 // app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
