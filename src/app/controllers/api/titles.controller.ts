@@ -1,7 +1,10 @@
+import HttpCodes from "@constants/http.codes.enum";
 import UserRoles from "@constants/user.roles.enum";
-import TitleDTO from "@dto/title.dto";
+import PageDTO from "@dto/page.dto";
+import TitleDTO, { FindAllTitlesQueryDTO } from "@dto/title.dto";
 import baseTitleSchema from "@joiSchemas/base.joi.title.schema";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
+import { getAllTitlesQuerySchema } from "@joiSchemas/common.title.joi.schemas";
 import Authorize from "@middlewares/authorization.middleware";
 import TitleService from "@service/title.service";
 import JoiValidator from "@utils/joi.validator";
@@ -23,6 +26,60 @@ class TitleController {
         this.router = Router();
 
         //get
+        /**
+         * @swagger
+         * /titles:
+         *  get:
+         *   tags:
+         *     - Titles
+         *   summary: API to get all titles
+         *   description: return list of titles for given query
+         *   parameters:
+         *      - in: query
+         *        name: search
+         *        schema:
+         *          type: string
+         *      - in: query
+         *        name: title_type
+         *        schema:
+         *          type: string
+         *          enum: ["tv", "movie"]
+         *      - in: query
+         *        name: genre
+         *        schema:
+         *          type: string
+         *      - in: query
+         *        name: language
+         *        schema:
+         *          type: string
+         *          description: ISO_639_1_code of language
+         *          example: en
+         *      - in: query
+         *        name: minimal
+         *        schema:
+         *          type: boolean
+         *      - in: query
+         *        name: page
+         *        schema:
+         *          type: integer
+         *      - in: query
+         *        name: limit
+         *        schema:
+         *          type: integer
+         *      - in: query
+         *        name: sort_by
+         *        schema:
+         *          type: string
+         *          example: year.desc
+         *
+         *   responses:
+         *       200:
+         *          description: Success
+         *       401:
+         *          description: Unauthorized
+         *       400:
+         *          description: Invalid query
+         */
         this.router.get("/", Authorize([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER]), this.getAllTitles.bind(this));
 
         /**
@@ -31,7 +88,7 @@ class TitleController {
          *  get:
          *   tags:
          *     - Titles
-         *   summary: API to to title details base Id
+         *   summary: API to get title details base Id
          *   description: return title details based on title ID
          *   parameters:
          *     - in: path
@@ -43,7 +100,10 @@ class TitleController {
          *          description: Success
          *       401:
          *          description: Unauthorized
-         *       404: Not Found
+         *       400:
+         *          description: Invalid id
+         *       404:
+         *          description: Not Found
          */
         this.router.get("/id/:id",Authorize([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER]), this.getTitleById.bind(this));
 
@@ -89,7 +149,11 @@ class TitleController {
 
         try {
 
-            throw new Error("method not implemented")
+            const validQuery: FindAllTitlesQueryDTO = await JoiValidator(getAllTitlesQuerySchema, req.query, {abortEarly: false, stripUnknown: true});
+
+            const page: PageDTO= await this.titleService.getAllTitles(validQuery);
+            
+            res.status(HttpCodes.OK).json(page);
 
         } catch (error) {
 
