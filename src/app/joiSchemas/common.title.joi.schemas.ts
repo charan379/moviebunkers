@@ -63,3 +63,15 @@ export const newTitleInitialCheckSchema: Joi.ObjectSchema = Joi.object({
         .valid(...Object.values(TitleSource))
         .required(),
 });
+
+export const  getAllTitlesQuerySchema = Joi.object({
+    search: Joi.string().example("Fight Club"),
+    // year: Joi.number().integer().example(1999),
+    title_type: Joi.string().valid(...Object.values(TitleType)),
+    genre: Joi.string().example('Action'),
+    language: Joi.string().example('en'),
+    minimal: Joi.boolean().example(false),
+    page: Joi.number().integer().example(1),
+    limit: Joi.number().integer().example(5),
+    sort_by: Joi.string().example("createdAt.desc"),
+  });
