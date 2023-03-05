@@ -10,11 +10,12 @@ import ErrorHandler from "@middlewares/errorHandler.middleware";
 import { ConsoleLogger } from "@middlewares/logger.middleware";
 import { swaggerDocs } from "./app/swagger/swagger.options";
 import swaggerUi from 'swagger-ui-express';
+import Config from "@Config";
 
 const app: Application = express();
 
 // set app environment
-app.set("env", "development");
+app.set("env", Config.NODE_ENV);
 
 // view engine setup
 app.set("views", path.join(__dirname, "/app/views"));

@@ -16,6 +16,7 @@ To run this project, you will need to add the following environment variables to
 `JWT_SECRET`  
 `CORS_ORIGINS`  
 `PORT`  
+`NODE_ENV`  
 
 
 ####  Example 
@@ -26,6 +27,7 @@ To run this project, you will need to add the following environment variables to
 `JWT_SECRE`T=my jwt secret key  
 `CORS_ORIGINS`=http://localhost:3080,http://yourapp.com  
 `PORT`=3010  
+`NODE_ENV`=production  
 
 ## Run
 
@@ -51,6 +53,12 @@ Start the server
 
 ```bash
   npm run start
+```
+
+Start the server in dev
+
+```bash
+  npm run dev
 ```
 
 Server will start running on given port

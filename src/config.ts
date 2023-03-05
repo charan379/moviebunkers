@@ -10,6 +10,7 @@ const Config = Object.freeze({
   CORS_ORIGINS: process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(",").map((origin) => origin)
     : [],
+  NODE_ENV: process.env?.NODE_ENV ?? "development"
 });
 
 export default Config;
