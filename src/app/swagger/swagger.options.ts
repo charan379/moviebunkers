@@ -9,7 +9,7 @@ export const swaggerOptions = {
         openapi: "3.0.3",
         info: {
             title: "moviebunkers",
-            description: "moviebunkers app server",
+            description: "moviebunkers backend server",
             version: "2.0.1",
             contact: {
                 name: "charan379",
@@ -19,6 +19,7 @@ export const swaggerOptions = {
                 name: "GNU Affero General Public License",
                 url: "https://www.gnu.org/licenses/agpl-3.0.en.html",
             },
+            
         },
         servers: [
             {
