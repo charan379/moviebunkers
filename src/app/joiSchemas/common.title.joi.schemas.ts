@@ -1,3 +1,4 @@
+import Country from "@constants/country.enum";
 import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
 import Joi from "joi";
@@ -71,12 +72,18 @@ export const newTitleInitialCheckSchema: Joi.ObjectSchema = Joi.object({
 
 export const getAllTitlesQuerySchema = Joi.object({
     search: Joi.string().example("Fight Club"),
-    // year: Joi.number().integer().example(1999),
-    title_type: Joi.string().valid(...Object.values(TitleType)),
     genre: Joi.string().example('Action'),
     language: Joi.string().example('en'),
-    minimal: Joi.boolean().example(false),
-    page: Joi.number().integer().example(1),
-    limit: Joi.number().integer().example(5),
+    movie: Joi.number().integer().example(1).min(0).max(1).required(),
+    tv: Joi.number().integer().example(1).min(0).max(1).required(),
+    starred: Joi.number().integer().example(1).min(0).max(1).required(),
+    favourite: Joi.number().integer().example(1).min(0).max(1).required(),
+    seen: Joi.number().integer().example(1).min(-1).max(1).required(),
+    "age.gte": Joi.number().min(2).max(26).example(8),
+    "age.lte": Joi.number().min(2).max(26).example(12),
+    country: Joi.string().example("IN").valid(...Object.values(Country)).required(),
     sort_by: Joi.string().example("createdAt.desc"),
+    limit: Joi.number().integer().example(5),
+    page: Joi.number().integer().example(1),
+    minimal: Joi.boolean().example(false),
 });

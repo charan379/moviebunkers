@@ -1,3 +1,4 @@
+import AgeRattings from "@constants/age.rattings";
 import HttpCodes from "@constants/http.codes.enum";
 import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
@@ -80,9 +81,9 @@ class TitleService implements ITitleService {
         const title = await this.titleRepository.findById(id);
 
         if (!title) throw new TitleException("Title Not Found !", HttpCodes.NOT_FOUND, `Title not found for given Id: ${id}`, `@TitleService.class: @getTitleById.method() requested title Id: ${id}`);
-        
+
         const titleDTO: TitleDTO = title as TitleDTO;
-        
+
         return titleDTO;
     }
 
@@ -93,18 +94,27 @@ class TitleService implements ITitleService {
      */
     async getAllTitles(queryDTO: FindAllTitlesQueryDTO): Promise<PageDTO> {
 
+        const title_types = [{ type: "movie", include: queryDTO?.movie ?? 0 }, { type: "tv", include: queryDTO?.tv ?? 0 }];
+
+        const age_filter = AgeRattings?.[queryDTO.country].map(ratting => {
+            if ((ratting.age >= (queryDTO?.["age.gte"] ?? 0)) && (ratting.age <= (queryDTO?.["age.lte"] ?? 26))) return ratting.certification
+        }).filter(Boolean);
+
         const query: FilterQuery<ITitle> = {
             $and: [
                 {
-                    title: { $regex: new RegExp(`^${queryDTO.search ?? ""}`, "i")},
-                    title_type: { $regex: new RegExp(`^${queryDTO.title_type ?? ""}`, "i")},
-                    "original_language.ISO_639_1_code": { $regex: new RegExp(`^${queryDTO.language ?? ""}`, "i")},
-                    genres: { $regex: new RegExp(`${queryDTO.genre ?? ""}`, "i")}
+                    title: { $regex: new RegExp(`^${queryDTO.search ?? ""}`, "i") },
+                    title_type: { $in: title_types.map(title_type => { if (title_type.include === 1) return title_type.type }).filter(Boolean) },
+                    "original_language.ISO_639_1_code": { $regex: new RegExp(`^${queryDTO.language ?? ""}`, "i") },
+                    genres: { $regex: new RegExp(`${queryDTO.genre ?? ""}`, "i") },
+                    'age_rattings.country': { $in: [queryDTO.country, 'default'] },
+                    'age_rattings.ratting': { $in: age_filter },
                 }
             ]
         }
 
-        const minimalProjection : ProjectionFields<ITitle> = {
+        console.log(age_filter)
+        const minimalProjection: ProjectionFields<ITitle> = {
             _id: 1,
             title_type: 1,
             title: 1,
@@ -121,13 +131,13 @@ class TitleService implements ITitleService {
         const sort = queryDTO.sort_by ? await MongoSortBuilder(queryDTO.sort_by) : { createdAt: 'desc' };
 
         const q: FindAllQuery = {
-          query,
-          sort: sort,
-          limit: queryDTO?.limit ?? 5,
-          page: queryDTO?.page ?? 1,
+            query,
+            sort: sort,
+            limit: queryDTO?.limit ?? 5,
+            page: queryDTO?.page ?? 1,
         }
-        
-        const page: PageDTO = await this.titleRepository.findAll(q, queryDTO.minimal ? minimalProjection : normalProjection );
+
+        const page: PageDTO = await this.titleRepository.findAll(q, queryDTO.minimal ? minimalProjection : normalProjection);
 
         return page;
     }

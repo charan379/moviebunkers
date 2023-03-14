@@ -40,11 +40,6 @@ class TitleController {
          *        schema:
          *          type: string
          *      - in: query
-         *        name: title_type
-         *        schema:
-         *          type: string
-         *          enum: ["tv", "movie"]
-         *      - in: query
          *        name: genre
          *        schema:
          *          type: string
@@ -55,23 +50,96 @@ class TitleController {
          *          description: ISO_639_1_code of language
          *          example: en
          *      - in: query
-         *        name: minimal
-         *        schema:
-         *          type: boolean
-         *      - in: query
-         *        name: page
+         *        name: movie
          *        schema:
          *          type: integer
+         *          minimum: 0
+         *          maximum: 1
+         *          enum: [0,1]
+         *          default: 1
+         *          description: 1 for include movies, 0 exclude movies
+         *          example: 1
          *      - in: query
-         *        name: limit
+         *        name: tv
          *        schema:
          *          type: integer
+         *          minimum: 0
+         *          maximum: 1
+         *          enum: [0,1]
+         *          default: 1
+         *          description: 1 for include tv shows, 0 exclude tv shows
+         *          example: 1
+         *      - in: query
+         *        name: starred
+         *        schema:
+         *          type: integer
+         *          minimum: 0
+         *          maximum: 1
+         *          enum: [0,1]
+         *          default: 0
+         *          description: 1 filters user starred titles, 0 disables this filter
+         *          example: 0
+         *      - in: query
+         *        name: favourite
+         *        schema:
+         *          type: integer
+         *          minimum: 0
+         *          maximum: 1
+         *          enum: [0,1]
+         *          default: 0
+         *          description: 1 filters user favourite titles, 0 disables this filter
+         *          example: 0
+         *      - in: query
+         *        name: seen
+         *        schema:
+         *          type: integer
+         *          minimum: -1
+         *          maximum: 1
+         *          enum: [-1,0,1]
+         *          default: 0
+         *          description: -1 filters user unseen titles, 1 filters user seen titles, 0 disables this filter
+         *          example: 0
+         *      - in: query
+         *        name: age.gte
+         *        schema:
+         *          type: integer
+         *          minimum: 2
+         *          maximum: 26
+         *          default: 8
+         *          description: age filter lower limit value, must be lower than age.lte 
+         *          example: 12
+         *      - in: query
+         *        name: age.lte
+         *        schema:
+         *          type: integer
+         *          minimum: 2
+         *          maximum: 26
+         *          default: 8
+         *          description: age filter upper limit value, must be higger than age.gte
+         *          example: 18
+         *      - in: query
+         *        name: country
+         *        schema:
+         *          type: string
+         *          enum: ["IN"]
+         *          example: IN
          *      - in: query
          *        name: sort_by
          *        schema:
          *          type: string
          *          example: year.desc
-         *
+         *      - in: query
+         *        name: limit
+         *        schema:
+         *          type: integer
+         *      - in: query
+         *        name: page
+         *        schema:
+         *          type: integer
+         *      - in: query
+         *        name: minimal
+         *        schema:
+         *          type: boolean
          *   responses:
          *       200:
          *          description: Success
@@ -105,7 +173,7 @@ class TitleController {
          *       404:
          *          description: Not Found
          */
-        this.router.get("/id/:id",Authorize([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER]), this.getTitleById.bind(this));
+        this.router.get("/id/:id", Authorize([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER]), this.getTitleById.bind(this));
 
         //post
         /**
@@ -136,7 +204,7 @@ class TitleController {
          *          description: Unauthorized
          *      
          */
-        this.router.post("/new",Authorize([UserRoles.ADMIN, UserRoles.MODERATOR]),  this.createTitle.bind(this));
+        this.router.post("/new", Authorize([UserRoles.ADMIN, UserRoles.MODERATOR]), this.createTitle.bind(this));
     }
 
     /**
@@ -149,10 +217,10 @@ class TitleController {
 
         try {
 
-            const validQuery: FindAllTitlesQueryDTO = await JoiValidator(getAllTitlesQuerySchema, req.query, {abortEarly: false, stripUnknown: true});
+            const validQuery: FindAllTitlesQueryDTO = await JoiValidator(getAllTitlesQuerySchema, req.query, { abortEarly: false, stripUnknown: true });
 
-            const page: PageDTO= await this.titleService.getAllTitles(validQuery);
-            
+            const page: PageDTO = await this.titleService.getAllTitles(validQuery);
+
             res.status(HttpCodes.OK).json(page);
 
         } catch (error) {
@@ -171,8 +239,8 @@ class TitleController {
 
         try {
 
-            const validId = await JoiValidator(ObjectIdSchema, req?.params?.id, {abortEarly: false, allowUnknown: false, stripUnknown: true})
-            
+            const validId = await JoiValidator(ObjectIdSchema, req?.params?.id, { abortEarly: false, allowUnknown: false, stripUnknown: true })
+
             const titileDTO: TitleDTO = await this.titleService.getTitleById(validId);
 
             res.status(200).json(titileDTO)
@@ -195,8 +263,8 @@ class TitleController {
             const titleDTO: Partial<TitleDTO> = await JoiValidator(baseTitleSchema, req.body, { abortEarly: false, allowUnknown: true, stripUnknown: false });
 
             const newTitle: TitleDTO = await this.titleService.createTitle(titleDTO);
-            
-            res.status(201).json({message:"New Title Added Successfully",new_title_id: newTitle._id})
+
+            res.status(201).json({ message: "New Title Added Successfully", new_title_id: newTitle._id })
 
         } catch (error) {
 
