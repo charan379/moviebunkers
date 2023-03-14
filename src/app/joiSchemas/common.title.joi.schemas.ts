@@ -53,6 +53,11 @@ export const titleAuthorSchema: Joi.ObjectSchema = Joi.object({
 
 });
 
+export const countryCertification: Joi.ObjectSchema = Joi.object({
+    country: Joi.string().required().example("IN"),
+    ratting: Joi.string().required().example("A"),
+});
+
 export const newTitleInitialCheckSchema: Joi.ObjectSchema = Joi.object({
 
     title_type: Joi.string()
@@ -64,7 +69,7 @@ export const newTitleInitialCheckSchema: Joi.ObjectSchema = Joi.object({
         .required(),
 });
 
-export const  getAllTitlesQuerySchema = Joi.object({
+export const getAllTitlesQuerySchema = Joi.object({
     search: Joi.string().example("Fight Club"),
     // year: Joi.number().integer().example(1999),
     title_type: Joi.string().valid(...Object.values(TitleType)),
@@ -74,4 +79,4 @@ export const  getAllTitlesQuerySchema = Joi.object({
     page: Joi.number().integer().example(1),
     limit: Joi.number().integer().example(5),
     sort_by: Joi.string().example("createdAt.desc"),
-  });
+});

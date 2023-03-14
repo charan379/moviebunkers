@@ -1,5 +1,6 @@
 import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
+import AgeRattingDTO from "./age.ratting.dto";
 import CastDTO from "./cast.dto";
 import LanguageDTO from "./language.dto";
 
@@ -18,7 +19,7 @@ interface BaseTitleDTO {
     year?: number;
     runtime?: number;
     ratting?: number;
-    age_ratting?: number;
+    age_rattings?: AgeRattingDTO[];
     genres: string[];
     overview?: string;
     production_companies?: string[];

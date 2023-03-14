@@ -1,5 +1,6 @@
 import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
+import AgeRattingDTO from "@dto/age.ratting.dto";
 import CastDTO from "@dto/cast.dto";
 import LanguageDTO from "@dto/language.dto";
 import { Document } from "mongoose";
@@ -21,7 +22,7 @@ interface IMovie {
     year: number;
     runtime: number;
     ratting: number;
-    age_ratting: number;
+    age_rattings: AgeRattingDTO[];
     genres: string[];
     overview: string;
     production_companies: string[];
