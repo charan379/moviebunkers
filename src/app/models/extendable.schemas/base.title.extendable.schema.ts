@@ -82,7 +82,7 @@ export const baseTitleExtendableSchema: Schema = new Schema(
         // genres
         genres: {
             type: [String],
-            default: ["unknown"],
+            default: ["Unknown"],
         },
         // overview
         overview: {

@@ -10,6 +10,7 @@ export const languageSchema: Joi.ObjectSchema = Joi.object({
 });
 
 export const castSchema: Joi.ObjectSchema = Joi.object({
+    profile_path: Joi.string().required().example("https://image.tmdb.org/t/p/w92/ajNaPmXVVMJFg9GWmu6MJzTaXdV.jpg"),
     name: Joi.string().required().example("Brad Pitt"),
     character: Joi.string().example("Tyler Durden"),
 });
