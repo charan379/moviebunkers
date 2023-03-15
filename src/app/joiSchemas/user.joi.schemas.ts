@@ -20,8 +20,8 @@ export const newUserSchema: Joi.ObjectSchema<any> = Joi.object({
   userName: userNameSchema.required(),
   email: emailSchema.required(),
   password: passwordSchema.required(),
-  role: Joi.string().valid(UserRoles.USER),
-  status: Joi.string().valid(UserStatus.ACTIVE),
+  role: Joi.string().valid(UserRoles.USER, UserRoles.GUEST),
+  status: Joi.string().valid(UserStatus.ACTIVE, UserStatus.INACTIVE),
 });
 
 export const findAllUserQuerySchema: Joi.ObjectSchema<any> = Joi.object({
@@ -37,7 +37,7 @@ export const findAllUserQuerySchema: Joi.ObjectSchema<any> = Joi.object({
 
 export const userUpdateSchema: Joi.ObjectSchema = Joi.object({
   status: Joi.string().valid(...Object.values(UserStatus)),
-  role: Joi.string().valid(...[UserRoles.USER, UserRoles.MODERATOR]),
+  role: Joi.string().valid(...[UserRoles.GUEST, UserRoles.USER, UserRoles.MODERATOR]),
 });
 
 export const lgoinSchema: Joi.ObjectSchema = Joi.object({

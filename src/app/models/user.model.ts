@@ -29,12 +29,12 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
     status: {
       type: String,
       enum: Object.values(UserStatus),
-      default: UserStatus.ACTIVE,
+      default: UserStatus.INACTIVE,
     },
     role: {
       type: String,
-      enum: [UserRoles.USER, UserRoles.MODERATOR],
-      default: UserRoles.USER,
+      enum: [UserRoles.GUEST, UserRoles.USER, UserRoles.MODERATOR],
+      default: UserRoles.GUEST,
     },
     last_modified_by: {
       type: String,

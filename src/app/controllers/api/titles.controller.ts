@@ -1,5 +1,5 @@
 import HttpCodes from "@constants/http.codes.enum";
-import UserRoles from "@constants/user.roles.enum";
+import UserRoles, { LevelOne, LevelTwo } from "@constants/user.roles.enum";
 import PageDTO from "@dto/page.dto";
 import TitleDTO, { FindAllTitlesQueryDTO } from "@dto/title.dto";
 import baseTitleSchema from "@joiSchemas/base.joi.title.schema";
@@ -148,7 +148,7 @@ class TitleController {
          *       400:
          *          description: Invalid query
          */
-        this.router.get("/", Authorize([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER]), this.getAllTitles.bind(this));
+        this.router.get("/", Authorize(LevelOne), this.getAllTitles.bind(this));
 
         /**
          * @swagger
@@ -173,7 +173,7 @@ class TitleController {
          *       404:
          *          description: Not Found
          */
-        this.router.get("/id/:id", Authorize([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER]), this.getTitleById.bind(this));
+        this.router.get("/id/:id", Authorize(LevelOne), this.getTitleById.bind(this));
 
         //post
         /**
@@ -204,7 +204,7 @@ class TitleController {
          *          description: Unauthorized
          *      
          */
-        this.router.post("/new", Authorize([UserRoles.ADMIN, UserRoles.MODERATOR]), this.createTitle.bind(this));
+        this.router.post("/new", Authorize(LevelTwo), this.createTitle.bind(this));
     }
 
     /**

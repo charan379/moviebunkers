@@ -9,7 +9,7 @@ import { NextFunction, Request, Response, Router } from "express";
 import { Inject, Service } from "typedi";
 import PageDTO from "@dto/page.dto";
 import Authorize from "@middlewares/authorization.middleware";
-import UserRoles from "@constants/user.roles.enum";
+import UserRoles, { LevelOne, LevelThere, LevelTwo, LevelZero } from "@constants/user.roles.enum";
 
 /**
  * @Controller("/users") => UserController.class
@@ -74,7 +74,7 @@ class UserController {
      *          description: Unauthorized
      *   
      */
-    this.router.get("/", Authorize([UserRoles.ADMIN]), this.getAllUsers.bind(this));
+    this.router.get("/", Authorize(LevelThere), this.getAllUsers.bind(this));
 
     /**
      * @swagger
@@ -99,7 +99,7 @@ class UserController {
      *       401:
      *          description: Unauthorized
      */
-    this.router.get("/id/:id", Authorize([UserRoles.ADMIN]), this.getUserById.bind(this));
+    this.router.get("/id/:id", Authorize(LevelThere), this.getUserById.bind(this));
 
     /**
      * @swagger
@@ -124,7 +124,7 @@ class UserController {
      *       401:
      *          description: Unauthorized
      */
-    this.router.get("/:userName", Authorize([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER]), this.getUserByUserName.bind(this));
+    this.router.get("/:userName", Authorize(LevelOne), this.getUserByUserName.bind(this));
 
     /**
      * @swagger
@@ -149,7 +149,7 @@ class UserController {
      *       401:
      *          description: Unauthorized
      */
-    this.router.get("/email/:email", Authorize([UserRoles.ADMIN]), this.getUserByEmail.bind(this));
+    this.router.get("/email/:email", Authorize(LevelThere), this.getUserByEmail.bind(this));
 
 
   /**
@@ -174,7 +174,7 @@ class UserController {
    *       401:
    *          description: Unauthorized
    */
-    this.router.post("/new", Authorize([UserRoles.ADMIN]), this.createUser.bind(this));
+    this.router.post("/new", Authorize(LevelThere), this.createUser.bind(this));
 
     /**
      * @swagger
@@ -204,7 +204,7 @@ class UserController {
      *       400:
      *          description: Invalid Update
      */
-    this.router.put("/update/:userName", Authorize([UserRoles.ADMIN]), this.updateUser.bind(this))
+    this.router.put("/update/:userName", Authorize(LevelTwo), this.updateUser.bind(this))
 
   }
 

@@ -33,7 +33,7 @@ export interface FindAllUsersQueryDTO {
 }
 
 export interface UpdateUserDTO {
-    role?: UserRoles.USER | UserRoles.MODERATOR,
+    role?: UserRoles.GUEST | UserRoles.USER | UserRoles.MODERATOR,
     status?: UserStatus,
     last_modified_by?: string,
 }
