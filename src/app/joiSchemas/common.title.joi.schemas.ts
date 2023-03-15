@@ -23,7 +23,7 @@ export const episodeSchema: Joi.ObjectSchema = Joi.object({
     overview: Joi.string().example(
         "The Hound is judged by the gods. Jaime is judged by men. Jon proves himself. Robb is betrayed. Tyrion learns the cost of weddings."
     ).allow(null).allow(""),
-    runtime: Joi.number().integer().example(57),
+    runtime: Joi.number().integer().example(57).allow("").allow(null),
     still_path: Joi.string().example(
         "https://image.tmdb.org/t/p/w300/41CekEZyGvNLTJIJy7BqFDTitcC.jpg"
     ).allow(null).allow(""),
