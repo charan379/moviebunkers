@@ -1,8 +1,10 @@
 import UserRoles from "@constants/user.roles.enum";
 import UserStatus from "@constants/user.status.enum";
+import { ObjectId } from "mongoose";
 
 
 export interface UserDTO {
+    _id?: ObjectId | string,
     userName: string;
     password?: string;
     email: string;

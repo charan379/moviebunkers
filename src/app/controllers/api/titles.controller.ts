@@ -1,12 +1,14 @@
 import HttpCodes from "@constants/http.codes.enum";
-import UserRoles, { LevelOne, LevelTwo } from "@constants/user.roles.enum";
+import { LevelOne, LevelTwo } from "@constants/user.roles.enum";
 import PageDTO from "@dto/page.dto";
 import TitleDTO, { FindAllTitlesQueryDTO } from "@dto/title.dto";
+import { UserDTO } from "@dto/user.dto";
 import baseTitleSchema from "@joiSchemas/base.joi.title.schema";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
 import { getAllTitlesQuerySchema } from "@joiSchemas/common.title.joi.schemas";
 import Authorize from "@middlewares/authorization.middleware";
 import TitleService from "@service/title.service";
+import { UserService } from "@service/user.service";
 import JoiValidator from "@utils/joi.validator";
 import { NextFunction, Request, Response, Router } from "express";
 import { Inject, Service } from "typedi";
@@ -19,9 +21,11 @@ class TitleController {
 
     public router: Router;
     private titleService: TitleService;
+    private userService: UserService;
 
-    constructor(@Inject() titleService: TitleService) {
+    constructor(@Inject() titleService: TitleService, @Inject() userService: UserService) {
         this.titleService = titleService;
+        this.userService = userService;
 
         this.router = Router();
 
@@ -152,7 +156,7 @@ class TitleController {
 
         /**
          * @swagger
-         * /id/{id}:
+         * /titles/id/{id}:
          *  get:
          *   tags:
          *     - Titles
@@ -261,8 +265,8 @@ class TitleController {
 
         try {
             const titleDTO: Partial<TitleDTO> = await JoiValidator(baseTitleSchema, req.body, { abortEarly: false, allowUnknown: true, stripUnknown: false });
-
-            const newTitle: TitleDTO = await this.titleService.createTitle(titleDTO);
+            const userDTO: UserDTO = await this.userService.getUserByUserName(req.userName as string)
+            const newTitle: TitleDTO = await this.titleService.createTitle(titleDTO, userDTO);
 
             res.status(201).json({ message: "New Title Added Successfully", new_title_id: newTitle._id })
 

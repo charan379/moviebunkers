@@ -2,6 +2,7 @@ import Country from "@constants/country.enum";
 import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
 import Joi from "joi";
+import { ObjectIdSchema } from "./common.joi.schemas";
 
 export const languageSchema: Joi.ObjectSchema = Joi.object({
     ISO_639_1_code: Joi.string().required().example("en"),
@@ -10,9 +11,9 @@ export const languageSchema: Joi.ObjectSchema = Joi.object({
 });
 
 export const castSchema: Joi.ObjectSchema = Joi.object({
-    profile_path: Joi.string().required().example("https://image.tmdb.org/t/p/w92/ajNaPmXVVMJFg9GWmu6MJzTaXdV.jpg"),
+    profile_path: Joi.string().example("https://image.tmdb.org/t/p/w92/ajNaPmXVVMJFg9GWmu6MJzTaXdV.jpg").allow("").allow(null),
     name: Joi.string().required().example("Brad Pitt"),
-    character: Joi.string().example("Tyler Durden"),
+    character: Joi.string().example("Tyler Durden").allow("").allow(null),
 });
 
 export const episodeSchema: Joi.ObjectSchema = Joi.object({
@@ -49,9 +50,9 @@ export const seasonSchema: Joi.ObjectSchema = Joi.object({
 
 export const titleAuthorSchema: Joi.ObjectSchema = Joi.object({
     // added_by
-    added_by: Joi.string().example("user001"),
+    added_by: ObjectIdSchema.required().example("6411c06ab4be7d8da5338cf7"),
     // last_modified_by
-    last_modified_by: Joi.string().example("user002"),
+    last_modified_by: ObjectIdSchema.required().example("6411c06ab4be7d8da5338cf7"),
 
 });
 
@@ -72,19 +73,19 @@ export const newTitleInitialCheckSchema: Joi.ObjectSchema = Joi.object({
 });
 
 export const getAllTitlesQuerySchema = Joi.object({
-    search: Joi.string().example("Fight Club"),
-    genre: Joi.string().example('Action'),
-    language: Joi.string().example('en'),
+    search: Joi.string().example("Fight Club").allow(""),
+    genre: Joi.string().example('Action').allow(""),
+    language: Joi.string().example('en').allow(""),
     movie: Joi.number().integer().example(1).min(0).max(1).required(),
     tv: Joi.number().integer().example(1).min(0).max(1).required(),
     starred: Joi.number().integer().example(1).min(0).max(1).required(),
     favourite: Joi.number().integer().example(1).min(0).max(1).required(),
     seen: Joi.number().integer().example(1).min(-1).max(1).required(),
-    "age.gte": Joi.number().min(2).max(26).example(8),
-    "age.lte": Joi.number().min(2).max(26).example(12),
+    "age.gte": Joi.number().min(0).max(26).example(8),
+    "age.lte": Joi.number().min(0).max(26).example(12),
     country: Joi.string().example("IN").valid(...Object.values(Country)).required(),
     sort_by: Joi.string().example("createdAt.desc"),
     limit: Joi.number().integer().example(5),
-    page: Joi.number().integer().example(1),
+    pageNo: Joi.number().integer().example(1),
     minimal: Joi.boolean().example(false),
 });

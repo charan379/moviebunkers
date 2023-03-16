@@ -46,7 +46,7 @@ class UserRepository implements IUserRepository {
    */
   findByUserName(userName: string): Promise<IUser | null> {
     return this.userModel
-      .findOne({ userName: userName }, { _id: 0, __v: 0 })
+      .findOne({ userName: userName }, { __v: 0 })
       .lean()
       .exec();
   }

@@ -16,16 +16,68 @@ class TitleRepository implements ITitleRepository {
         this.titleModel = TitleModel;
     }
 
-    findById(id: string, projection: ProjectionFields<ITitle>= {__v: 0}): Promise<ITitle | null> {
-        return this.titleModel.findById(id, projection).lean().exec();
+    findById(id: string, projection: ProjectionFields<ITitle> = { __v: 0 }): Promise<ITitle | null> {
+        return this.titleModel.findById(id, projection)
+            .populate([{
+                path: 'added_by',
+                model: 'user',
+                localField: 'added_by',
+                foreignField: '_id',
+                select: "userName email status role createdAt",
+                strictPopulate: false,
+            },
+            {
+                path: 'last_modified_by',
+                model: 'user',
+                localField: 'added_by',
+                foreignField: '_id',
+                select: "userName email status role createdAt",
+                strictPopulate: false,
+            }])
+            .lean()
+            .exec();
     }
 
-    findByTmdbId(tmdbId: number, projection: ProjectionFields<ITitle>= {__v: 0}): Promise<ITitle | null> {
-        return this.titleModel.findOne({tmdb_id: tmdbId},projection).lean().exec();
+    findByTmdbId(tmdbId: number, projection: ProjectionFields<ITitle> = { __v: 0 }): Promise<ITitle | null> {
+        return this.titleModel.findOne({ tmdb_id: tmdbId }, projection)
+            .populate([{
+                path: 'added_by',
+                model: 'user',
+                localField: 'added_by',
+                foreignField: '_id',
+                select: "userName email status role createdAt",
+                strictPopulate: false,
+            },
+            {
+                path: 'last_modified_by',
+                model: 'user',
+                localField: 'added_by',
+                foreignField: '_id',
+                select: "userName email status role createdAt",
+                strictPopulate: false,
+            }])
+            .lean().exec();
     }
 
-    findByImdbId(imdbId: string, projection: ProjectionFields<ITitle>= {__v: 0}): Promise<ITitle | null> {
-        return this.titleModel.findOne({imdb_id: imdbId}, projection).lean().exec();
+    findByImdbId(imdbId: string, projection: ProjectionFields<ITitle> = { __v: 0 }): Promise<ITitle | null> {
+        return this.titleModel.findOne({ imdb_id: imdbId }, projection)
+            .populate([{
+                path: 'added_by',
+                model: 'user',
+                localField: 'added_by',
+                foreignField: '_id',
+                select: "userName email status role createdAt",
+                strictPopulate: false,
+            },
+            {
+                path: 'last_modified_by',
+                model: 'user',
+                localField: 'added_by',
+                foreignField: '_id',
+                select: "userName email status role createdAt",
+                strictPopulate: false,
+            }])
+            .lean().exec();
     }
 
     /**
@@ -34,7 +86,7 @@ class TitleRepository implements ITitleRepository {
      * @param projection ProjectionFields<ITitle>
      * @returns 
      */
-    async findAll({ query, sort, limit, page }: FindAllQuery, projection: ProjectionFields<ITitle>= {__v: 0}): Promise<PageDTO> {
+    async findAll({ query, sort, limit, page }: FindAllQuery, projection: ProjectionFields<ITitle> = { __v: 0 }): Promise<PageDTO> {
 
 
         const total_results = await this.titleModel.find({ ...query }).countDocuments().lean().exec();
@@ -42,6 +94,22 @@ class TitleRepository implements ITitleRepository {
         const titlesList: ITitle[] = await this.titleModel.find({ ...query }, projection)
             .limit(limit * 1)
             .skip((page - 1) * limit)
+            .populate([{
+                path: 'added_by',
+                model: 'user',
+                localField: 'added_by',
+                foreignField: '_id',
+                select: "userName email status role createdAt",
+                strictPopulate: false,
+            },
+            {
+                path: 'last_modified_by',
+                model: 'user',
+                localField: 'added_by',
+                foreignField: '_id',
+                select: "userName email status role createdAt",
+                strictPopulate: false,
+            }])
             .sort({ ...sort })
             .lean()
             .exec();

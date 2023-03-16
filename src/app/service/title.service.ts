@@ -1,4 +1,3 @@
-import AgeRattings from "@constants/age.rattings";
 import HttpCodes from "@constants/http.codes.enum";
 import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
@@ -6,17 +5,18 @@ import MovieDTO from "@dto/movie.dto";
 import PageDTO from "@dto/page.dto";
 import TitleDTO, { FindAllTitlesQueryDTO } from "@dto/title.dto";
 import TvDTO from "@dto/Tv.dto";
+import { UserDTO } from "@dto/user.dto";
 import TitleException from "@exceptions/title.exeception";
 import ITitle from "@models/interfaces/title.interface";
 import { FindAllQuery } from "@repositories/interfaces/custom.types.interfaces";
 import TitleRepository from "@repositories/title.repository";
+import getCertificationsByAgeRange from "@utils/getCertificationsByAgeRange";
 import MongoSortBuilder from "@utils/mongo.sort.builder";
-import { FilterQuery, ProjectionFields } from "mongoose";
+import { FilterQuery, ObjectId, ProjectionFields } from "mongoose";
 import { Inject, Service } from "typedi";
 import ITitleService from "./interfaces/title.service.interface";
 import MovieService from "./movie.service";
 import TvService from "./tv.service";
-
 
 @Service()
 class TitleService implements ITitleService {
@@ -35,7 +35,7 @@ class TitleService implements ITitleService {
      * createTitle
      * @param titileDTO 
      */
-    async createTitle(titileDTO: Partial<TitleDTO>): Promise<TitleDTO> {
+    async createTitle(titileDTO: Partial<TitleDTO>, userDTO: UserDTO): Promise<TitleDTO> {
 
 
         switch (titileDTO.source) {
@@ -60,14 +60,15 @@ class TitleService implements ITitleService {
             if (await this.titleRepository.findByTmdbId(titileDTO.tmdb_id)) throw new TitleException(`Title with TMDB ID: ${titileDTO.tmdb_id} already exists`, HttpCodes.BAD_REQUEST, "Duplicate Title according to TMDB ID", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titileDTO)}`);
         }
 
+        const title: Partial<TitleDTO> = { ...titileDTO, added_by: userDTO._id as ObjectId };
 
         switch (titileDTO.title_type) {
             case TitleType.MOVIE:
                 const movieDTO: NonNullable<Partial<MovieDTO>> = titileDTO as Partial<MovieDTO>;
-                return await this.movieService.createMovie(movieDTO) as TitleDTO;
+                return await this.movieService.createMovie(movieDTO, userDTO) as TitleDTO;
             case TitleType.TV:
                 const tvDTO: NonNullable<Partial<TvDTO>> = titileDTO as Partial<TvDTO>;
-                return await this.tvService.createTv(tvDTO) as TitleDTO;
+                return await this.tvService.createTv(tvDTO, userDTO) as TitleDTO;
             default:
                 throw new TitleException("TitleType: Is Unknown", HttpCodes.BAD_REQUEST, "Unknown TitleType received", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titileDTO)}`);
         }
@@ -96,9 +97,7 @@ class TitleService implements ITitleService {
 
         const title_types = [{ type: "movie", include: queryDTO?.movie ?? 0 }, { type: "tv", include: queryDTO?.tv ?? 0 }];
 
-        const age_filter = AgeRattings?.[queryDTO.country].map(ratting => {
-            if ((ratting.age >= (queryDTO?.["age.gte"] ?? 0)) && (ratting.age <= (queryDTO?.["age.lte"] ?? 26))) return ratting.certification
-        }).filter(Boolean);
+        const age_filter = await getCertificationsByAgeRange(queryDTO?.["age.gte"] ?? 0, queryDTO?.["age.lte"] ?? 26, queryDTO?.country ?? 'IN')
 
         const query: FilterQuery<ITitle> = {
             $and: [
@@ -107,13 +106,11 @@ class TitleService implements ITitleService {
                     title_type: { $in: title_types.map(title_type => { if (title_type.include === 1) return title_type.type }).filter(Boolean) },
                     "original_language.ISO_639_1_code": { $regex: new RegExp(`^${queryDTO.language ?? ""}`, "i") },
                     genres: { $regex: new RegExp(`${queryDTO.genre ?? ""}`, "i") },
-                    'age_rattings.country': { $in: [queryDTO.country, 'default'] },
-                    'age_rattings.ratting': { $in: age_filter },
+                    'age_rattings.country': { $in: ((queryDTO?.["age.lte"] ?? 26) >= 26) ? [/.*?/i] : [queryDTO.country, 'default'] },
+                    'age_rattings.ratting': { $in: ((queryDTO?.["age.lte"] ?? 26) >= 26) ? [/.*?/i] : age_filter },
                 }
             ]
         }
-
-        console.log(age_filter)
         const minimalProjection: ProjectionFields<ITitle> = {
             _id: 1,
             title_type: 1,
@@ -134,7 +131,7 @@ class TitleService implements ITitleService {
             query,
             sort: sort,
             limit: queryDTO?.limit ?? 5,
-            page: queryDTO?.page ?? 1,
+            page: queryDTO?.pageNo ?? 1,
         }
 
         const page: PageDTO = await this.titleRepository.findAll(q, queryDTO.minimal ? minimalProjection : normalProjection);

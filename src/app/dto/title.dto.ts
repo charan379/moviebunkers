@@ -2,6 +2,7 @@ import Country from "@constants/country.enum";
 import TitleType from "@constants/titile.types.enum";
 import LanguageDTO from "./language.dto";
 import MovieDTO from "./movie.dto";
+import TitleAuthorDTO from "./title.author.dto";
 import TvDTO from "./Tv.dto";
 
 
@@ -26,6 +27,6 @@ export interface FindAllTitlesQueryDTO {
     country: Country;
     sort_by?: string,
     limit?: number
-    page?: number,
+    pageNo?: number,
     minimal?: boolean,
 }

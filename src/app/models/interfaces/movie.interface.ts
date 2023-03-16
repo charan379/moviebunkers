@@ -3,7 +3,7 @@ import TitleSource from "@constants/title.souces.enum";
 import AgeRattingDTO from "@dto/age.ratting.dto";
 import CastDTO from "@dto/cast.dto";
 import LanguageDTO from "@dto/language.dto";
-import { Document } from "mongoose";
+import { ObjectId } from "mongoose";
 
 
 
@@ -32,8 +32,8 @@ interface IMovie {
     providers: string[];
     directors: string[];
     cast: CastDTO[];
-    added_by: string;
-    last_modified_by: string;
+    added_by: ObjectId;
+    last_modified_by: ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }
