@@ -1,3 +1,4 @@
+import Config from "@Config";
 import HttpCodes from "@constants/http.codes.enum";
 import { LevelZero } from "@constants/user.roles.enum";
 import { LoginDTO, UserDTO } from "@dto/user.dto";
@@ -95,7 +96,7 @@ class AuthController {
             res.cookie("auth", `Bearer ${token}`, {
                 maxAge: 30 * 24 * 60 * 60 * 1000,
                 httpOnly: true,
-                // secure: Config.HTTPS,
+                secure: Config.HTTPS,
                 signed: true,
                 overwrite: true,
                 sameSite: false,
