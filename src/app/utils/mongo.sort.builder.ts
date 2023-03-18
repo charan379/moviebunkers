@@ -6,20 +6,20 @@ export default async function MongoSortBuilder(sort_by: string) {
 
     let sortElementsObject: object = {};
 
-    const sortElementsArray : string[] = sort_by.split(",");
+    const sortElementsArray: string[] = sort_by.split(",");
 
     for (let index: number = 0; index < sortElementsArray.length; index++) {
         const element = sortElementsArray[index];
 
         if (element.match(elementRegex)) {
             const [key, value] = element.split(".");
-            sortElementsObject = { ...sortElementsObject, [key]: value };
+            sortElementsObject = { ...sortElementsObject, [key]: value === "desc" ? -1 : 1 };
         }
     }
 
-    if (Object.keys(sortElementsObject).length === 0) return {createdAt: 'desc'};
+    if (Object.keys(sortElementsObject).length === 0) return { createdAt: -1 };
 
     return sortElementsObject;
 
-    
+
 }
