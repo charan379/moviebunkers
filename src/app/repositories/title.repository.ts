@@ -245,6 +245,12 @@ class TitleRepository implements ITitleRepository {
                 'added_by.updatedAt': 0,
                 'added_by.createdAt': 0,
                 'added_by.__v': 0,
+                'last_modified_by.password': 0,
+                'last_modified_by.email': 0,
+                'last_modified_by.last_modified_by': 0,
+                'last_modified_by.updatedAt': 0,
+                'last_modified_by.createdAt': 0,
+                'last_modified_by.__v': 0,
             }
         }
 
