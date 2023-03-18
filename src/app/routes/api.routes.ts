@@ -1,5 +1,6 @@
 import AuthController from "@controllers/api/auth.controller";
 import TitleController from "@controllers/api/titles.controller";
+import UserDataController from "@controllers/api/userdata.controller";
 import UserController from "@controllers/api/users.controller";
 import { Router } from "express";
 import Container from "typedi";
@@ -17,5 +18,8 @@ router.use("/auth", authController.router);
 
 const titleController = Container.get(TitleController);
 router.use("/titles", titleController.router);
+
+const userDataController = Container.get(UserDataController);
+router.use("/userdata", userDataController.router);
 
 export default router;

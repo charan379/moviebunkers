@@ -12,24 +12,28 @@ const userDataSchema: Schema<IUserData> = new Schema<IUserData>(
         type: Schema.Types.ObjectId,
         ref: 'title'
       }],
+      default: []
     },
     unseenTitles: {
       type: [{
         type: Schema.Types.ObjectId,
         ref: 'title'
       }],
+      default: []
     },
     starredTitles: {
       type: [{
         type: Schema.Types.ObjectId,
         ref: 'title'
       }],
+      default: []
     },
     favouriteTitles: {
       type: [{
         type: Schema.Types.ObjectId,
         ref: 'title'
       }],
+      default: []
     },
   },
   {
@@ -37,7 +41,7 @@ const userDataSchema: Schema<IUserData> = new Schema<IUserData>(
       createdAt: true,
       updatedAt: true,
     },
-    collection: "user_data"
+    collection: "userData"
   }
 );
 
