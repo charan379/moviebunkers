@@ -166,7 +166,7 @@ class TitleController {
          *   tags:
          *     - Titles
          *   summary: API to get title details base Id
-         *   description: return title details based on titleId, Note: titleId must be in base64url encoding
+         *   description: return title details based on titleId, titleId must be in base64url encoding
          *   parameters:
          *     - in: path
          *       name: id
