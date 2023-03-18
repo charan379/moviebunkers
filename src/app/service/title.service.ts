@@ -152,14 +152,14 @@ class TitleService implements ITitleService {
      * @param userId 
      */
     async getTitleByIdWithUserData(titleId: string, userId: ObjectId): Promise<TitleDTO> {
-        console.log(titleId)
+        
         const title = await this.titleRepository.findByIdWithUserData(titleId, userId);
 
         if (!title) throw new TitleException("Title Not Found !", HttpCodes.NOT_FOUND, `Title not found for given Id: ${titleId}`, `@TitleService.class: @getTitleByIdWithUserData.method() requested title Id: ${titleId}`);
 
         const titleDTO: TitleDTO = title as TitleDTO;
 
-        console.log(titleDTO)
+        
         return titleDTO;
     }
 
@@ -190,9 +190,7 @@ class TitleService implements ITitleService {
         if (queryDTO.favourite === 1) {
             userDataFilters = { ...userDataFilters, favouriteByUser: true }
         }
-
-        const objId: ObjectId = '64134cce661b4da2fb891d36' as unknown as ObjectId
-        console.log(objId)
+        
         const query: FilterQuery<ITitle> = {
             $and: [
                 {
