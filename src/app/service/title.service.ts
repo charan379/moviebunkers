@@ -12,7 +12,7 @@ import { FindAllQuery } from "@repositories/interfaces/custom.types.interfaces";
 import TitleRepository from "@repositories/title.repository";
 import getCertificationsByAgeRange from "@utils/getCertificationsByAgeRange";
 import MongoSortBuilder from "@utils/mongo.sort.builder";
-import { FilterQuery, ObjectId, ProjectionFields } from "mongoose";
+import mongoose, { FilterQuery, ObjectId, ProjectionFields } from "mongoose";
 import { Inject, Service } from "typedi";
 import ITitleService from "./interfaces/title.service.interface";
 import MovieService from "./movie.service";
@@ -26,11 +26,16 @@ class TitleService implements ITitleService {
 
     private titleRepository: TitleRepository;
 
-    constructor(@Inject() movieService: MovieService, @Inject() tvService: TvService, @Inject() titleRepository: TitleRepository) {
+    constructor(
+        @Inject()
+        movieService: MovieService,
+        tvService: TvService,
+        titleRepository: TitleRepository) {
         this.movieService = movieService;
         this.tvService = tvService;
         this.titleRepository = titleRepository;
     }
+
     /**
      * createTitle
      * @param titileDTO 
@@ -60,8 +65,6 @@ class TitleService implements ITitleService {
             if (await this.titleRepository.findByTmdbId(titileDTO.tmdb_id)) throw new TitleException(`Title with TMDB ID: ${titileDTO.tmdb_id} already exists`, HttpCodes.BAD_REQUEST, "Duplicate Title according to TMDB ID", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titileDTO)}`);
         }
 
-        const title: Partial<TitleDTO> = { ...titileDTO, added_by: userDTO._id as ObjectId };
-
         switch (titileDTO.title_type) {
             case TitleType.MOVIE:
                 const movieDTO: NonNullable<Partial<MovieDTO>> = titileDTO as Partial<MovieDTO>;
@@ -75,6 +78,7 @@ class TitleService implements ITitleService {
     }
 
     /**
+     * @deprecated user getTitleByIdWithUserData
      * getTitleById()
      * @param id 
      */
@@ -88,8 +92,11 @@ class TitleService implements ITitleService {
         return titleDTO;
     }
 
+
+
+
     /**
-     * 
+     * @deprecated use findAllWithUserData()
      * @param queryDTO 
      * @returns Promise<PageDTO>
      */
@@ -102,7 +109,7 @@ class TitleService implements ITitleService {
         const query: FilterQuery<ITitle> = {
             $and: [
                 {
-                    title: { $regex: new RegExp(`^${queryDTO.search ?? ""}`, "i") },
+                    title: { $regex: new RegExp(`${queryDTO.search ?? ""}`, "i") },
                     title_type: { $in: title_types.map(title_type => { if (title_type.include === 1) return title_type.type }).filter(Boolean) },
                     "original_language.ISO_639_1_code": { $regex: new RegExp(`^${queryDTO.language ?? ""}`, "i") },
                     genres: { $regex: new RegExp(`${queryDTO.genre ?? ""}`, "i") },
@@ -138,6 +145,105 @@ class TitleService implements ITitleService {
 
         return page;
     }
+
+    /**
+     * getTitleByIdWithUserData()
+     * @param titleId 
+     * @param userId 
+     */
+    async getTitleByIdWithUserData(titleId: string, userId: ObjectId): Promise<TitleDTO> {
+        console.log(titleId)
+        const title = await this.titleRepository.findByIdWithUserData(titleId, userId);
+
+        if (!title) throw new TitleException("Title Not Found !", HttpCodes.NOT_FOUND, `Title not found for given Id: ${titleId}`, `@TitleService.class: @getTitleByIdWithUserData.method() requested title Id: ${titleId}`);
+
+        const titleDTO: TitleDTO = title as TitleDTO;
+
+        console.log(titleDTO)
+        return titleDTO;
+    }
+
+    /**
+      * getAllTitlesWithUserData()
+      * @param queryDTO 
+      * @param userId
+      * @returns Promise<PageDTO>
+      */
+    async getAllTitlesWithUserData(queryDTO: FindAllTitlesQueryDTO, userId: ObjectId): Promise<PageDTO> {
+
+        const title_types = [{ type: "movie", include: queryDTO?.movie ?? 0 }, { type: "tv", include: queryDTO?.tv ?? 0 }];
+
+        const age_filter = await getCertificationsByAgeRange(queryDTO?.["age.gte"] ?? 0, queryDTO?.["age.lte"] ?? 26, queryDTO?.country ?? 'IN')
+
+        let userDataFilters = {};
+
+        if (queryDTO.seen === 1) {
+            userDataFilters = { ...userDataFilters, seenByUser: true }
+        } else if (queryDTO.seen === -1) {
+            userDataFilters = { ...userDataFilters, unseenByUser: true }
+        }
+
+        if (queryDTO.starred === 1) {
+            userDataFilters = { ...userDataFilters, starredByUser: true }
+        }
+
+        if (queryDTO.favourite === 1) {
+            userDataFilters = { ...userDataFilters, favouriteByUser: true }
+        }
+
+        const objId: ObjectId = '64134cce661b4da2fb891d36' as unknown as ObjectId
+        console.log(objId)
+        const query: FilterQuery<ITitle> = {
+            $and: [
+                {
+                    // _id: new mongoose.Types.ObjectId('64134cce661b4da2fb891d36'),
+                    title: { $regex: new RegExp(`${queryDTO.search ?? ""}`, "i") },
+                    title_type: { $in: title_types.map(title_type => { if (title_type.include === 1) return title_type.type }).filter(Boolean) },
+                    "original_language.ISO_639_1_code": { $regex: new RegExp(`^${queryDTO.language ?? ""}`, "i") },
+                    genres: { $regex: new RegExp(`${queryDTO.genre ?? ""}`, "i") },
+                    'age_rattings.country': { $in: ((queryDTO?.["age.lte"] ?? 26) >= 26) ? [/.*?/i] : [queryDTO.country, 'default'] },
+                    'age_rattings.ratting': { $in: ((queryDTO?.["age.lte"] ?? 26) >= 26) ? [/.*?/i] : age_filter },
+                    ...userDataFilters
+                }
+            ]
+        }
+
+        const minimalProjection: ProjectionFields<ITitle> = {
+            _id: 1,
+            title_type: 1,
+            title: 1,
+            ratting: 1,
+            year: 1,
+            poster_path: 1,
+            genres: 1,
+            seenByUser: 1,
+            unseenByUser: 1,
+            starredByUser: 1,
+            favouriteByUser: 1,
+        }
+
+        const normalProjection: ProjectionFields<ITitle> = {
+            __v: 0,
+            userData: 0
+        }
+
+        const sort = queryDTO.sort_by ? await MongoSortBuilder(queryDTO.sort_by) : { createdAt: 'desc' };
+
+        const q: FindAllQuery = {
+            query,
+            sort: sort,
+            limit: queryDTO?.limit ?? 5,
+            page: queryDTO?.pageNo ?? 1,
+        }
+
+        const page: PageDTO = await this.titleRepository.findAllWithUserData(q, userId, queryDTO.minimal ? minimalProjection : normalProjection);
+
+        return page;
+    }
+
 }
+
+
+
 
 export default TitleService;

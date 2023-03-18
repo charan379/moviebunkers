@@ -7,7 +7,7 @@ import TvDTO from "./Tv.dto";
 
 
 interface TitleDTO extends MovieDTO, TvDTO, TitleAuthorDTO {
-    _id?: string;
+    _id?: Object | string;
 }
 
 export default TitleDTO;

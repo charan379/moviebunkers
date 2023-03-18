@@ -1,8 +1,9 @@
 import HttpCodes from "@constants/http.codes.enum";
-import { LevelOne, LevelTwo } from "@constants/user.roles.enum";
+import { LevelOne, LevelTwo, LevelZero } from "@constants/user.roles.enum";
 import PageDTO from "@dto/page.dto";
 import TitleDTO, { FindAllTitlesQueryDTO } from "@dto/title.dto";
 import { UserDTO } from "@dto/user.dto";
+import TitleException from "@exceptions/title.exeception";
 import baseTitleSchema from "@joiSchemas/base.joi.title.schema";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
 import { getAllTitlesQuerySchema } from "@joiSchemas/common.title.joi.schemas";
@@ -11,6 +12,7 @@ import TitleService from "@service/title.service";
 import { UserService } from "@service/user.service";
 import JoiValidator from "@utils/joi.validator";
 import { NextFunction, Request, Response, Router } from "express";
+import { ObjectId } from "mongoose";
 import { Inject, Service } from "typedi";
 
 /**
@@ -23,7 +25,10 @@ class TitleController {
     private titleService: TitleService;
     private userService: UserService;
 
-    constructor(@Inject() titleService: TitleService, @Inject() userService: UserService) {
+    constructor(
+        @Inject()
+        titleService: TitleService,
+        userService: UserService) {
         this.titleService = titleService;
         this.userService = userService;
 
@@ -152,7 +157,7 @@ class TitleController {
          *       400:
          *          description: Invalid query
          */
-        this.router.get("/", Authorize(LevelOne), this.getAllTitles.bind(this));
+        this.router.get("/", Authorize(LevelZero), this.getAllTitles.bind(this));
 
         /**
          * @swagger
@@ -161,7 +166,7 @@ class TitleController {
          *   tags:
          *     - Titles
          *   summary: API to get title details base Id
-         *   description: return title details based on title ID
+         *   description: return title details based on titleId, Note: titleId must be in base64url encoding
          *   parameters:
          *     - in: path
          *       name: id
@@ -177,7 +182,7 @@ class TitleController {
          *       404:
          *          description: Not Found
          */
-        this.router.get("/id/:id", Authorize(LevelOne), this.getTitleById.bind(this));
+        this.router.get("/id/:id", Authorize(LevelZero), this.getTitleById.bind(this));
 
         //post
         /**
@@ -221,9 +226,18 @@ class TitleController {
 
         try {
 
+            const userName: string | undefined = req?.userName;
+
+            if (!userName) throw new TitleException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@TitleController.getAllTitles()`);
+
+            const userDto: UserDTO = await this.userService.getUserByUserName(userName);
+
+            await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@TitleController.getAllTitles() - userId`);
+
             const validQuery: FindAllTitlesQueryDTO = await JoiValidator(getAllTitlesQuerySchema, req.query, { abortEarly: false, stripUnknown: true });
 
-            const page: PageDTO = await this.titleService.getAllTitles(validQuery);
+            
+            const page: PageDTO = await this.titleService.getAllTitlesWithUserData(validQuery, userDto?._id as ObjectId);
 
             res.status(HttpCodes.OK).json(page);
 
@@ -242,10 +256,17 @@ class TitleController {
     private async getTitleById(req: Request, res: Response, next: NextFunction) {
 
         try {
+            const userName: string | undefined = req?.userName;
 
-            const validId = await JoiValidator(ObjectIdSchema, req?.params?.id, { abortEarly: false, allowUnknown: false, stripUnknown: true })
+            if (!userName) throw new TitleException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@TitleController.getTitleById()`);
 
-            const titileDTO: TitleDTO = await this.titleService.getTitleById(validId);
+            const userDto: UserDTO = await this.userService.getUserByUserName(userName);
+
+            await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@TitleController.getTitleById() - userId`);
+
+            const titleId = await JoiValidator(ObjectIdSchema, Buffer.from(req?.params?.id, 'base64url').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true })
+             
+            const titileDTO: TitleDTO = await this.titleService.getTitleByIdWithUserData(titleId, userDto._id as ObjectId)
 
             res.status(200).json(titileDTO)
 
@@ -264,9 +285,16 @@ class TitleController {
     private async createTitle(req: Request, res: Response, next: NextFunction) {
 
         try {
+
+            const userName: string | undefined = req?.userName;
+
+            if (!userName) throw new TitleException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@TitleController.getTitleById()`);
+
+            const userDto: UserDTO = await this.userService.getUserByUserName(userName);
+
             const titleDTO: Partial<TitleDTO> = await JoiValidator(baseTitleSchema, req.body, { abortEarly: false, allowUnknown: true, stripUnknown: false });
-            const userDTO: UserDTO = await this.userService.getUserByUserName(req.userName as string)
-            const newTitle: TitleDTO = await this.titleService.createTitle(titleDTO, userDTO);
+
+            const newTitle: TitleDTO = await this.titleService.createTitle(titleDTO, userDto);
 
             res.status(201).json({ message: "New Title Added Successfully", new_title_id: newTitle._id })
 
