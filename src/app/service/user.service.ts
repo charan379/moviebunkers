@@ -37,11 +37,11 @@ export class UserService implements IUserService {
 
     const userNameAlreadyExists = await this.userRepository.findByUserName(newUserDTO.userName);
 
-    if (userNameAlreadyExists) throw new UserException("User Name already exits", HttpCodes.OK, `UserName: ${newUserDTO.userName} is already taken`);
+    if (userNameAlreadyExists) throw new UserException("User Name already exits", HttpCodes.BAD_REQUEST, `UserName: ${newUserDTO.userName} is already taken`);
 
     const emailAlreadyExits = await this.userRepository.findByEmail(newUserDTO.email);
 
-    if (emailAlreadyExits) throw new UserException("Email already exits", HttpCodes.OK, `Email: ${newUserDTO.email} is already taken`);
+    if (emailAlreadyExits) throw new UserException("Email already exits", HttpCodes.BAD_REQUEST, `Email: ${newUserDTO.email} is already taken`);
 
     const hashedPassword: string = await generateHash(newUserDTO.password);
 
