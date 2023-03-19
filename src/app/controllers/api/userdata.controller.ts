@@ -172,7 +172,7 @@ class UserDataController {
 
             await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `UserDataController.addToSeenTitles() - userId`);
 
-            const validTitleId = await JoiValidator(ObjectIdSchema, Buffer.from(req.params?.titleId, 'base64url').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `UserDataController.addToSeenTitles() - titleId`)
+            const validTitleId = await JoiValidator(ObjectIdSchema, Buffer.from(req.params?.titleId, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `UserDataController.addToSeenTitles() - titleId`)
 
             const result = await this.userDataService.addToSeenTitles(userDto._id as ObjectId, validTitleId as ObjectId)
 
@@ -204,7 +204,7 @@ class UserDataController {
 
             await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@UserDataController.addToUnSeenTitles() - userId`);
 
-            const validTitleId = await JoiValidator(ObjectIdSchema, Buffer.from(req.params?.titleId, 'base64url').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `UserDataController.addToUnSeenTitles() - titleId`)
+            const validTitleId = await JoiValidator(ObjectIdSchema, Buffer.from(req.params?.titleId, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `UserDataController.addToUnSeenTitles() - titleId`)
 
             const result = await this.userDataService.addToUnSeenTitles(userDto._id as ObjectId, validTitleId as ObjectId)
 
@@ -237,7 +237,7 @@ class UserDataController {
 
             await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@UserDataController.addToFavouriteTitles() - userId`);
 
-            const validTitleId = await JoiValidator(ObjectIdSchema, Buffer.from(req.params?.titleId, 'base64url').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@UserDataController.addToFavouriteTitles() - titleId`)
+            const validTitleId = await JoiValidator(ObjectIdSchema, Buffer.from(req.params?.titleId, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@UserDataController.addToFavouriteTitles() - titleId`)
 
             const result = await this.userDataService.addToFavouriteTitles(userDto._id as ObjectId, validTitleId as ObjectId)
 
@@ -269,7 +269,7 @@ class UserDataController {
 
             await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@UserDataController.removeFromFavouriteTitles() - userId`);
 
-            const validTitleId = await JoiValidator(ObjectIdSchema, Buffer.from(req.params?.titleId, 'base64url').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@UserDataController.removeFromFavouriteTitles() - titleId`)
+            const validTitleId = await JoiValidator(ObjectIdSchema, Buffer.from(req.params?.titleId, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@UserDataController.removeFromFavouriteTitles() - titleId`)
 
             const result = await this.userDataService.removeFromFavouriteTitles(userDto._id as ObjectId, validTitleId as ObjectId)
 
@@ -302,7 +302,7 @@ class UserDataController {
 
             await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@UserDataController.addToStarredTitles() - userId`);
 
-            const validTitleId = await JoiValidator(ObjectIdSchema, Buffer.from(req.params?.titleId, 'base64url').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@UserDataController.addToStarredTitles() - titleId`)
+            const validTitleId = await JoiValidator(ObjectIdSchema, Buffer.from(req.params?.titleId, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@UserDataController.addToStarredTitles() - titleId`)
 
             const result = await this.userDataService.addToStarredTitles(userDto._id as ObjectId, validTitleId as ObjectId)
 
@@ -334,7 +334,7 @@ class UserDataController {
 
             await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@UserDataController.removeFromStarredTitles() - userId`);
 
-            const validTitleId = await JoiValidator(ObjectIdSchema, Buffer.from(req.params?.titleId, 'base64url').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@UserDataController.removeFromStarredTitles() - titleId`)
+            const validTitleId = await JoiValidator(ObjectIdSchema, Buffer.from(req.params?.titleId, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@UserDataController.removeFromStarredTitles() - titleId`)
 
             const result = await this.userDataService.removeFromStarredTitles(userDto._id as ObjectId, validTitleId as ObjectId)
 

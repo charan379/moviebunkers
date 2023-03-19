@@ -170,7 +170,7 @@ class TitleController {
          *   tags:
          *     - Titles
          *   summary: API to get title details base Id
-         *   description: return title details based on titleId, titleId must be in base64url encoding
+         *   description: return title details based on titleId, titleId must be in base64 encoding
          *   parameters:
          *     - in: path
          *       name: id
@@ -269,7 +269,7 @@ class TitleController {
 
             await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@TitleController.getTitleById() - userId`);
 
-            const titleId = await JoiValidator(ObjectIdSchema, Buffer.from(req?.params?.id, 'base64url').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true })
+            const titleId = await JoiValidator(ObjectIdSchema, Buffer.from(req?.params?.id, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true })
 
             const titileDTO: TitleDTO = await this.titleService.getTitleByIdWithUserData(titleId, userDto._id as ObjectId);
 
