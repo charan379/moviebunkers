@@ -1,3 +1,4 @@
+import Config from '@Config';
 import HttpCodes from '@constants/http.codes.enum';
 import { UserDTO } from '@dto/user.dto';
 import AuthorizationException from '@exceptions/authorization.exception';
@@ -19,7 +20,7 @@ export async function generateJwtToken(userDTO: UserDTO): Promise<string> {
 
     try {
 
-        token = jwt.sign(payload, "privateOrsecretKeyHere", signOptions);
+        token = jwt.sign(payload, Config.JWT_SECRET as string, signOptions);
 
     } catch (error: any) {
         throw new AuthorizationException('Token Creation Failed', HttpCodes.INTERNAL_SERVER_ERROR, `jwt token creation failed for user: ${userDTO.userName}`, `@generateJwtToken.function(): UserDetails : ${userDTO}, ${error?.stack}`);
@@ -31,7 +32,7 @@ export async function verifyJwtToken(jwtToken: string): Promise<JwtPayload | str
     let deCodedToken;
 
     try {
-        deCodedToken = jwt.verify(jwtToken, "privateOrsecretKeyHere");
+        deCodedToken = jwt.verify(jwtToken, Config.JWT_SECRET as string);
 
     } catch (error: any) {
         /**

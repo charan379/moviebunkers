@@ -1,5 +1,6 @@
+import Config from "@Config";
 import HttpCodes from "@constants/http.codes.enum";
-import UserRoles from "@constants/user.roles.enum";
+import { LevelZero } from "@constants/user.roles.enum";
 import { LoginDTO, UserDTO } from "@dto/user.dto";
 import { lgoinSchema } from "@joiSchemas/user.joi.schemas";
 import Authorize from "@middlewares/authorization.middleware";
@@ -76,7 +77,7 @@ class AuthController {
          *       401:
          *          description: Unauthorized
          */
-        this.router.get("/who-am-i", Authorize([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER]), this.getWhoAmI.bind(this));
+        this.router.get("/who-am-i", Authorize(LevelZero), this.getWhoAmI.bind(this));
     }
 
 
@@ -95,7 +96,7 @@ class AuthController {
             res.cookie("auth", `Bearer ${token}`, {
                 maxAge: 30 * 24 * 60 * 60 * 1000,
                 httpOnly: true,
-                // secure: Config.HTTPS,
+                secure: Config.HTTPS,
                 signed: true,
                 overwrite: true,
                 sameSite: false,

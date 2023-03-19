@@ -46,7 +46,7 @@ class UserRepository implements IUserRepository {
    */
   findByUserName(userName: string): Promise<IUser | null> {
     return this.userModel
-      .findOne({ userName: userName }, { _id: 0, __v: 0 })
+      .findOne({ userName: { $regex: new RegExp(`^${userName}$`, "i") } }, { __v: 0 })
       .lean()
       .exec();
   }
@@ -61,7 +61,7 @@ class UserRepository implements IUserRepository {
     email: string,
     projection: ProjectionFields<IUser> = { _id: 0, password: 0, __v: 0 }
   ): Promise<IUser | null> {
-    return this.userModel.findOne({ email: email }, projection).lean().exec();
+    return this.userModel.findOne({ email: { $regex: new RegExp(`^${email}$`, "i") } }, projection).lean().exec();
   }
 
   /**
@@ -113,7 +113,7 @@ class UserRepository implements IUserRepository {
    */
   async update(userName: string, user: Partial<IUser>): Promise<IUser | null> {
     await this.userModel
-      .findOneAndUpdate({ userName: userName }, { $set: { ...user } })
+      .findOneAndUpdate({ userName: { $regex: new RegExp(`^${userName}$`, "i") } }, { $set: { ...user } })
       .exec();
 
     return this.findByUserName(userName);

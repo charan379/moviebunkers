@@ -1,7 +1,6 @@
 import HttpCodes from "@constants/http.codes.enum";
 import { LoginDTO, UserDTO } from "@dto/user.dto";
 import AuthorizationException from "@exceptions/authorization.exception";
-import UserException from "@exceptions/user.exception";
 import { validateHash } from "@utils/bcrypt";
 import { generateJwtToken } from "@utils/jwt";
 import { Inject, Service } from "typedi";

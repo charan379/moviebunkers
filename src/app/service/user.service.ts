@@ -37,11 +37,11 @@ export class UserService implements IUserService {
 
     const userNameAlreadyExists = await this.userRepository.findByUserName(newUserDTO.userName);
 
-    if (userNameAlreadyExists) throw new UserException("User Name already exits", HttpCodes.OK, `UserName: ${newUserDTO.userName} is already taken`);
+    if (userNameAlreadyExists) throw new UserException("User Name already exits", HttpCodes.BAD_REQUEST, `UserName: ${newUserDTO.userName} is already taken`);
 
     const emailAlreadyExits = await this.userRepository.findByEmail(newUserDTO.email);
 
-    if (emailAlreadyExits) throw new UserException("Email already exits", HttpCodes.OK, `Email: ${newUserDTO.email} is already taken`);
+    if (emailAlreadyExits) throw new UserException("Email already exits", HttpCodes.BAD_REQUEST, `Email: ${newUserDTO.email} is already taken`);
 
     const hashedPassword: string = await generateHash(newUserDTO.password);
 
@@ -74,15 +74,7 @@ export class UserService implements IUserService {
 
     if (!user) throw new UserException("User Not Found !", HttpCodes.NOT_FOUND, `User not found for given id : ${id}`, `@UserService.class: @getUserById.method() userId : ${id}`);
 
-    const userDTO: UserDTO = {
-      userName: user.userName,
-      email: user.email,
-      status: user.status,
-      role: user.role,
-      last_modified_by: user?.last_modified_by,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
+    const userDTO: UserDTO = user;
 
     return userDTO;
   }
@@ -96,18 +88,9 @@ export class UserService implements IUserService {
 
     const user = await this.userRepository.findByUserName(userName);
 
-    if (!user) throw new UserException("User Not Found", HttpCodes.NOT_FOUND, `user not found for given userName : ${userName}`,`@UserService.class: @getUserByUserName.method() userName : ${userName}`);
+    if (!user) throw new UserException("User Not Found", HttpCodes.NOT_FOUND, `user not found for given userName : ${userName}`, `@UserService.class: @getUserByUserName.method() userName : ${userName}`);
 
-    const userDTO: UserDTO = {
-      userName: user.userName,
-      password: user.password,
-      email: user.email,
-      status: user.status,
-      role: user.role,
-      last_modified_by: user?.last_modified_by,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
+    const userDTO: UserDTO = user;
 
     return userDTO;
   }

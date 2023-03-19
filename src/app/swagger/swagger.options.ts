@@ -41,6 +41,9 @@ export const swaggerOptions = {
             },
             {
                 name: 'Auth'
+            },
+            {
+                name: 'UserData'
             }
         ],
 
