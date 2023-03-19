@@ -10,6 +10,7 @@ import { getAllTitlesQuerySchema } from "@joiSchemas/common.title.joi.schemas";
 import Authorize from "@middlewares/authorization.middleware";
 import TitleService from "@service/title.service";
 import { UserService } from "@service/user.service";
+import UserDataService from "@service/userdata.service";
 import JoiValidator from "@utils/joi.validator";
 import { NextFunction, Request, Response, Router } from "express";
 import { ObjectId } from "mongoose";
@@ -24,13 +25,16 @@ class TitleController {
     public router: Router;
     private titleService: TitleService;
     private userService: UserService;
+    private userDataService: UserDataService;
 
     constructor(
         @Inject()
         titleService: TitleService,
-        userService: UserService) {
+        userService: UserService,
+        userDataService: UserDataService) {
         this.titleService = titleService;
         this.userService = userService;
+        this.userDataService = userDataService;
 
         this.router = Router();
 
@@ -236,8 +240,9 @@ class TitleController {
 
             const validQuery: FindAllTitlesQueryDTO = await JoiValidator(getAllTitlesQuerySchema, req.query, { abortEarly: false, stripUnknown: true });
 
-            
-            const page: PageDTO = await this.titleService.getAllTitlesWithUserData(validQuery, userDto?._id as ObjectId);
+            const userData = await this.userDataService.getUserData(userDto._id as ObjectId);
+
+            const page: PageDTO = await this.titleService.getAllTitlesWithUserData(validQuery, userDto?._id as ObjectId, userData);
 
             res.status(HttpCodes.OK).json(page);
 
@@ -265,8 +270,8 @@ class TitleController {
             await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@TitleController.getTitleById() - userId`);
 
             const titleId = await JoiValidator(ObjectIdSchema, Buffer.from(req?.params?.id, 'base64url').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true })
-             
-            const titileDTO: TitleDTO = await this.titleService.getTitleByIdWithUserData(titleId, userDto._id as ObjectId)
+
+            const titileDTO: TitleDTO = await this.titleService.getTitleByIdWithUserData(titleId, userDto._id as ObjectId);
 
             res.status(200).json(titileDTO)
 

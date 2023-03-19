@@ -369,9 +369,9 @@ class TitleRepository implements ITitleRepository {
         const projectionStage: PipelineStage.Project = {
             $project: projection
         }
-        const titlesCount = await this.titleModel.aggregate([lookupUserData, addUserDataDoc, addUserDataFields, matchQuery, countTotalResults]);
+        const titlesCount = await this.titleModel.aggregate([matchQuery, lookupUserData, addUserDataDoc, addUserDataFields, countTotalResults]);
 
-        const titlesList = await this.titleModel.aggregate([lookupUserData, addUserDataDoc, addUserDataFields, matchQuery, sortDocs, skipDocs, limitDocs, projectionStage]);
+        const titlesList = await this.titleModel.aggregate([matchQuery, lookupUserData, addUserDataDoc, addUserDataFields, sortDocs, skipDocs, limitDocs, projectionStage]);
 
         const titleDTOs: TitleDTO[] = titlesList.map(iTitle => {
             return iTitle as TitleDTO;

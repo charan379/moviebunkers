@@ -6,6 +6,7 @@ import PageDTO from "@dto/page.dto";
 import TitleDTO, { FindAllTitlesQueryDTO } from "@dto/title.dto";
 import TvDTO from "@dto/Tv.dto";
 import { UserDTO } from "@dto/user.dto";
+import UserDataDTO from "@dto/userdata.dto";
 import TitleException from "@exceptions/title.exeception";
 import ITitle from "@models/interfaces/title.interface";
 import { FindAllQuery } from "@repositories/interfaces/custom.types.interfaces";
@@ -152,14 +153,14 @@ class TitleService implements ITitleService {
      * @param userId 
      */
     async getTitleByIdWithUserData(titleId: string, userId: ObjectId): Promise<TitleDTO> {
-        
+
         const title = await this.titleRepository.findByIdWithUserData(titleId, userId);
 
         if (!title) throw new TitleException("Title Not Found !", HttpCodes.NOT_FOUND, `Title not found for given Id: ${titleId}`, `@TitleService.class: @getTitleByIdWithUserData.method() requested title Id: ${titleId}`);
 
         const titleDTO: TitleDTO = title as TitleDTO;
 
-        
+
         return titleDTO;
     }
 
@@ -169,39 +170,78 @@ class TitleService implements ITitleService {
       * @param userId
       * @returns Promise<PageDTO>
       */
-    async getAllTitlesWithUserData(queryDTO: FindAllTitlesQueryDTO, userId: ObjectId): Promise<PageDTO> {
+    async getAllTitlesWithUserData(queryDTO: FindAllTitlesQueryDTO, userId: ObjectId, userData: UserDataDTO): Promise<PageDTO> {
 
         const title_types = [{ type: "movie", include: queryDTO?.movie ?? 0 }, { type: "tv", include: queryDTO?.tv ?? 0 }];
 
         const age_filter = await getCertificationsByAgeRange(queryDTO?.["age.gte"] ?? 0, queryDTO?.["age.lte"] ?? 26, queryDTO?.country ?? 'IN')
 
-        let userDataFilters = {};
+
+        let titleIdsSet = new Set<string>();
 
         if (queryDTO.seen === 1) {
-            userDataFilters = { ...userDataFilters, seenByUser: true }
+            for (const id of userData.seenTitles) {
+                titleIdsSet.add(id.toString())
+            }
         } else if (queryDTO.seen === -1) {
-            userDataFilters = { ...userDataFilters, unseenByUser: true }
+            for (const id of userData.unseenTitles) {
+                titleIdsSet.add(id.toString())
+            }
         }
 
         if (queryDTO.starred === 1) {
-            userDataFilters = { ...userDataFilters, starredByUser: true }
+            for (const id of userData.starredTitles) {
+                titleIdsSet.add(id.toString())
+            }
         }
 
+
         if (queryDTO.favourite === 1) {
-            userDataFilters = { ...userDataFilters, favouriteByUser: true }
+            for (const id of userData.favouriteTitles) {
+                titleIdsSet.add(id.toString())
+            }
         }
-        
+
+        let titileObjectIdsSet = new Set<mongoose.Types.ObjectId>();
+
+        for (const id of titleIdsSet) {
+            titileObjectIdsSet.add(new mongoose.Types.ObjectId(id))
+        }
+
+        let idFilter = {};
+        if (titileObjectIdsSet.size > 0) {
+            idFilter = { ...idFilter, _id: { $in: Array.from(titileObjectIdsSet) } }
+        }
+
+
+        // let userDataFilters = {};
+
+        // if (queryDTO.seen === 1) {
+        //     userDataFilters = { ...userDataFilters, seenByUser: true }
+        // } else if (queryDTO.seen === -1) {
+        //     userDataFilters = { ...userDataFilters, unseenByUser: true }
+        // }
+
+        // if (queryDTO.starred === 1) {
+        //     userDataFilters = { ...userDataFilters, starredByUser: true }
+        // }
+
+        // if (queryDTO.favourite === 1) {
+        //     userDataFilters = { ...userDataFilters, favouriteByUser: true }
+        // }
+
+
         const query: FilterQuery<ITitle> = {
             $and: [
                 {
-                    // _id: new mongoose.Types.ObjectId('64134cce661b4da2fb891d36'),
+                    ...idFilter,
                     title: { $regex: new RegExp(`${queryDTO.search ?? ""}`, "i") },
                     title_type: { $in: title_types.map(title_type => { if (title_type.include === 1) return title_type.type }).filter(Boolean) },
                     "original_language.ISO_639_1_code": { $regex: new RegExp(`^${queryDTO.language ?? ""}`, "i") },
                     genres: { $regex: new RegExp(`${queryDTO.genre ?? ""}`, "i") },
                     'age_rattings.country': { $in: ((queryDTO?.["age.lte"] ?? 26) >= 26) ? [/.*?/i] : [queryDTO.country, 'default'] },
                     'age_rattings.ratting': { $in: ((queryDTO?.["age.lte"] ?? 26) >= 26) ? [/.*?/i] : age_filter },
-                    ...userDataFilters
+                    // ...userDataFilters
                 }
             ]
         }
