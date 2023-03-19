@@ -46,7 +46,7 @@ class UserRepository implements IUserRepository {
    */
   findByUserName(userName: string): Promise<IUser | null> {
     return this.userModel
-      .findOne({ userName: { $regex: new RegExp(`^${userName}$`, "i") } }, { __v: 0 })
+      .findOne({ userName: userName }, { __v: 0 })
       .lean()
       .exec();
   }
@@ -113,7 +113,7 @@ class UserRepository implements IUserRepository {
    */
   async update(userName: string, user: Partial<IUser>): Promise<IUser | null> {
     await this.userModel
-      .findOneAndUpdate({ userName: { $regex: new RegExp(`^${userName}$`, "i") } }, { $set: { ...user } })
+      .findOneAndUpdate({ userName: userName }, { $set: { ...user } })
       .exec();
 
     return this.findByUserName(userName);
