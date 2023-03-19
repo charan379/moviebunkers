@@ -268,7 +268,6 @@ class TitleService implements ITitleService {
                 }
             ]
         }
-        console.log(JSON.stringify(query))
 
         const minimalProjection: ProjectionFields<ITitle> = {
             _id: 1,
