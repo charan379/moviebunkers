@@ -174,7 +174,7 @@ class UserController {
    *       401:
    *          description: Unauthorized
    */
-    this.router.post("/new", Authorize(LevelThere), this.createUser.bind(this));
+    this.router.post("/new", this.createUser.bind(this));
 
     /**
      * @swagger
