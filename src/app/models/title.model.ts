@@ -18,6 +18,7 @@ const titleSchema: Schema<ITitle> = new Schema<ITitle>(
     }
 );
 
+titleSchema.index({ title_type: 1 })
 const TitleModel: Model<ITitle> = mongoose.model<ITitle>("title", titleSchema);
 
 export default TitleModel;

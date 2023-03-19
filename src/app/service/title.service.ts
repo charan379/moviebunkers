@@ -230,21 +230,45 @@ class TitleService implements ITitleService {
         //     userDataFilters = { ...userDataFilters, favouriteByUser: true }
         // }
 
+        let titleFilter = {};
+        if (queryDTO.search) {
+            titleFilter = { ...titleFilter, title: { $regex: new RegExp(`${queryDTO.search}`, "i") } }
+        }
 
+        let originalLangFilter = {};
+        if (queryDTO.language) {
+            originalLangFilter = { ...originalLangFilter, "original_language.ISO_639_1_code": { $regex: new RegExp(`^${queryDTO.language}`, "i") }, }
+        }
+
+        let genresFilter = {};
+        if (queryDTO.genre) {
+            genresFilter = { ...genresFilter, genres: { $regex: new RegExp(`${queryDTO.genre}`, "i") }, }
+        }
+
+        let ageFilter = {}
+        if ((queryDTO["age.lte"] !== 26) || (queryDTO["age.gte"] !== 0)) {
+            ageFilter = {
+                ...ageFilter,
+                // 'age_rattings.country': { $in: ((queryDTO?.["age.lte"] ?? 26) >= 26) ? [/.*?/i] : [queryDTO.country, 'default'] },
+                // 'age_rattings.ratting': { $in: ((queryDTO?.["age.lte"] ?? 26) >= 26) ? [/.*?/i] : age_filter },
+                'age_rattings.country': { $in: (queryDTO["age.lte"] > 21) ? [queryDTO.country, 'default'] : [queryDTO.country] },
+                'age_rattings.ratting': { $in: age_filter },
+            }
+        }
         const query: FilterQuery<ITitle> = {
             $and: [
                 {
                     ...idFilter,
-                    title: { $regex: new RegExp(`${queryDTO.search ?? ""}`, "i") },
                     title_type: { $in: title_types.map(title_type => { if (title_type.include === 1) return title_type.type }).filter(Boolean) },
-                    "original_language.ISO_639_1_code": { $regex: new RegExp(`^${queryDTO.language ?? ""}`, "i") },
-                    genres: { $regex: new RegExp(`${queryDTO.genre ?? ""}`, "i") },
-                    'age_rattings.country': { $in: ((queryDTO?.["age.lte"] ?? 26) >= 26) ? [/.*?/i] : [queryDTO.country, 'default'] },
-                    'age_rattings.ratting': { $in: ((queryDTO?.["age.lte"] ?? 26) >= 26) ? [/.*?/i] : age_filter },
+                    ...originalLangFilter,
+                    ...genresFilter,
+                    ...titleFilter,
+                    ...ageFilter,
                     // ...userDataFilters
                 }
             ]
         }
+        console.log(JSON.stringify(query))
 
         const minimalProjection: ProjectionFields<ITitle> = {
             _id: 1,
