@@ -99,10 +99,10 @@ class AuthController {
                 secure: Config.HTTPS,
                 signed: true,
                 overwrite: true,
-                sameSite: false,
+                sameSite: 'none',
             } as CookieOptions)
-            .status(HttpCodes.OK)
-            .json({ message: "Successfully Logged In" });
+                .status(HttpCodes.OK)
+                .json({ message: "Successfully Logged In" });
 
         } catch (error) {
 
@@ -120,8 +120,8 @@ class AuthController {
         try {
 
             res.clearCookie("auth")
-            .status(HttpCodes.OK)
-            .json({ message: "Successfully Logged Out" })
+                .status(HttpCodes.OK)
+                .json({ message: "Successfully Logged Out" })
 
         } catch (error) {
 
@@ -143,7 +143,7 @@ class AuthController {
             const userDTO: UserDTO = await this.authService.WhoAmI(userName);
 
             delete userDTO.password;
-      
+
             res.status(HttpCodes.OK).json(userDTO);
         } catch (error) {
             next(error);
