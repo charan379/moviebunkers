@@ -90,16 +90,154 @@ class UserDataController {
          */
         this.router.get("/get-all", Authorize(LevelThere), this.getAllUsersData.bind(this));
 
+        /**
+         * @swagger
+         * /userdata/add-to-seen/{titleId}:
+         *  post:
+         *   tags:
+         *     - UserData
+         *   summary: API to add titleId to user's seen list
+         *   description: add's title to seen, titleId must be in base64 encoding 
+         *   parameters:
+         *     - in: path
+         *       name: titleId
+         *       schema:
+         *          type: string
+         *   responses:
+         *       200:
+         *          description: Success
+         *       404:
+         *          description: User not found
+         *       400:
+         *          description: Invalid titleId
+         *       401:
+         *          description: Unauthorized
+         */
         this.router.post("/add-to-seen/:titleId", Authorize(LevelZero), this.addToSeenTitles.bind(this));
 
+        /**
+         * @swagger
+         * /userdata/add-to-unseen/{titleId}:
+         *  post:
+         *   tags:
+         *     - UserData
+         *   summary: API to add titleId to user's unseen list
+         *   description: add's title to unseen, titleId must be in base64 encoding 
+         *   parameters:
+         *     - in: path
+         *       name: titleId
+         *       schema:
+         *          type: string
+         *   responses:
+         *       200:
+         *          description: Success
+         *       404:
+         *          description: User not found
+         *       400:
+         *          description: Invalid titleId
+         *       401:
+         *          description: Unauthorized
+         */
         this.router.post("/add-to-unseen/:titleId", Authorize(LevelZero), this.addToUnSeenTitles.bind(this));
 
+        /**
+        * @swagger
+        * /userdata/add-to-favourite/{titleId}:
+        *  post:
+        *   tags:
+        *     - UserData
+        *   summary: API to add titleId to user's favourite list
+        *   description: add's title to favourite, titleId must be in base64 encoding 
+        *   parameters:
+        *     - in: path
+        *       name: titleId
+        *       schema:
+        *          type: string
+        *   responses:
+        *       200:
+        *          description: Success
+        *       404:
+        *          description: User not found
+        *       400:
+        *          description: Invalid titleId
+        *       401:
+        *          description: Unauthorized
+        */
         this.router.post("/add-to-favourite/:titleId", Authorize(LevelZero), this.addToFavouriteTitles.bind(this));
 
+        /**
+         * @swagger
+         * /userdata/remove-from-favourite/{titleId}:
+         *  post:
+         *   tags:
+         *     - UserData
+         *   summary: API to remove titleId to user's favourite list
+         *   description: removes's title from favourite, titleId must be in base64 encoding 
+         *   parameters:
+         *     - in: path
+         *       name: titleId
+         *       schema:
+         *          type: string
+         *   responses:
+         *       200:
+         *          description: Success
+         *       404:
+         *          description: User not found
+         *       400:
+         *          description: Invalid titleId
+         *       401:
+         *          description: Unauthorized
+         */
         this.router.post("/remove-from-favourite/:titleId", Authorize(LevelZero), this.removeFromFavouriteTitles.bind(this));
 
+        /**
+         * @swagger
+         * /userdata/add-to-starred/{titleId}:
+         *  post:
+         *   tags:
+         *     - UserData
+         *   summary: API to add titleId to user's starred list
+         *   description: add's title to starred, titleId must be in base64 encoding 
+         *   parameters:
+         *     - in: path
+         *       name: titleId
+         *       schema:
+         *          type: string
+         *   responses:
+         *       200:
+         *          description: Success
+         *       404:
+         *          description: User not found
+         *       400:
+         *          description: Invalid titleId
+         *       401:
+         *          description: Unauthorized
+         */
         this.router.post("/add-to-starred/:titleId", Authorize(LevelZero), this.addToStarredTitles.bind(this));
 
+        /**
+         * @swagger
+         * /userdata/remove-from-starred/{titleId}:
+         *  post:
+         *   tags:
+         *     - UserData
+         *   summary: API to remove titleId to user's starred list
+         *   description: removes's title from starred, titleId must be in base64 encoding 
+         *   parameters:
+         *     - in: path
+         *       name: titleId
+         *       schema:
+         *          type: string
+         *   responses:
+         *       200:
+         *          description: Success
+         *       404:
+         *          description: User not found
+         *       400:
+         *          description: Invalid titleId
+         *       401:
+         *          description: Unauthorized
+         */
         this.router.post("/remove-from-starred/:titleId", Authorize(LevelZero), this.removeFromStarredTitles.bind(this));
     }
 
