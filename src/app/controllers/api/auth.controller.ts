@@ -119,7 +119,7 @@ class AuthController {
     private async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
-            res.clearCookie("auth")
+            res.clearCookie("auth", { sameSite: "none", httpOnly: true, secure: Config.HTTPS })
                 .status(HttpCodes.OK)
                 .json({ message: "Successfully Logged Out" })
 
