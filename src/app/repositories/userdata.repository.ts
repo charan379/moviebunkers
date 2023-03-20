@@ -15,16 +15,33 @@ class UserDataRepository implements IUserDataRepository {
         this.userDataModel = UserDataModel;
     }
 
+    /**
+     * create()
+     * @param userData 
+     * @returns 
+     */
     async create(userData: Partial<IUserData>): Promise<IUserData> {
         return this.userDataModel.create<Partial<IUserData>>(userData);
 
     }
+
+    /**
+     * findByUserId()
+     * @param userId 
+     * @returns 
+     */
     async findByUserId(userId: Schema.Types.ObjectId): Promise<IUserData | null> {
         return this.userDataModel
             .findOne({ userId: userId }, { __v: 0 })
             .exec();
     }
 
+    /**
+     * updateUserData()
+     * @param userId 
+     * @param update 
+     * @returns 
+     */
     async updateUserData(userId: Schema.Types.ObjectId, update: UpdateQuery<IUserData>): Promise<boolean> {
 
         const result = await this.userDataModel.findOneAndUpdate({ userId: userId }, update, { new: true }).exec();
@@ -35,6 +52,10 @@ class UserDataRepository implements IUserDataRepository {
         }
     }
 
+    /**
+     * findAll()
+     * @returns 
+     */
     async findAll(): Promise<IUserData[]> {
 
         return await this.userDataModel.find({}, { __v: 0 })
@@ -46,6 +67,8 @@ class UserDataRepository implements IUserDataRepository {
                 select: "userName email status role createdAt",
             }).exec()
 
+        // same result as above but with aggregation
+        // will be implemented in future
         // return await this.userDataModel.aggregate([
         //     // {
         //     //     $match: {

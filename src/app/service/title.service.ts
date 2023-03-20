@@ -79,7 +79,7 @@ class TitleService implements ITitleService {
     }
 
     /**
-     * @deprecated user getTitleByIdWithUserData
+     * @deprecated use getTitleByIdWithUserData
      * getTitleById()
      * @param id 
      */
@@ -92,8 +92,6 @@ class TitleService implements ITitleService {
 
         return titleDTO;
     }
-
-
 
 
     /**
@@ -213,23 +211,6 @@ class TitleService implements ITitleService {
             idFilter = { ...idFilter, _id: { $in: Array.from(titileObjectIdsSet) } }
         }
 
-
-        // let userDataFilters = {};
-
-        // if (queryDTO.seen === 1) {
-        //     userDataFilters = { ...userDataFilters, seenByUser: true }
-        // } else if (queryDTO.seen === -1) {
-        //     userDataFilters = { ...userDataFilters, unseenByUser: true }
-        // }
-
-        // if (queryDTO.starred === 1) {
-        //     userDataFilters = { ...userDataFilters, starredByUser: true }
-        // }
-
-        // if (queryDTO.favourite === 1) {
-        //     userDataFilters = { ...userDataFilters, favouriteByUser: true }
-        // }
-
         let titleFilter = {};
         if (queryDTO.search) {
             titleFilter = { ...titleFilter, title: { $regex: new RegExp(`${queryDTO.search}`, "i") } }
@@ -249,8 +230,6 @@ class TitleService implements ITitleService {
         if ((queryDTO["age.lte"] !== 26) || (queryDTO["age.gte"] !== 0)) {
             ageFilter = {
                 ...ageFilter,
-                // 'age_rattings.country': { $in: ((queryDTO?.["age.lte"] ?? 26) >= 26) ? [/.*?/i] : [queryDTO.country, 'default'] },
-                // 'age_rattings.ratting': { $in: ((queryDTO?.["age.lte"] ?? 26) >= 26) ? [/.*?/i] : age_filter },
                 'age_rattings.country': { $in: (queryDTO["age.lte"] > 21) ? [queryDTO.country, 'default'] : [queryDTO.country] },
                 'age_rattings.ratting': { $in: age_filter },
             }
@@ -264,7 +243,6 @@ class TitleService implements ITitleService {
                     ...genresFilter,
                     ...titleFilter,
                     ...ageFilter,
-                    // ...userDataFilters
                 }
             ]
         }

@@ -14,6 +14,11 @@ class MovieRepository implements IMovieRepository {
         this.movieModel = MovieModel;
     }
 
+    /**
+     * create()
+     * @param movie 
+     * @returns 
+     */
     create(movie: Partial<IMovie>): Promise<IMovie> {
        return  this.movieModel.create<Partial<IMovie>>(movie);
     }

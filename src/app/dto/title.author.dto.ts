@@ -1,5 +1,4 @@
 import { ObjectId } from "mongoose";
-import { UserDTO } from "./user.dto";
 
 
 interface TitleAuthorDTO {
