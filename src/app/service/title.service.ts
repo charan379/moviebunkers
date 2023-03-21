@@ -175,58 +175,52 @@ class TitleService implements ITitleService {
         const age_filter = await getCertificationsByAgeRange(queryDTO?.["age.gte"] ?? 0, queryDTO?.["age.lte"] ?? 26, queryDTO?.country ?? 'IN')
 
 
-        let titleIdsSet = new Set<string>();
+        let arraysOfIds = [];
 
         if (queryDTO.seen === 1) {
-            for (const id of userData.seenTitles) {
-                titleIdsSet.add(id.toString())
-            }
+            arraysOfIds.push(userData.seenTitles);
         } else if (queryDTO.seen === -1) {
-            for (const id of userData.unseenTitles) {
-                titleIdsSet.add(id.toString())
-            }
+            arraysOfIds.push(userData.unseenTitles);
         }
 
         if (queryDTO.starred === 1) {
-            for (const id of userData.starredTitles) {
-                titleIdsSet.add(id.toString())
-            }
+            arraysOfIds.push(userData.starredTitles)
         }
-
 
         if (queryDTO.favourite === 1) {
-            for (const id of userData.favouriteTitles) {
-                titleIdsSet.add(id.toString())
-            }
+            arraysOfIds.push(userData.favouriteTitles);
         }
 
-        let titileObjectIdsSet = new Set<mongoose.Types.ObjectId>();
-
-        for (const id of titleIdsSet) {
-            titileObjectIdsSet.add(new mongoose.Types.ObjectId(id))
-        }
+        const idsToFilter = arraysOfIds.length ? arraysOfIds.reduce((accumulator, currentArray) =>
+            accumulator.filter(value => currentArray.includes(value))
+        ) : [];
 
         let idFilter = {};
-        if (titileObjectIdsSet.size > 0) {
-            idFilter = { ...idFilter, _id: { $in: Array.from(titileObjectIdsSet) } }
+
+        if (arraysOfIds.length > 0) {
+            idFilter = { ...idFilter, _id: { $in: idsToFilter } }
         }
 
         let titleFilter = {};
+
         if (queryDTO.search) {
             titleFilter = { ...titleFilter, title: { $regex: new RegExp(`${queryDTO.search}`, "i") } }
         }
 
         let originalLangFilter = {};
+
         if (queryDTO.language) {
             originalLangFilter = { ...originalLangFilter, "original_language.ISO_639_1_code": { $regex: new RegExp(`^${queryDTO.language}`, "i") }, }
         }
 
         let genresFilter = {};
+
         if (queryDTO.genre) {
             genresFilter = { ...genresFilter, genres: { $regex: new RegExp(`${queryDTO.genre}`, "i") }, }
         }
 
         let ageFilter = {}
+        
         if ((queryDTO["age.lte"] !== 26) || (queryDTO["age.gte"] !== 0)) {
             ageFilter = {
                 ...ageFilter,
