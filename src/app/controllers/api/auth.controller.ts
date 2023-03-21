@@ -44,6 +44,28 @@ class AuthController {
          */
         this.router.post("/cookie-auth", this.cookieAuth.bind(this));
 
+        /**
+         * @swagger
+         * /auth/token-auth:
+         *  post:
+         *   tags:
+         *     - Auth
+         *   summary: API to authenticate user and sent token
+         *   description: return a token after successfull authentication
+         *   requestBody:
+         *      content:
+         *        application/json:
+         *          schema:
+         *              $ref: '#/components/schemas/login'
+         *   responses:
+         *       200:
+         *          description: Success
+         *       404:
+         *          description: user or password incorrect or not found
+         *   security: []
+         */
+        this.router.post("/token-auth", this.tokenAuth.bind(this));
+
         //logout
         /**
          * @swagger
@@ -82,7 +104,7 @@ class AuthController {
 
 
     /**
-     * @Post("/login") => login() Controller
+     * @Post("/cookie-auth") => cookieAuth() Controller
      * @param req 
      * @param res 
      * @param next 
@@ -111,6 +133,27 @@ class AuthController {
     }
 
     /**
+     * @Post("/token-auth") => tokenAuth() Controller
+     * @param req 
+     * @param res 
+     * @param next 
+     */
+    private async tokenAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const validLoginDTO: LoginDTO = await JoiValidator(lgoinSchema, req?.body, { allowUnknown: false, stripUnknown: true, abortEarly: false });
+
+            const token: string = await this.authService.login(validLoginDTO);
+
+            res.status(HttpCodes.OK)
+                .json({ message: "Successfully authenticated", token: token });
+
+        } catch (error) {
+
+            next(error)
+        }
+    }
+
+    /**
      * @Get("/logout") => logout() Controller
      * @param req 
      * @param res 
@@ -119,7 +162,7 @@ class AuthController {
     private async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
-            res.clearCookie("auth")
+            res.clearCookie("auth", { sameSite: "none", httpOnly: true, secure: Config.HTTPS })
                 .status(HttpCodes.OK)
                 .json({ message: "Successfully Logged Out" })
 

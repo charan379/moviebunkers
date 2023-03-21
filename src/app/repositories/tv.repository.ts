@@ -14,6 +14,11 @@ class TvRepository implements ITvRepository {
         this.tvModel = TvModel;
     }
     
+    /**
+     * create()
+     * @param tv 
+     * @returns 
+     */
     create(tv: Partial<ITv>): Promise<ITv> {
         return this.tvModel.create<Partial<ITv>>(tv);
     }

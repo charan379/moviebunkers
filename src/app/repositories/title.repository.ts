@@ -16,6 +16,12 @@ class TitleRepository implements ITitleRepository {
         this.titleModel = TitleModel;
     }
 
+    /**
+     * findById()
+     * @param id 
+     * @param projection 
+     * @returns 
+     */
     findById(id: string, projection: ProjectionFields<ITitle> = { __v: 0 }): Promise<ITitle | null> {
         return this.titleModel.findById(id, projection)
             .populate([{
@@ -38,6 +44,12 @@ class TitleRepository implements ITitleRepository {
             .exec();
     }
 
+    /**
+     * findByTmdbId()
+     * @param tmdbId 
+     * @param projection 
+     * @returns 
+     */
     findByTmdbId(tmdbId: number, projection: ProjectionFields<ITitle> = { __v: 0 }): Promise<ITitle | null> {
         return this.titleModel.findOne({ tmdb_id: tmdbId }, projection)
             .populate([{
@@ -59,6 +71,12 @@ class TitleRepository implements ITitleRepository {
             .lean().exec();
     }
 
+    /**
+     * findByImdbId()
+     * @param imdbId 
+     * @param projection 
+     * @returns 
+     */
     findByImdbId(imdbId: string, projection: ProjectionFields<ITitle> = { __v: 0 }): Promise<ITitle | null> {
         return this.titleModel.findOne({ imdb_id: imdbId }, projection)
             .populate([{
@@ -81,6 +99,7 @@ class TitleRepository implements ITitleRepository {
     }
 
     /**
+     * @deprecated use findAllWithUserData()
      * @param param0 FindAllQuery
      * @param projection ProjectionFields<ITitle>
      * @returns 
@@ -113,6 +132,13 @@ class TitleRepository implements ITitleRepository {
     }
 
 
+    /**
+     * findByIdWithUserData()
+     * @param titleId 
+     * @param userId 
+     * @param projection 
+     * @returns 
+     */
     async findByIdWithUserData(titleId: string, userId: ObjectId, projection: ProjectionFields<ITitle> = { __v: 0, userData: 0 }): Promise<ITitle | null> {
 
         const matchQuery: PipelineStage.Match = {
@@ -259,6 +285,13 @@ class TitleRepository implements ITitleRepository {
         return title[0];
     }
 
+    /**
+     * findAllWithUserData()
+     * @param param0 
+     * @param userId 
+     * @param projection 
+     * @returns 
+     */
     async findAllWithUserData({ query, sort, limit, page }: FindAllQuery, userId: Schema.Types.ObjectId, projection: ProjectionFields<ITitle>): Promise<PageDTO> {
 
         const lookupUserData: PipelineStage.Lookup = {

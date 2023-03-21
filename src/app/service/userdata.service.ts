@@ -20,7 +20,7 @@ class UserDataService implements IUserDataService {
     }
 
     /**
-     * 
+     * create()
      * @param userId 
      * @returns 
      */
@@ -38,7 +38,7 @@ class UserDataService implements IUserDataService {
     }
 
     /**
-     * 
+     * getUserData()
      * @param userId 
      * @returns 
      */
@@ -57,7 +57,7 @@ class UserDataService implements IUserDataService {
     }
 
     /**
-     * 
+     * addToSeenTitles()
      * @param userId 
      * @param titileId 
      */
@@ -78,7 +78,7 @@ class UserDataService implements IUserDataService {
     }
 
     /**
-     * 
+     * addToUnSeenTitles()
      * @param userId 
      * @param titileId 
      */
@@ -99,15 +99,13 @@ class UserDataService implements IUserDataService {
     }
 
     /**
-     * 
+     * addToFavouriteTitles()
      * @param userId 
      * @param titileId 
      */
     async addToFavouriteTitles(userId: ObjectId, titileId: ObjectId): Promise<boolean> {
 
         // to find if title already in favorites
-        // const userDataDto = await this.getUserData(userId);
-
         const result = await this.userDataRepository.updateUserData(userId, { $addToSet: { favouriteTitles: titileId } });
 
         if (result) {
@@ -118,14 +116,13 @@ class UserDataService implements IUserDataService {
     }
 
     /**
-     * 
+     * removeFromFavouriteTitles()
      * @param userId 
      * @param titileId 
      */
     async removeFromFavouriteTitles(userId: ObjectId, titileId: ObjectId): Promise<boolean> {
-        // to find if title already not in favorites
-        // const userDataDto = await this.getUserData(userId);
 
+        // to find if title already not in favorites
         const result = await this.userDataRepository.updateUserData(userId, { $pull: { favouriteTitles: titileId } });
 
         if (result) {
@@ -136,15 +133,13 @@ class UserDataService implements IUserDataService {
     }
 
     /**
-     * 
+     * addToStarredTitles()
      * @param userId 
      * @param titileId 
      */
     async addToStarredTitles(userId: ObjectId, titileId: ObjectId): Promise<boolean> {
 
         // to find if title already in starred
-        // const userDataDto = await this.getUserData(userId);
-
         const result = await this.userDataRepository.updateUserData(userId, { $addToSet: { starredTitles: titileId } });
 
         if (result) {
@@ -155,15 +150,13 @@ class UserDataService implements IUserDataService {
     }
 
     /**
-     * 
+     * removeFromStarredTitles()
      * @param userId 
      * @param titileId 
      */
     async removeFromStarredTitles(userId: ObjectId, titileId: ObjectId): Promise<boolean> {
 
         // to find if title already in starred
-        // const userDataDto = await this.getUserData(userId);
-
         const result = await this.userDataRepository.updateUserData(userId, { $pull: { starredTitles: titileId } });
 
         if (result) {
@@ -174,7 +167,7 @@ class UserDataService implements IUserDataService {
     }
 
     /**
-     * getAllUsersData
+     * getAllUsersData()
      */
     async getAllUsersData(): Promise<UserDataDTO[]> {
         return await this.userDataRepository.findAll();
