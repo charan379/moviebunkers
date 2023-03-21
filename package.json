@@ -1,6 +1,6 @@
 {
   "name": "moviebunkers",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "private": true,
   "scripts": {
     "start": "ts-node --files -r tsconfig-paths/register server.ts ",
@@ -47,7 +47,7 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^15.6.1",
     "eslint-plugin-promise": "^6.1.1",
-    "nodemon": "^2.0.20",
+    "nodemon": "^30",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^3.14.2",
     "typescript": "^4.9.5"
