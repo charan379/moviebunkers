@@ -1,6 +1,7 @@
 import HttpCodes from "@constants/http.codes.enum";
 import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
+import LanguageDTO from "@dto/language.dto";
 import MovieDTO from "@dto/movie.dto";
 import PageDTO from "@dto/page.dto";
 import TitleDTO, { FindAllTitlesQueryDTO } from "@dto/title.dto";
@@ -13,7 +14,7 @@ import { FindAllQuery } from "@repositories/interfaces/custom.types.interfaces";
 import TitleRepository from "@repositories/title.repository";
 import getCertificationsByAgeRange from "@utils/getCertificationsByAgeRange";
 import MongoSortBuilder from "@utils/mongo.sort.builder";
-import mongoose, { FilterQuery, ObjectId, ProjectionFields } from "mongoose";
+import { FilterQuery, ObjectId, ProjectionFields } from "mongoose";
 import { Inject, Service } from "typedi";
 import ITitleService from "./interfaces/title.service.interface";
 import MovieService from "./movie.service";
@@ -220,7 +221,7 @@ class TitleService implements ITitleService {
         }
 
         let ageFilter = {}
-        
+
         if ((queryDTO["age.lte"] !== 26) || (queryDTO["age.gte"] !== 0)) {
             ageFilter = {
                 ...ageFilter,
@@ -273,6 +274,24 @@ class TitleService implements ITitleService {
 
         return page;
     }
+
+
+    /**
+     * getAllAvailableLanguages()
+     */
+    async getAllAvailableLanguages(): Promise<LanguageDTO[]> {
+
+        return await this.titleRepository.fetchAllAvailableLanguages();
+    }
+
+    /**
+     * getAllAvailableGenres()
+     */
+    async getAllAvailableGenres(): Promise<string[]> {
+
+        return await this.titleRepository.fetchAllAvailableGenres();
+    }
+
 
 }
 

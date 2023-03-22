@@ -1,3 +1,4 @@
+import LanguageDTO from "@dto/language.dto";
 import PageDTO from "@dto/page.dto";
 import TitleDTO from "@dto/title.dto";
 import ITitle from "@models/interfaces/title.interface";
@@ -419,6 +420,157 @@ class TitleRepository implements ITitleRepository {
         }
 
         return result;
+    }
+
+    /**
+     * fetchAllAvailableGenres()
+     */
+    async fetchAllAvailableGenres(): Promise<string[]> {
+
+        const matchStage: PipelineStage.Match = {
+            $match: {
+                genres: {
+                    $exists: true,
+                    $ne: { $in: [null, []] },
+                },
+            }
+        }
+
+        const projectStage1: PipelineStage.Project = {
+            $project: {
+                genres: 1,
+            }
+        }
+
+        const unwindStage1: PipelineStage.Unwind = {
+            $unwind: {
+                path: "$genres",
+                includeArrayIndex: "string",
+                preserveNullAndEmptyArrays: false,
+            }
+        }
+
+        const groupStage1: PipelineStage.Group = {
+            $group: {
+                _id: "$genres",
+            }
+        }
+
+        const groupStage2: PipelineStage.Group = {
+            $group: {
+                _id: null,
+                genres: {
+                    $push: "$_id",
+                },
+            }
+        }
+
+        const unwindStage2: PipelineStage.Unwind = {
+            $unwind: {
+                path: "$genres",
+                includeArrayIndex: "string",
+                preserveNullAndEmptyArrays: false,
+            }
+        }
+
+        const sortStage: PipelineStage.Sort = {
+            $sort: {
+                genres: 1,
+            }
+        }
+
+        const groupStage3: PipelineStage.Group = {
+            $group: {
+                _id: null,
+                genres: {
+                    $push: "$genres",
+                }
+            }
+        }
+
+        const projectStage2: PipelineStage.Project = {
+            $project: {
+                _id: 0,
+                genres: 1,
+            }
+        }
+
+        const data = await this.titleModel.aggregate([
+            matchStage,
+            projectStage1,
+            unwindStage1,
+            groupStage1,
+            groupStage2,
+            unwindStage2,
+            sortStage,
+            groupStage3,
+            projectStage2
+        ]).exec();
+
+
+        return data[0]?.genres ?? [];
+    }
+
+    /**
+     * fetchAllAvailableLanguages()
+     */
+    async fetchAllAvailableLanguages(): Promise<LanguageDTO[]> {
+
+        const matchStage: PipelineStage.Match = {
+            $match: {
+                languages: {
+                    $exists: true,
+                    $ne: { $in: [null, []] },
+                },
+            }
+        }
+
+        const projectStage1: PipelineStage.Project = {
+            $project: {
+                languages: 1,
+            }
+        }
+
+        const unwindStage: PipelineStage.Unwind = {
+            $unwind: {
+                path: "$languages",
+                includeArrayIndex: "string",
+                preserveNullAndEmptyArrays: false,
+            }
+        }
+
+        const sortStage: PipelineStage.Sort = {
+            $sort: {
+                "languages.english_name": 1,
+            }
+        }
+
+        const groupStage: PipelineStage.Group = {
+            $group: {
+                _id: null,
+                languages: {
+                    $addToSet: "$languages",
+                },
+            }
+        }
+
+        const projectStage2: PipelineStage.Project = {
+            $project: {
+                _id: 0,
+                languages: 1,
+            }
+        }
+
+        const data = await this.titleModel.aggregate([
+            matchStage,
+            projectStage1,
+            unwindStage,
+            sortStage,
+            groupStage,
+            projectStage2
+        ]).exec();
+
+        return data[0]?.languages ?? [];
     }
 }
 
