@@ -22,4 +22,17 @@ router.use("/titles", titleController.router);
 const userDataController = Container.get(UserDataController);
 router.use("/userdata", userDataController.router);
 
+
+router.use("/health-check", (req, res, next) => {
+    try {
+        const data = {
+            uptime: process.uptime(),
+            message: 'running',
+            date: new Date()
+        }
+        res.status(200).json(data)
+    } catch (error) {
+        next(error)
+    }
+})
 export default router;
