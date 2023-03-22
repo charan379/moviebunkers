@@ -1,5 +1,6 @@
 import HttpCodes from "@constants/http.codes.enum";
 import { LevelOne, LevelTwo, LevelZero } from "@constants/user.roles.enum";
+import LanguageDTO from "@dto/language.dto";
 import PageDTO from "@dto/page.dto";
 import TitleDTO, { FindAllTitlesQueryDTO } from "@dto/title.dto";
 import { UserDTO } from "@dto/user.dto";
@@ -163,6 +164,7 @@ class TitleController {
          */
         this.router.get("/", Authorize(LevelZero), this.getAllTitles.bind(this));
 
+        //get
         /**
          * @swagger
          * /titles/id/{id}:
@@ -218,6 +220,47 @@ class TitleController {
          *      
          */
         this.router.post("/new", Authorize(LevelTwo), this.createTitle.bind(this));
+
+        //get
+        /**
+         * @swagger
+         * /titles/available-languages:
+         *  get:
+         *   tags:
+         *     - Titles
+         *   summary: API to get all available languages
+         *   description: returns all available languages
+         *   responses:
+         *       200:
+         *          description: Success
+         *       401:
+         *          description: Unauthorized
+         *       404:
+         *          description: Not Found
+         *   security: []
+         */
+        this.router.get("/available-languages", this.getAllAvailableLanguages.bind(this));
+        
+        //get
+        /**
+         * @swagger
+         * /titles/available-genres:
+         *  get:
+         *   tags:
+         *     - Titles
+         *   summary: API to get all available genres
+         *   description: returns all available genres
+         *   responses:
+         *       200:
+         *          description: Success
+         *       401:
+         *          description: Unauthorized
+         *       404:
+         *          description: Not Found
+         *   security: []
+         */
+        this.router.get("/available-genres", this.getAllAvailableGenres.bind(this));
+
     }
 
     /**
@@ -302,6 +345,44 @@ class TitleController {
             const newTitle: TitleDTO = await this.titleService.createTitle(titleDTO, userDto);
 
             res.status(201).json({ message: "New Title Added Successfully", new_title_id: newTitle._id })
+
+        } catch (error) {
+
+            next(error)
+        }
+    }
+
+
+    /**
+    * @Get("/available-languages") => getAllAvailableLanguages()
+    * @param req 
+    * @param res 
+    * @param next 
+    */
+    private async getAllAvailableLanguages(req: Request, res: Response, next: NextFunction) {
+        try {
+
+            const languages: LanguageDTO[] = await this.titleService.getAllAvailableLanguages();
+
+            res.status(200).json(languages)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+
+    /**
+     * @Get("/available-genres") => getAllAvailableGenres()
+     * @param req 
+     * @param res 
+     * @param next 
+     */
+    private async getAllAvailableGenres(req: Request, res: Response, next: NextFunction) {
+        try {
+
+            const genres: string[] = await this.titleService.getAllAvailableGenres();
+
+            res.status(200).json(genres)
 
         } catch (error) {
 
