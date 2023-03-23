@@ -208,10 +208,10 @@ class TitleService implements ITitleService {
             titleFilter = { ...titleFilter, title: { $regex: new RegExp(`${queryDTO.search}`, "i") } }
         }
 
-        let originalLangFilter = {};
+        let languageFilter = {};
 
         if (queryDTO.language) {
-            originalLangFilter = { ...originalLangFilter, "original_language.ISO_639_1_code": { $regex: new RegExp(`^${queryDTO.language}`, "i") }, }
+            languageFilter = { ...languageFilter, "languages.ISO_639_1_code": { $regex: new RegExp(`^${queryDTO.language}`, "i") }, }
         }
 
         let genresFilter = {};
@@ -234,7 +234,7 @@ class TitleService implements ITitleService {
                 {
                     ...idFilter,
                     title_type: { $in: title_types.map(title_type => { if (title_type.include === 1) return title_type.type }).filter(Boolean) },
-                    ...originalLangFilter,
+                    ...languageFilter,
                     ...genresFilter,
                     ...titleFilter,
                     ...ageFilter,
