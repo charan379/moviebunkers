@@ -15,6 +15,7 @@ interface ITitleService {
     getAllTitlesWithUserData(queryDTO: FindAllTitlesQueryDTO, userId: ObjectId, userData: UserDataDTO): Promise<PageDTO>;
     getAllAvailableLanguages(): Promise<LanguageDTO[]>;
     getAllAvailableGenres(): Promise<string[]>;
+    deleteTitleById(titleId: string): Promise<void>;
 
 }
 

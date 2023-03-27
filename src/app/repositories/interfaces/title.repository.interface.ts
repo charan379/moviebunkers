@@ -14,6 +14,7 @@ interface ITitleRepository {
     findAllWithUserData({ query, sort, limit, page }: FindAllQuery, userId: ObjectId, projection: ProjectionFields<ITitle>): Promise<PageDTO>;
     fetchAllAvailableGenres(): Promise<Array<string>>;
     fetchAllAvailableLanguages(): Promise<LanguageDTO[]>;
+    deleteTitleById(titleId: string): Promise<void>;
 }
 
 export default ITitleRepository;

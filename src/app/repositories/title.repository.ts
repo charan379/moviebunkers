@@ -572,6 +572,14 @@ class TitleRepository implements ITitleRepository {
 
         return data[0]?.languages ?? [];
     }
+
+    /**
+     * deleteTitleById()
+     * @param titleId 
+     */
+    async deleteTitleById(titleId: string): Promise<void> {
+        await this.titleModel.deleteOne({ _id: titleId }).lean().exec();
+    }
 }
 
 export default TitleRepository;

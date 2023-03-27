@@ -80,7 +80,6 @@ class TitleService implements ITitleService {
     }
 
     /**
-     * @deprecated use getTitleByIdWithUserData
      * getTitleById()
      * @param id 
      */
@@ -292,7 +291,16 @@ class TitleService implements ITitleService {
         return await this.titleRepository.fetchAllAvailableGenres();
     }
 
+    /**
+     * deleteTitleById()
+     * @param titleId 
+     */
+    async deleteTitleById(titleId: string): Promise<void> {
 
+        await this.getTitleById(titleId);
+
+        await this.titleRepository.deleteTitleById(titleId);
+    }
 }
 
 
