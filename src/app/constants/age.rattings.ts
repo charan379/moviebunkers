@@ -1,6 +1,9 @@
 const AgeRattings = {
     IN: [ // India
         { certification: "U", age: [0, 11] },
+        { certification: "U/A 7+", age: [7, 21] },
+        { certification: "U/A 13+", age: [13, 21] },
+        { certification: "U/A 16+", age: [16, 21] },
         { certification: "UA", age: [12, 17] },
         { certification: "A", age: [18, 21] },
         { certification: "S", age: [21, 26] },
