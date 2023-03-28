@@ -301,6 +301,26 @@ class TitleService implements ITitleService {
 
         await this.titleRepository.deleteTitleById(titleId);
     }
+
+    /**
+     * updateTitleById()
+     * @param titleId 
+     * @param title 
+     */
+    async updateTitleById(titleId: string, title: Partial<TitleDTO>): Promise<TitleDTO> {
+
+        await this.getTitleById(titleId);
+
+        switch (title?.title_type) {
+            case TitleType.MOVIE:
+                return this.movieService.updateMovieById(titleId, title);
+            case TitleType.TV:
+                return this.tvService.updateTvById(titleId, title)
+            default:
+                throw new TitleException("Invalid Title Type", HttpCodes.BAD_REQUEST, `Title type not provided`, `@TitleService.class: @updateTitleById.method() requested , titleId: ${titleId}, titleDTO: ${title}`);
+
+        }
+    }
 }
 
 

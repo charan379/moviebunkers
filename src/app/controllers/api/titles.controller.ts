@@ -286,6 +286,42 @@ class TitleController {
          *          description: Not Found
          */
         this.router.delete("/delete/id/:id", Authorize(LevelThere), this.deleteTitleById.bind(this));
+
+        //PUT
+        /**
+         * @swagger
+         * /titles/update/id/{id}:
+         *  put:
+         *   tags:
+         *     - Titles
+         *   summary: API to update title
+         *   description: update's title for valid title object
+         *   parameters:
+         *     - in: path
+         *       name: id
+         *       schema:
+         *          type: string
+         *   requestBody:
+         *      content:
+         *        application/json:
+         *          description: movie
+         *          schema:
+         *              #$ref: '#/components/schemas/new_movie'
+         *              #$ref: '#/components/schemas/new_tv'
+         *              oneOf:
+         *                  - $ref: '#/components/schemas/new_movie'
+         *                  - $ref: '#/components/schemas/new_tv'
+         *                
+         *   responses:
+         *       200:
+         *          description: Success
+         *       400:
+         *          description: Invalid data
+         *       401:
+         *          description: Unauthorized
+         *      
+         */
+        this.router.put("/update/id/:id", Authorize(LevelTwo), this.updateTitleById.bind(this));
     }
 
     /**
@@ -431,6 +467,30 @@ class TitleController {
         } catch (error) {
 
             next(error);
+        }
+    }
+
+    private async updateTitleById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userName: string | undefined = req?.userName;
+
+            if (!userName) throw new TitleException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@TitleController.updateTitleById()`);
+
+            const userDto: UserDTO = await this.userService.getUserByUserName(userName);
+
+            const last_modified_by = await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@TitleController.updateTitleById() - userId`);
+
+            const titleId = await JoiValidator(ObjectIdSchema, Buffer.from(req?.params?.id, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true })
+
+            const validTitleDTO: Partial<TitleDTO> = { ...req.body, last_modified_by };
+
+            const updateTitleDTO: TitleDTO = await this.titleService.updateTitleById(titleId, validTitleDTO);
+
+            res.status(200).json({ message: "Title Updated Successfully", title: updateTitleDTO })
+
+        } catch (error) {
+
+            next(error)
         }
     }
 }
