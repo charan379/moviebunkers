@@ -13,7 +13,7 @@ class TvRepository implements ITvRepository {
     constructor() {
         this.tvModel = TvModel;
     }
-    
+
     /**
      * create()
      * @param tv 
@@ -23,6 +23,19 @@ class TvRepository implements ITvRepository {
         return this.tvModel.create<Partial<ITv>>(tv);
     }
 
+    /**
+     * updateTvById()
+     * @param tvId 
+     * @param tv 
+     */
+    updateTvById(tvId: string, tv: Partial<ITv>): Promise<ITv | null> {
+
+        return this.tvModel
+            .findByIdAndUpdate(tvId, { $set: { ...tv } }, { returnDocument: "after" })
+            .lean()
+            .exec();
+
+    }
 }
 
 export default TvRepository;

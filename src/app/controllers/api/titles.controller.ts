@@ -1,5 +1,5 @@
 import HttpCodes from "@constants/http.codes.enum";
-import { LevelOne, LevelTwo, LevelZero } from "@constants/user.roles.enum";
+import { LevelOne, LevelThere, LevelTwo, LevelZero } from "@constants/user.roles.enum";
 import LanguageDTO from "@dto/language.dto";
 import PageDTO from "@dto/page.dto";
 import TitleDTO, { FindAllTitlesQueryDTO } from "@dto/title.dto";
@@ -171,7 +171,7 @@ class TitleController {
          *  get:
          *   tags:
          *     - Titles
-         *   summary: API to get title details base Id
+         *   summary: API to get title details based on Id
          *   description: return title details based on titleId, titleId must be in base64 encoding
          *   parameters:
          *     - in: path
@@ -240,7 +240,7 @@ class TitleController {
          *   security: []
          */
         this.router.get("/available-languages", this.getAllAvailableLanguages.bind(this));
-        
+
         //get
         /**
          * @swagger
@@ -261,6 +261,67 @@ class TitleController {
          */
         this.router.get("/available-genres", this.getAllAvailableGenres.bind(this));
 
+        //DELETE
+        /**
+         * @swagger
+         * /titles/delete/id/{id}:
+         *  delete:
+         *   tags:
+         *     - Titles
+         *   summary: API to delete title based on Id
+         *   description: delete's title based on titleId, titleId must be in base64 encoding
+         *   parameters:
+         *     - in: path
+         *       name: id
+         *       schema:
+         *          type: string
+         *   responses:
+         *       200:
+         *          description: Success
+         *       401:
+         *          description: Unauthorized
+         *       400:
+         *          description: Invalid id
+         *       404:
+         *          description: Not Found
+         */
+        this.router.delete("/delete/id/:id", Authorize(LevelThere), this.deleteTitleById.bind(this));
+
+        //PUT
+        /**
+         * @swagger
+         * /titles/update/id/{id}:
+         *  put:
+         *   tags:
+         *     - Titles
+         *   summary: API to update title
+         *   description: update's title for valid title object
+         *   parameters:
+         *     - in: path
+         *       name: id
+         *       schema:
+         *          type: string
+         *   requestBody:
+         *      content:
+         *        application/json:
+         *          description: movie
+         *          schema:
+         *              #$ref: '#/components/schemas/new_movie'
+         *              #$ref: '#/components/schemas/new_tv'
+         *              oneOf:
+         *                  - $ref: '#/components/schemas/new_movie'
+         *                  - $ref: '#/components/schemas/new_tv'
+         *                
+         *   responses:
+         *       200:
+         *          description: Success
+         *       400:
+         *          description: Invalid data
+         *       401:
+         *          description: Unauthorized
+         *      
+         */
+        this.router.put("/update/id/:id", Authorize(LevelTwo), this.updateTitleById.bind(this));
     }
 
     /**
@@ -383,6 +444,49 @@ class TitleController {
             const genres: string[] = await this.titleService.getAllAvailableGenres();
 
             res.status(200).json(genres)
+
+        } catch (error) {
+
+            next(error)
+        }
+    }
+
+    /**
+     * @Delete("/delete/id/:id")
+     * @param req 
+     * @param res 
+     * @param next 
+     */
+    private async deleteTitleById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const titleId = await JoiValidator(ObjectIdSchema, Buffer.from(req?.params?.id, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true })
+
+            await this.titleService.deleteTitleById(titleId);
+
+            res.status(200).json({ message: "Title successfully deleted" })
+        } catch (error) {
+
+            next(error);
+        }
+    }
+
+    private async updateTitleById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userName: string | undefined = req?.userName;
+
+            if (!userName) throw new TitleException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@TitleController.updateTitleById()`);
+
+            const userDto: UserDTO = await this.userService.getUserByUserName(userName);
+
+            const last_modified_by = await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@TitleController.updateTitleById() - userId`);
+
+            const titleId = await JoiValidator(ObjectIdSchema, Buffer.from(req?.params?.id, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true })
+
+            const validTitleDTO: Partial<TitleDTO> = { ...req.body, last_modified_by };
+
+            const updateTitleDTO: TitleDTO = await this.titleService.updateTitleById(titleId, validTitleDTO);
+
+            res.status(200).json({ message: "Title Updated Successfully", title: updateTitleDTO })
 
         } catch (error) {
 

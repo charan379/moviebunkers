@@ -80,7 +80,6 @@ class TitleService implements ITitleService {
     }
 
     /**
-     * @deprecated use getTitleByIdWithUserData
      * getTitleById()
      * @param id 
      */
@@ -292,7 +291,36 @@ class TitleService implements ITitleService {
         return await this.titleRepository.fetchAllAvailableGenres();
     }
 
+    /**
+     * deleteTitleById()
+     * @param titleId 
+     */
+    async deleteTitleById(titleId: string): Promise<void> {
 
+        await this.getTitleById(titleId);
+
+        await this.titleRepository.deleteTitleById(titleId);
+    }
+
+    /**
+     * updateTitleById()
+     * @param titleId 
+     * @param title 
+     */
+    async updateTitleById(titleId: string, title: Partial<TitleDTO>): Promise<TitleDTO> {
+
+        await this.getTitleById(titleId);
+
+        switch (title?.title_type) {
+            case TitleType.MOVIE:
+                return this.movieService.updateMovieById(titleId, title);
+            case TitleType.TV:
+                return this.tvService.updateTvById(titleId, title)
+            default:
+                throw new TitleException("Invalid Title Type", HttpCodes.BAD_REQUEST, `Title type not provided`, `@TitleService.class: @updateTitleById.method() requested , titleId: ${titleId}, titleDTO: ${title}`);
+
+        }
+    }
 }
 
 
