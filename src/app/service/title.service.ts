@@ -12,6 +12,7 @@ import TitleException from "@exceptions/title.exeception";
 import ITitle from "@models/interfaces/title.interface";
 import { FindAllQuery } from "@repositories/interfaces/custom.types.interfaces";
 import TitleRepository from "@repositories/title.repository";
+import downloadImageFromUrl from "@utils/downloadImageFromUrl";
 import getCertificationsByAgeRange from "@utils/getCertificationsByAgeRange";
 import MongoSortBuilder from "@utils/mongo.sort.builder";
 import { FilterQuery, ObjectId, ProjectionFields } from "mongoose";
@@ -40,42 +41,55 @@ class TitleService implements ITitleService {
 
     /**
      * createTitle
-     * @param titileDTO 
+     * @param titleDTO 
      */
-    async createTitle(titileDTO: Partial<TitleDTO>, userDTO: UserDTO): Promise<TitleDTO> {
+    async createTitle(titleDTO: Partial<TitleDTO>, userDTO: UserDTO): Promise<TitleDTO> {
 
 
-        switch (titileDTO.source) {
+        switch (titleDTO.source) {
             case TitleSource.IMDB:
-                if (!titileDTO.imdb_id) throw new TitleException("IMDB ID is mandatory for SourceType: IMDB", HttpCodes.BAD_REQUEST, "SourceType is IMDB but IMDB ID is not provided", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titileDTO)}`);
+                if (!titleDTO.imdb_id) throw new TitleException("IMDB ID is mandatory for SourceType: IMDB", HttpCodes.BAD_REQUEST, "SourceType is IMDB but IMDB ID is not provided", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titleDTO)}`);
                 break;
             case TitleSource.TMDB:
-                if (!titileDTO.tmdb_id) throw new TitleException("TMDB ID is mandatory for SourceType: TMDB", HttpCodes.BAD_REQUEST, "SourceType is TMDB but TMDB ID is not provided", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titileDTO)}`);
+                if (!titleDTO.tmdb_id) throw new TitleException("TMDB ID is mandatory for SourceType: TMDB", HttpCodes.BAD_REQUEST, "SourceType is TMDB but TMDB ID is not provided", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titleDTO)}`);
                 break;
             case TitleSource.CUSTOM:
                 break;
             default:
-                throw new TitleException("SourceType: Is Unknown", HttpCodes.BAD_REQUEST, "Unknown SourceType received", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titileDTO)}`);
+                throw new TitleException("SourceType: Is Unknown", HttpCodes.BAD_REQUEST, "Unknown SourceType received", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titleDTO)}`);
         }
 
 
-        if (titileDTO.imdb_id) {
-            if (await this.titleRepository.findByImdbId(titileDTO.imdb_id)) throw new TitleException(`Title with IMDB ID: ${titileDTO.imdb_id} already exists`, HttpCodes.BAD_REQUEST, "Duplicate Title according to IMDB ID", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titileDTO)}`);
+        if (titleDTO.imdb_id) {
+            if (await this.titleRepository.findByImdbId(titleDTO.imdb_id)) throw new TitleException(`Title with IMDB ID: ${titleDTO.imdb_id} already exists`, HttpCodes.BAD_REQUEST, "Duplicate Title according to IMDB ID", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titleDTO)}`);
         }
 
-        if (titileDTO.tmdb_id) {
-            if (await this.titleRepository.findByTmdbId(titileDTO.tmdb_id)) throw new TitleException(`Title with TMDB ID: ${titileDTO.tmdb_id} already exists`, HttpCodes.BAD_REQUEST, "Duplicate Title according to TMDB ID", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titileDTO)}`);
+        if (titleDTO.tmdb_id) {
+            if (await this.titleRepository.findByTmdbId(titleDTO.tmdb_id)) throw new TitleException(`Title with TMDB ID: ${titleDTO.tmdb_id} already exists`, HttpCodes.BAD_REQUEST, "Duplicate Title according to TMDB ID", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titleDTO)}`);
         }
 
-        switch (titileDTO.title_type) {
+        // poster path
+        try {
+            titleDTO = {
+                ...titleDTO,
+                poster_path: await downloadImageFromUrl(titleDTO?.poster_path as string),
+            }
+        } catch (error) {
+            titleDTO = {
+                ...titleDTO,
+                poster_path: "",
+            }
+        }
+
+        switch (titleDTO.title_type) {
             case TitleType.MOVIE:
-                const movieDTO: NonNullable<Partial<MovieDTO>> = titileDTO as Partial<MovieDTO>;
+                const movieDTO: NonNullable<Partial<MovieDTO>> = titleDTO as Partial<MovieDTO>;
                 return await this.movieService.createMovie(movieDTO, userDTO) as TitleDTO;
             case TitleType.TV:
-                const tvDTO: NonNullable<Partial<TvDTO>> = titileDTO as Partial<TvDTO>;
+                const tvDTO: NonNullable<Partial<TvDTO>> = titleDTO as Partial<TvDTO>;
                 return await this.tvService.createTv(tvDTO, userDTO) as TitleDTO;
             default:
-                throw new TitleException("TitleType: Is Unknown", HttpCodes.BAD_REQUEST, "Unknown TitleType received", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titileDTO)}`);
+                throw new TitleException("TitleType: Is Unknown", HttpCodes.BAD_REQUEST, "Unknown TitleType received", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titleDTO)}`);
         }
     }
 
@@ -244,6 +258,8 @@ class TitleService implements ITitleService {
         const minimalProjection: ProjectionFields<ITitle> = {
             _id: 1,
             title_type: 1,
+            tmdb_id: 1,
+            imdb_id: 1,
             title: 1,
             ratting: 1,
             year: 1,
@@ -265,7 +281,7 @@ class TitleService implements ITitleService {
         const q: FindAllQuery = {
             query,
             sort: sort,
-            limit: queryDTO?.limit ?? 5,
+            limit: queryDTO?.limit ?? 0,
             page: queryDTO?.pageNo ?? 1,
         }
 

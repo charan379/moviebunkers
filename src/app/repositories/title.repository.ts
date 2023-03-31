@@ -420,7 +420,7 @@ class TitleRepository implements ITitleRepository {
         };
 
         const limitDocs: PipelineStage.Limit = {
-            $limit: limit,
+            $limit: limit === 0 ? await this.titleModel.find({}).count().lean().exec() : limit,
         };
 
         const projectionStage: PipelineStage.Project = {
@@ -449,13 +449,17 @@ class TitleRepository implements ITitleRepository {
             return iTitle as TitleDTO;
         });
 
-        const result: PageDTO = {
+        let result: PageDTO = {
             page: page,
-            total_pages: Math.ceil((titlesCount[0]?.total_results ?? 0) / limit),
+            total_pages: Math.ceil((titlesCount[0]?.total_results ?? 0) / limit === 0 ? 1 : limit),
             total_results: titlesCount[0]?.total_results ?? 0,
             sort_order: sort,
             list: titleDTOs,
         };
+
+        if (!result?.total_pages) {
+            result = { ...result, total_pages: 1 }
+        }
 
         return result;
     }

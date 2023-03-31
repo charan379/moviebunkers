@@ -5,6 +5,8 @@ import TitleException from "@exceptions/title.exeception";
 import tvSchema from "@joiSchemas/tv.joi.schema";
 import ITv from "@models/interfaces/tv.interface";
 import TvRepository from "@repositories/tv.repository";
+import deleteImage from "@utils/deleteImage";
+import downloadImageFromUrl from "@utils/downloadImageFromUrl";
 import JoiValidator from "@utils/joi.validator";
 import { ObjectId } from "mongoose";
 import { Inject, Service } from "typedi";
@@ -43,7 +45,20 @@ class TvService implements ITvService {
      * @param movie 
      */
     async updateTvById(tvId: string, tv: Partial<TvDTO>): Promise<TvDTO> {
-        const updatedTv: TvDTO | null = await this.tvRepository.updateTvById(tvId, tv);
+
+
+        try {
+            const oldPoster = tv?.poster_path as string;
+            tv = { ...tv, poster_path: await downloadImageFromUrl(tv?.poster_path as string) }
+            deleteImage(oldPoster)
+        } catch (error) {
+            tv = { ...tv, poster_path: "" }
+
+        }
+
+        const validTV: TvDTO = await JoiValidator(tvSchema, tv, { abortEarly: false, stripUnknown: true, allowUnknown: false });
+
+        const updatedTv: TvDTO | null = await this.tvRepository.updateTvById(tvId, validTV);
 
         if (!updatedTv) throw new TitleException("TV update failed", HttpCodes.INTERNAL_SERVER_ERROR, `Somthing went wrong tv not updated`, `@TvService.class: @updateTvById.method() tvId: ${tvId} ,movieDTO: ${JSON.stringify(tv)}`);
 

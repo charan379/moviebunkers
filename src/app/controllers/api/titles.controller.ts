@@ -117,7 +117,7 @@ class TitleController {
          *        name: age.gte
          *        schema:
          *          type: integer
-         *          minimum: 2
+         *          minimum: 0
          *          maximum: 26
          *          default: 8
          *          description: age filter lower limit value, must be lower than age.lte 
@@ -126,7 +126,7 @@ class TitleController {
          *        name: age.lte
          *        schema:
          *          type: integer
-         *          minimum: 2
+         *          minimum: 5
          *          maximum: 26
          *          default: 8
          *          description: age filter upper limit value, must be higger than age.gte
