@@ -258,6 +258,8 @@ class TitleService implements ITitleService {
         const minimalProjection: ProjectionFields<ITitle> = {
             _id: 1,
             title_type: 1,
+            tmdb_id: 1,
+            imdb_id: 1,
             title: 1,
             ratting: 1,
             year: 1,
@@ -279,7 +281,7 @@ class TitleService implements ITitleService {
         const q: FindAllQuery = {
             query,
             sort: sort,
-            limit: queryDTO?.limit ?? 5,
+            limit: queryDTO?.limit ?? 0,
             page: queryDTO?.pageNo ?? 1,
         }
 
