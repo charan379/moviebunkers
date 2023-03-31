@@ -30,6 +30,7 @@ function downloadImageFromUrl(imageUrl: string): Promise<string> {
             }
         }).on('error', function (error) {
             reject(error);
+            console.log(error)
         });
     });
 }
