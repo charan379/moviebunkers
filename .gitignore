@@ -1,3 +1,6 @@
+# title images
+public/images/*
+
 # Logs
 logs
 *.log

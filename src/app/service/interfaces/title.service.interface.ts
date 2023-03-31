@@ -8,7 +8,7 @@ import { ObjectId } from "mongoose";
 
 interface ITitleService {
 
-    createTitle(titileDTO: Partial<TitleDTO>, userDTO: UserDTO): Promise<TitleDTO>;
+    createTitle(titleDTO: Partial<TitleDTO>, userDTO: UserDTO): Promise<TitleDTO>;
     getTitleById(id: string): Promise<TitleDTO>;
     getAllTitles(queryDTO: FindAllTitlesQueryDTO): Promise<PageDTO>;
     getTitleByIdWithUserData(titleId: string, userId: ObjectId): Promise<TitleDTO>

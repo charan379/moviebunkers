@@ -5,6 +5,8 @@ import TitleException from "@exceptions/title.exeception";
 import movieSchema from "@joiSchemas/movie.joi.schema";
 import IMovie from "@models/interfaces/movie.interface";
 import MovieRepository from "@repositories/movie.repository";
+import deleteImage from "@utils/deleteImage";
+import downloadImageFromUrl from "@utils/downloadImageFromUrl";
 import JoiValidator from "@utils/joi.validator";
 import { ObjectId } from "mongoose";
 import { Inject, Service } from "typedi";
@@ -43,7 +45,18 @@ class MovieService implements IMovieService {
      */
     async updateMovieById(movieId: string, movie: Partial<IMovie>): Promise<MovieDTO> {
 
-        const updatedMovie: MovieDTO | null = await this.movieRepository.updateMovieById(movieId, movie);
+        try {
+            const oldPoster = movie?.poster_path as string;
+            movie = { ...movie, poster_path: await downloadImageFromUrl(movie?.poster_path as string) }
+            deleteImage(oldPoster)
+        } catch (error) {
+            movie = { ...movie, poster_path: "" }
+        }
+
+        const validMovie: MovieDTO = await JoiValidator(movieSchema, movie, { abortEarly: false, stripUnknown: true, allowUnknown: false });
+
+
+        let updatedMovie: MovieDTO | null = await this.movieRepository.updateMovieById(movieId, validMovie);
 
         if (!updatedMovie) throw new TitleException("Movie update failed", HttpCodes.INTERNAL_SERVER_ERROR, `Somthing went wrong movie not updated`, `@MovieService.class: @updateMovieById.method() movieId: ${movieId} ,movieDTO: ${JSON.stringify(movie)}`);
 
