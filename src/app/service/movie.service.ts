@@ -45,11 +45,12 @@ class MovieService implements IMovieService {
      */
     async updateMovieById(movieId: string, movie: Partial<IMovie>): Promise<MovieDTO> {
 
-        try {
-            movie = { ...movie, poster_path: await downloadImageFromUrl(movie?.poster_path as string, movieId) }
-        } catch (error) {
-            movie = { ...movie, poster_path: "" }
-        }
+        // commenting out until buying a VPS
+        // try {
+        //     movie = { ...movie, poster_path: await downloadImageFromUrl(movie?.poster_path as string, movieId) }
+        // } catch (error) {
+        //     movie = { ...movie, poster_path: "" }
+        // }
 
         const validMovie: MovieDTO = await JoiValidator(movieSchema, movie, { abortEarly: false, stripUnknown: true, allowUnknown: false });
 

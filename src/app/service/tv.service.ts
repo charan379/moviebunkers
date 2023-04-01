@@ -47,12 +47,12 @@ class TvService implements ITvService {
     async updateTvById(tvId: string, tv: Partial<TvDTO>): Promise<TvDTO> {
 
 
-        try {
-            tv = { ...tv, poster_path: await downloadImageFromUrl(tv?.poster_path as string, tvId) }
-        } catch (error) {
-            tv = { ...tv, poster_path: "" }
-
-        }
+        // commenting out until buying a VPS
+        // try {
+        //     tv = { ...tv, poster_path: await downloadImageFromUrl(tv?.poster_path as string, tvId) }
+        // } catch (error) {
+        //     tv = { ...tv, poster_path: "" }
+        // }
 
         const validTV: TvDTO = await JoiValidator(tvSchema, tv, { abortEarly: false, stripUnknown: true, allowUnknown: false });
 

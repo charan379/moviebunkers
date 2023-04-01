@@ -7,7 +7,6 @@ async function deleteImage(imageName: string) {
     fs.unlink(imagePath, (err) => {
         if (err) {
             //  do nothing 
-            console.log(err)
         };
     });
 }
