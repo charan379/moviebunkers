@@ -48,9 +48,7 @@ class TvService implements ITvService {
 
 
         try {
-            const oldPoster = tv?.poster_path?.split('/').pop() as string;
-            tv = { ...tv, poster_path: await downloadImageFromUrl(tv?.poster_path as string) }
-            deleteImage(oldPoster)
+            tv = { ...tv, poster_path: await downloadImageFromUrl(tv?.poster_path as string, tvId) }
         } catch (error) {
             tv = { ...tv, poster_path: "" }
 

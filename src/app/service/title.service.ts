@@ -68,19 +68,6 @@ class TitleService implements ITitleService {
             if (await this.titleRepository.findByTmdbId(titleDTO.tmdb_id)) throw new TitleException(`Title with TMDB ID: ${titleDTO.tmdb_id} already exists`, HttpCodes.BAD_REQUEST, "Duplicate Title according to TMDB ID", `@TitleService.class: @createTitle.method() TitleDTO: ${JSON.stringify(titleDTO)}`);
         }
 
-        // poster path
-        try {
-            titleDTO = {
-                ...titleDTO,
-                poster_path: await downloadImageFromUrl(titleDTO?.poster_path as string),
-            }
-        } catch (error) {
-            titleDTO = {
-                ...titleDTO,
-                poster_path: "",
-            }
-        }
-
         switch (titleDTO.title_type) {
             case TitleType.MOVIE:
                 const movieDTO: NonNullable<Partial<MovieDTO>> = titleDTO as Partial<MovieDTO>;
