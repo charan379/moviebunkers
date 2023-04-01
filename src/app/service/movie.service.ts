@@ -46,9 +46,7 @@ class MovieService implements IMovieService {
     async updateMovieById(movieId: string, movie: Partial<IMovie>): Promise<MovieDTO> {
 
         try {
-            const oldPoster = movie?.poster_path?.split('/').pop() as string;
-            movie = { ...movie, poster_path: await downloadImageFromUrl(movie?.poster_path as string) }
-            deleteImage(oldPoster)
+            movie = { ...movie, poster_path: await downloadImageFromUrl(movie?.poster_path as string, movieId) }
         } catch (error) {
             movie = { ...movie, poster_path: "" }
         }
