@@ -451,13 +451,13 @@ class TitleRepository implements ITitleRepository {
 
         let result: PageDTO = {
             page: page,
-            total_pages: Math.ceil((titlesCount[0]?.total_results ?? 0) / limit === 0 ? 1 : limit),
+            total_pages: Math.ceil((titlesCount[0]?.total_results ?? 0) / (limit === 0 ? 1 : limit)),
             total_results: titlesCount[0]?.total_results ?? 0,
             sort_order: sort,
             list: titleDTOs,
         };
 
-        if (!result?.total_pages) {
+        if (!limit) {
             result = { ...result, total_pages: 1 }
         }
 
