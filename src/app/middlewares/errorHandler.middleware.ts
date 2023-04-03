@@ -5,26 +5,26 @@ import { HttpError } from "http-errors";
 import WinstonLogger from "./winstonlogger.middleware";
 
 
-const ErrorHandler: ErrorRequestHandler = (err: HttpError | Error | MoviebunkersException,req: Request,res: Response,next: NextFunction) => {
-    
-    
+const ErrorHandler: ErrorRequestHandler = (error: HttpError | Error | MoviebunkersException, req: Request, res: Response, next: NextFunction) => {
+
+
     // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get("env") === "development" ? err : {};
+    res.locals.message = error.message;
+    res.locals.error = req.app.get("env") === "development" ? error : {};
 
     // render the error page
-    if (err instanceof HttpError) {
-        WinstonLogger.warn(err)
-        res.status(err?.status || 500);
-        res.json(ErrorResponse(err))
-    } else if (err instanceof MoviebunkersException) {
-        WinstonLogger.warn(err)
-        res.status(err?.status ?? 500);
-        res.json(ErrorResponse(err));
+    if (error instanceof HttpError) {
+        WinstonLogger.warn(error)
+        res.status(error?.status || 500);
+        res.json(ErrorResponse({ error }))
+    } else if (error instanceof MoviebunkersException) {
+        WinstonLogger.warn(error)
+        res.status(error?.status ?? 500);
+        res.json(ErrorResponse({ error }));
     } else {
-        WinstonLogger.error(err)
+        WinstonLogger.error(error)
         res.status(500)
-        res.json(ErrorResponse(err))
+        res.json(ErrorResponse({ error }))
     }
 
 }
