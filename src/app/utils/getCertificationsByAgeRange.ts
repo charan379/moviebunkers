@@ -21,8 +21,8 @@ async function getCertificationsByAgeRange(lowerAgeLimit: number, upperAgeLimit:
 
   // Filter the age ratings that match the given age range, and extract the certification values.
   const certifications = ageRatings
-    .filter((rating: any) => rating.age[0] <= upperAgeLimit && rating.age[1] >= lowerAgeLimit)
-    .map((rating: any) => rating.certification);
+    .filter((rating: AgeRating) => rating.age[0] <= upperAgeLimit && rating.age[1] >= lowerAgeLimit)
+    .map((rating: AgeRating) => rating.certification);
 
   return certifications;
 }
