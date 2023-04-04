@@ -12,7 +12,6 @@ import TitleException from "@exceptions/title.exeception";
 import ITitle from "@models/interfaces/title.interface";
 import { FindAllQuery } from "@repositories/interfaces/custom.types.interfaces";
 import TitleRepository from "@repositories/title.repository";
-import downloadImageFromUrl from "@utils/downloadImageFromUrl";
 import getCertificationsByAgeRange from "@utils/getCertificationsByAgeRange";
 import MongoSortBuilder from "@utils/mongo.sort.builder";
 import { FilterQuery, ObjectId, ProjectionFields } from "mongoose";
@@ -132,7 +131,7 @@ class TitleService implements ITitleService {
             __v: 0,
         }
 
-        const sort = queryDTO.sort_by ? await MongoSortBuilder(queryDTO.sort_by) : { createdAt: 'desc' };
+        const sort = MongoSortBuilder(queryDTO?.sort_by as string);
 
         const q: FindAllQuery = {
             query,
@@ -263,7 +262,7 @@ class TitleService implements ITitleService {
             userData: 0
         }
 
-        const sort = queryDTO.sort_by ? await MongoSortBuilder(queryDTO.sort_by) : { createdAt: 'desc' };
+        const sort = MongoSortBuilder(queryDTO?.sort_by as string);
 
         const q: FindAllQuery = {
             query,
