@@ -420,7 +420,7 @@ class TitleRepository implements ITitleRepository {
         };
 
         const limitDocs: PipelineStage.Limit = {
-            $limit: limit === 0 ? await this.titleModel.find({}).count().lean().exec() : limit,
+            $limit: limit === 0 ? await this.titleModel.find({}).countDocuments().lean().exec() : limit,
         };
 
         const projectionStage: PipelineStage.Project = {

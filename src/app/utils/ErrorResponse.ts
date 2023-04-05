@@ -1,13 +1,13 @@
 import HttpCodes from "@constants/http.codes.enum";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
 
-
 /**
- * 
- * @param {ErrorObject} error 
- * @returns error response
+ * Returns an error response object.
+ * @param {Object} error - The error object.
+ * @param {MoviebunkersException} options.error - The error object.
+ * @returns {Object} - The error response object.
  */
-function ErrorResponse(error:  MoviebunkersException) {
+function ErrorResponse({ error }: { error: MoviebunkersException | undefined }) {
   return {
     success: false,
     error: {
