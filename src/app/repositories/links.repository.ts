@@ -19,7 +19,11 @@ class LinksRepository implements ILinksRespository {
      * @param link 
      */
     create(link: Partial<ILink>): Promise<ILink> {
-        return this.linkModel.create<Partial<ILink>>(link);
+        try {
+            return this.linkModel.create<Partial<ILink>>(link);
+        } catch (error) {
+            throw error
+        }
     }
 
     getAllByParentId(parentId: Types.ObjectId): Promise<ILink[]> {
@@ -28,11 +32,26 @@ class LinksRepository implements ILinksRespository {
         } catch (error) {
             throw error;
         }
-        throw new Error("Method not implemented.");
     }
-    deleteById(id: Types.ObjectId): Promise<void> {
-        throw new Error("Method not implemented.");
+
+    
+    /**
+     * Deletes a document from the database by its _id field
+     * @param {Types.ObjectId} id - The ObjectId of the document to delete
+     * @returns {Promise<void>} A Promise that resolves when the document is deleted
+     * @throws {Error} Throws an error if an error occurs while deleting the document
+     */
+    async deleteById(id: Types.ObjectId): Promise<void> {
+        try {
+            // Use Mongoose's findByIdAndDelete function to delete the document by its _id field.
+            // The lean method is used to return plain JavaScript objects instead of Mongoose documents
+            await this.linkModel.findByIdAndDelete(id).lean().exec();
+        } catch (error) {
+            // If an error occurs, throw it to the caller of this method
+            throw error;
+        }
     }
+
     updateById(id: Types.ObjectId): Promise<ILink> {
         throw new Error("Method not implemented.");
     }
