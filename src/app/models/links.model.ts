@@ -15,6 +15,10 @@ const linkSchema: Schema<ILink> = new Schema<ILink>(
             enum: [...Object.values(ContentType)],
             required: [true, "content type required"],
         },
+        languages: {
+            type: [Object],
+            _id: false,
+        },
         linkType: {
             type: String,
             enum: [...Object.values(LinkType)],
@@ -28,6 +32,13 @@ const linkSchema: Schema<ILink> = new Schema<ILink>(
         link: {
             type: String,
             required: [true, 'link is required']
+        },
+        title: {
+            type: String,
+            required: [true, 'title is required']
+        },
+        remarks: {
+            type: String
         }
     },
     {
