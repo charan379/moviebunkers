@@ -34,7 +34,7 @@ class LinksRepository implements ILinksRespository {
         }
     }
 
-    
+
     /**
      * Deletes a document from the database by its _id field
      * @param {Types.ObjectId} id - The ObjectId of the document to delete
@@ -52,9 +52,36 @@ class LinksRepository implements ILinksRespository {
         }
     }
 
-    updateById(id: Types.ObjectId): Promise<ILink> {
-        throw new Error("Method not implemented.");
+
+    /**
+     * Updates a document in the database by its _id field
+     * @param {Types.ObjectId} id - The ObjectId of the document to update
+     * @param {Partial<ILink>} update - The fields to update in the document
+     * @returns {Promise<ILink>} A Promise that resolves with the updated document
+     * @throws {Error} Throws an error if an error occurs while updating the document
+     */
+    async updateById(id: Types.ObjectId, update: Partial<ILink>): Promise<ILink> {
+        try {
+            // Use Mongoose's findByIdAndUpdate function to update the document by its _id field
+            const updatedDocument = await this.linkModel.findByIdAndUpdate(
+                id, // The ObjectId of the document to update
+                { $set: update }, // The fields to update in the document
+                { new: true } // Option to return the updated document
+            ).lean().exec();
+
+            // If the document is not found, throw an error
+            if (!updatedDocument) {
+                throw new Error(`Link with id ${id} not found.`);
+            }
+
+            // Return the updated document
+            return updatedDocument;
+        } catch (error) {
+            // If an error occurs, throw it to the caller of this method
+            throw error;
+        }
     }
+
 
 }
 
