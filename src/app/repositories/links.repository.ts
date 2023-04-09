@@ -14,17 +14,26 @@ class LinksRepository implements ILinksRespository {
         this.linkModel = LinkModel
     }
 
+
     /**
-     * 
-     * @param link 
+     * Creates a new document in the database with the given properties.
+     * @param {Partial<ILink>} link - The properties of the new document to create
+     * @returns {Promise<ILink>} A Promise that resolves to the created document
+     * @throws {Error} Throws an error if an error occurs while creating the document
      */
-    create(link: Partial<ILink>): Promise<ILink> {
+    async create(link: Partial<ILink>): Promise<ILink> {
         try {
-            return this.linkModel.create<Partial<ILink>>(link);
+            // Use Mongoose's create method to create the new document with the given properties
+            const createdLink = await this.linkModel.create<Partial<ILink>>(link);
+
+            // Return the created document
+            return createdLink;
         } catch (error) {
-            throw error
+            // If an error occurs, throw it to the caller of this method
+            throw error;
         }
     }
+
 
     /**
      * Fetches all links from the database that have a given parentId value
