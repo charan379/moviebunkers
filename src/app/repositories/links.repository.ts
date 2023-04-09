@@ -26,14 +26,26 @@ class LinksRepository implements ILinksRespository {
         }
     }
 
-    getAllByParentId(parentId: Types.ObjectId): Promise<ILink[]> {
+    /**
+     * Fetches all links from the database that have a given parentId value
+     * @param {Types.ObjectId} parentId - The ObjectId value to search for in the parentId field
+     * @returns {Promise<ILink[]>} A Promise that resolves to an array of ILink objects that match the search criteria
+     * @throws {Error} Throws an error if an error occurs while fetching the documents
+     */
+    async getAllByParentId(parentId: Types.ObjectId): Promise<ILink[]> {
         try {
-            return this.linkModel.find({ parentId: parentId }, {}).lean().exec();
+            // Use Mongoose's find method to fetch all documents that have the given parentId value
+            // The lean method is used to return plain JavaScript objects instead of Mongoose documents
+            // An empty object is passed as the second argument to include all fields in the returned documents
+            const links = await this.linkModel.find({ parentId: parentId }, {}).lean().exec();
+
+            // Return the array of links
+            return links;
         } catch (error) {
+            // If an error occurs, throw it to the caller of this method
             throw error;
         }
     }
-
 
     /**
      * Deletes a document from the database by its _id field
