@@ -39,13 +39,21 @@ class LinksRepository implements ILinksRespository {
      * Deletes a document from the database by its _id field
      * @param {Types.ObjectId} id - The ObjectId of the document to delete
      * @returns {Promise<void>} A Promise that resolves when the document is deleted
-     * @throws {Error} Throws an error if an error occurs while deleting the document
+     * @throws {Error} Throws an error if an error occurs while deleting the document, or if the document is not found
      */
     async deleteById(id: Types.ObjectId): Promise<void> {
         try {
             // Use Mongoose's findByIdAndDelete function to delete the document by its _id field.
             // The lean method is used to return plain JavaScript objects instead of Mongoose documents
-            await this.linkModel.findByIdAndDelete(id).lean().exec();
+            const deletedDocument = await this.linkModel.findByIdAndDelete(id).lean().exec();
+
+            // If the document is not found, throw an error
+            if (!deletedDocument) {
+                throw new Error(`Link with id ${id} not found.`);
+            }
+
+            // Document deleted successfully
+            // You can optionally return the deleted document, but in this implementation, it is not necessary
         } catch (error) {
             // If an error occurs, throw it to the caller of this method
             throw error;
