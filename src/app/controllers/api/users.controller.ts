@@ -152,28 +152,28 @@ class UserController {
     this.router.get("/email/:email", Authorize(LevelThere), this.getUserByEmail.bind(this));
 
 
-  /**
-   * @swagger
-   * /users/new:
-   *  post:
-   *   tags:
-   *     - Users
-   *   summary: API to create new user
-   *   description: create a user for valid user object
-   *   requestBody:
-   *      content:
-   *        application/json:
-   *          schema:
-   *              $ref: '#/components/schemas/new_user'
-   *   security: []
-   *   responses:
-   *       201:
-   *          description: Success
-   *       400:
-   *          description: Invalid new user
-   *       401:
-   *          description: Unauthorized
-   */
+    /**
+     * @swagger
+     * /users/new:
+     *  post:
+     *   tags:
+     *     - Users
+     *   summary: API to create new user
+     *   description: create a user for valid user object
+     *   requestBody:
+     *      content:
+     *        application/json:
+     *          schema:
+     *              $ref: '#/components/schemas/new_user'
+     *   security: []
+     *   responses:
+     *       201:
+     *          description: Success
+     *       400:
+     *          description: Invalid new user
+     *       401:
+     *          description: Unauthorized
+     */
     this.router.post("/new", this.createUser.bind(this));
 
     /**
