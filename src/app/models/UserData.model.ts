@@ -6,34 +6,43 @@ const userDataSchema: Schema<IUserData> = new Schema<IUserData>(
     userId: {
       type: Schema.Types.ObjectId,
       unique: true,
+      index: true,
     },
     seenTitles: {
-      type: [{
-        type: Schema.Types.ObjectId,
-        ref: 'title'
-      }],
-      default: []
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "title",
+        },
+      ],
+      default: [],
     },
     unseenTitles: {
-      type: [{
-        type: Schema.Types.ObjectId,
-        ref: 'title'
-      }],
-      default: []
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "title",
+        },
+      ],
+      default: [],
     },
     starredTitles: {
-      type: [{
-        type: Schema.Types.ObjectId,
-        ref: 'title'
-      }],
-      default: []
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "title",
+        },
+      ],
+      default: [],
     },
     favouriteTitles: {
-      type: [{
-        type: Schema.Types.ObjectId,
-        ref: 'title'
-      }],
-      default: []
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "title",
+        },
+      ],
+      default: [],
     },
   },
   {
@@ -41,10 +50,13 @@ const userDataSchema: Schema<IUserData> = new Schema<IUserData>(
       createdAt: true,
       updatedAt: true,
     },
-    collection: "userData"
+    collection: "userData",
   }
 );
 
-const UserDataModel: Model<IUserData> = mongoose.model<IUserData>("UserData", userDataSchema);
+const UserDataModel: Model<IUserData> = mongoose.model<IUserData>(
+  "UserData",
+  userDataSchema
+);
 
 export default UserDataModel;
