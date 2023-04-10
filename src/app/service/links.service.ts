@@ -114,6 +114,25 @@ class LinksService implements ILinksService {
       throw error;
     }
   }
+
+  /**
+   * Deletes all link documents that belong to the specified parent ID.
+   *
+   * @param {string} parentId - ID of the parent document to delete links for.
+   * @returns {Promise<void>} Resolves if the deletion succeeded.
+   * @throws Error if the deletion failed.
+   */
+  async deleteManyByParentId(parentId: string): Promise<void> {
+    try {
+      // Convert the parentId string to a Mongoose ObjectId to match the document schema.
+      const objectId = new mongoose.Types.ObjectId(parentId);
+
+      // Call the deleteManyByParentId method on the linksRepository to delete all links with the given parentId.
+      await this.linksRepository.deleteManyByParentId(objectId);
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default LinksService;

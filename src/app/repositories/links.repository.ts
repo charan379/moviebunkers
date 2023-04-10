@@ -121,6 +121,23 @@ class LinksRepository implements ILinksRespository {
       throw error;
     }
   }
+
+  /**
+   * Deletes all link documents that belong to the parent document with the specified ID.
+   *
+   * @param {Types.ObjectId} parentId - ID of the parent document to delete links for.
+   * @returns {Promise<void>} A Promise that resolves when the documents are deleted
+   * @throws {Error} If the deletion fails for any reason.
+   */
+  async deleteManyByParentId(parentId: Types.ObjectId): Promise<void> {
+    try {
+      // Call the deleteMany method of the links repository to delete all links with the specified parent ID
+      await this.linkModel.deleteMany({ parentId: parentId }).lean().exec();
+    } catch (error) {
+      // If any error occurs during the deletion process, re-throw it to be handled by the caller
+      throw error;
+    }
+  }
 }
 
 export default LinksRepository;
