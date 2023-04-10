@@ -1,9 +1,8 @@
 # moviebunkers :clapper:
 
-[![VERSION](https://img.shields.io/badge/VERSION-v2.0.3-sucess)](https://github.com/charan379/moviebunkers)    [![LAST UPDATE](https://img.shields.io/badge/LAST--UPDATED-21--March--2023-sucess)](https://github.com/charan379/moviebunkers) [![AGPL License](https://img.shields.io/badge/LICENSE-GNU%20AGPLv3-informational)](https://www.gnu.org/licenses/agpl-3.0.en.html)
+[![VERSION](https://img.shields.io/badge/VERSION-v2.0.5-sucess)](https://github.com/charan379/moviebunkers) [![LAST UPDATE](https://img.shields.io/badge/LAST--UPDATED-10--April--2023-sucess)](https://github.com/charan379/moviebunkers) [![AGPL License](https://img.shields.io/badge/LICENSE-GNU%20AGPLv3-informational)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 
 This is REST API application. Developed using Express, Nodejs , Typescript
-
 
 ## Environment Variables
 
@@ -16,10 +15,10 @@ To run this project, you will need to add the following environment variables to
 `JWT_SECRET`  
 `CORS_ORIGINS`  
 `PORT`  
-`NODE_ENV`  
+`NODE_ENV`
 
+#### Example
 
-####  Example 
 `DOMAIN_NAME`=localhost  
 `MongoDB_SERVER_STRING`=mongodb://127.0.0.1:27017/moviebunkers  
 `HTTPS`=false  
@@ -27,7 +26,7 @@ To run this project, you will need to add the following environment variables to
 `JWT_SECRE`T=my jwt secret key  
 `CORS_ORIGINS`=http://localhost:3080,http://yourapp.com  
 `PORT`=3010  
-`NODE_ENV`=production  
+`NODE_ENV`=production
 
 ## Run
 
@@ -42,6 +41,7 @@ Go to the project directory
 ```bash
   cd moviebunkers
 ```
+
 Add Environment Variables then
 Install dependencies
 
@@ -64,10 +64,13 @@ Start the server in dev
 Server will start running on given port
 
 ### Post-Installation
+
 #### Swagger Documentation
+
 ```bash
     http://localhost:PORT/api-docs
-````
+```
+
 ![Swagger-docs-preview](documentation/moviebunkers-swagger.gif)
 
 ## Authors
@@ -76,4 +79,4 @@ Server will start running on given port
 
 ## License
 
- [![AGPL License](https://img.shields.io/badge/LICENSE-GNU%20AGPLv3-brightgreen)](https://www.gnu.org/licenses/agpl-3.0.en.html)
+[![AGPL License](https://img.shields.io/badge/LICENSE-GNU%20AGPLv3-brightgreen)](https://www.gnu.org/licenses/agpl-3.0.en.html)
