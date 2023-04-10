@@ -6,10 +6,6 @@ import ContentQuality from "@constants/contenetQuality.enum";
 
 const linkSchema: Schema<ILink> = new Schema<ILink>(
   {
-    _id: {
-      type: Schema.Types.ObjectId,
-      index: true,
-    },
     parentId: {
       type: Schema.Types.ObjectId,
       index: true,
@@ -20,7 +16,22 @@ const linkSchema: Schema<ILink> = new Schema<ILink>(
       required: [true, "content type required"],
     },
     languages: {
-      type: [Object],
+      type: [
+        {
+          ISO_639_1_code: {
+            type: String,
+            required: [true, "Language ISO_639_1_code is required"],
+          },
+          english_name: {
+            type: String,
+            required: [true, "Language english_name is required"],
+          },
+          native_name: {
+            type: String,
+            required: [true, "Language native_name is required"],
+          },
+        },
+      ],
       _id: false,
     },
     linkType: {
