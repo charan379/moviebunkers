@@ -4,6 +4,8 @@ import { Inject, Service } from "typedi";
 import LinksRepository from "@repositories/links.repository";
 import ILink from "@models/interfaces/ILinks";
 import mongoose from "mongoose";
+import LinkException from "@exceptions/link.exception";
+import HttpCodes from "@constants/http.codes.enum";
 
 /**
  * The `LinksService` class is responsible for handling the business logic for
@@ -36,9 +38,14 @@ class LinksService implements ILinksService {
       if (!newLink) throw Error("Link not created");
       // Otherwise, return the new link document as a LinkDTO
       return newLink as LinkDTO;
-    } catch (error) {
+    } catch (error: any) {
       // If any error occurs during the creation process, re-throw it to be handled by the caller
-      throw error;
+      throw new LinkException(
+        `Link not created`,
+        HttpCodes.INTERNAL_SERVER_ERROR,
+        `${error?.message}`,
+        `LinksService.class: create.method()`
+      );
     }
   }
 
@@ -63,9 +70,14 @@ class LinksService implements ILinksService {
       });
       // Return the resulting array of LinkDTOs
       return linkDTOs;
-    } catch (error) {
+    } catch (error: any) {
       // If any error occurs during the retrieval process, re-throw it to be handled by the caller
-      throw error;
+      throw new LinkException(
+        `Failed to retrive links`,
+        HttpCodes.BAD_REQUEST,
+        `${error?.message}`,
+        `LinksService.class: getLinksByParentId.method()`
+      );
     }
   }
 
@@ -82,9 +94,14 @@ class LinksService implements ILinksService {
       const objectId = new mongoose.Types.ObjectId(id);
       // Call the repository's deleteById method with the ObjectID
       await this.linksRepository.deleteById(objectId);
-    } catch (error) {
+    } catch (error: any) {
       // If an error occurs, re-throw it to be handled by the caller
-      throw error;
+      throw new LinkException(
+        `Failed to delete link`,
+        HttpCodes.BAD_REQUEST,
+        `${error?.message}`,
+        `LinksService.class: deleteById.method()`
+      );
     }
   }
 
@@ -109,9 +126,14 @@ class LinksService implements ILinksService {
       if (!updatedLink) throw new Error(`Link with ID ${id} not found.`);
       // Convert the updated link document to a LinkDTO and return it
       return updatedLink as LinkDTO;
-    } catch (error) {
+    } catch (error: any) {
       // If any error occurs during the update process, re-throw it to be handled by the caller
-      throw error;
+      throw new LinkException(
+        `Failed to update link`,
+        HttpCodes.BAD_REQUEST,
+        `${error?.message}`,
+        `LinksService.class: updateById.method()`
+      );
     }
   }
 
@@ -129,8 +151,13 @@ class LinksService implements ILinksService {
 
       // Call the deleteManyByParentId method on the linksRepository to delete all links with the given parentId.
       await this.linksRepository.deleteManyByParentId(objectId);
-    } catch (error) {
-      throw error;
+    } catch (error: any) {
+      throw new LinkException(
+        `Failed to delete links`,
+        HttpCodes.BAD_REQUEST,
+        `${error?.message}`,
+        `LinksService.class: deleteManyByParentId.method()`
+      );
     }
   }
 }
