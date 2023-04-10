@@ -1,5 +1,6 @@
+import Config from "@Config";
 import HttpCodes from "@constants/http.codes.enum";
-import UserRoles from "@constants/user.roles.enum";
+import { LevelZero } from "@constants/user.roles.enum";
 import { LoginDTO, UserDTO } from "@dto/user.dto";
 import { lgoinSchema } from "@joiSchemas/user.joi.schemas";
 import Authorize from "@middlewares/authorization.middleware";
@@ -43,6 +44,28 @@ class AuthController {
          */
         this.router.post("/cookie-auth", this.cookieAuth.bind(this));
 
+        /**
+         * @swagger
+         * /auth/token-auth:
+         *  post:
+         *   tags:
+         *     - Auth
+         *   summary: API to authenticate user and sent token
+         *   description: return a token after successfull authentication
+         *   requestBody:
+         *      content:
+         *        application/json:
+         *          schema:
+         *              $ref: '#/components/schemas/login'
+         *   responses:
+         *       200:
+         *          description: Success
+         *       404:
+         *          description: user or password incorrect or not found
+         *   security: []
+         */
+        this.router.post("/token-auth", this.tokenAuth.bind(this));
+
         //logout
         /**
          * @swagger
@@ -76,12 +99,12 @@ class AuthController {
          *       401:
          *          description: Unauthorized
          */
-        this.router.get("/who-am-i", Authorize([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER]), this.getWhoAmI.bind(this));
+        this.router.get("/who-am-i", Authorize(LevelZero), this.getWhoAmI.bind(this));
     }
 
 
     /**
-     * @Post("/login") => login() Controller
+     * @Post("/cookie-auth") => cookieAuth() Controller
      * @param req 
      * @param res 
      * @param next 
@@ -95,13 +118,34 @@ class AuthController {
             res.cookie("auth", `Bearer ${token}`, {
                 maxAge: 30 * 24 * 60 * 60 * 1000,
                 httpOnly: true,
-                // secure: Config.HTTPS,
+                secure: Config.HTTPS,
                 signed: true,
                 overwrite: true,
-                sameSite: false,
+                sameSite: 'none',
             } as CookieOptions)
-            .status(HttpCodes.OK)
-            .json({ message: "Successfully Logged In" });
+                .status(HttpCodes.OK)
+                .json({ message: "Successfully Logged In" });
+
+        } catch (error) {
+
+            next(error)
+        }
+    }
+
+    /**
+     * @Post("/token-auth") => tokenAuth() Controller
+     * @param req 
+     * @param res 
+     * @param next 
+     */
+    private async tokenAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const validLoginDTO: LoginDTO = await JoiValidator(lgoinSchema, req?.body, { allowUnknown: false, stripUnknown: true, abortEarly: false });
+
+            const token: string = await this.authService.login(validLoginDTO);
+
+            res.status(HttpCodes.OK)
+                .json({ message: "Successfully authenticated", token: token });
 
         } catch (error) {
 
@@ -118,9 +162,9 @@ class AuthController {
     private async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
-            res.clearCookie("auth")
-            .status(HttpCodes.OK)
-            .json({ message: "Successfully Logged Out" })
+            res.clearCookie("auth", { sameSite: "none", httpOnly: true, secure: Config.HTTPS })
+                .status(HttpCodes.OK)
+                .json({ message: "Successfully Logged Out" })
 
         } catch (error) {
 
@@ -142,7 +186,7 @@ class AuthController {
             const userDTO: UserDTO = await this.authService.WhoAmI(userName);
 
             delete userDTO.password;
-      
+
             res.status(HttpCodes.OK).json(userDTO);
         } catch (error) {
             next(error);

@@ -1,6 +1,7 @@
 import BaseTitleDTO from "./base.title.dto";
 import EpisodeDTO from "./episode.dto";
 import SeasonDTO from "./season.dto";
+import TitleAuthorDTO from "./title.author.dto";
 
 
 interface TvDTO extends BaseTitleDTO, TitleAuthorDTO {

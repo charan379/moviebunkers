@@ -27,7 +27,7 @@ app.use(cors(CorsOptions));
 // app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser("cookieSecretHere"));
+app.use(cookieParser(Config.COOKIE_SECRET));
 app.use(stylus.middleware(path.join(__dirname, "../public")));
 app.use(express.static(path.join(__dirname, "../public")));
 

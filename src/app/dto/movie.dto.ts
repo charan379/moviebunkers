@@ -1,4 +1,5 @@
 import BaseTitleDTO from "./base.title.dto";
+import TitleAuthorDTO from "./title.author.dto";
 
 
 

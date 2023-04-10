@@ -1,6 +1,8 @@
+import Country from "@constants/country.enum";
 import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
 import Joi from "joi";
+import { ObjectIdSchema } from "./common.joi.schemas";
 
 export const languageSchema: Joi.ObjectSchema = Joi.object({
     ISO_639_1_code: Joi.string().required().example("en"),
@@ -9,8 +11,9 @@ export const languageSchema: Joi.ObjectSchema = Joi.object({
 });
 
 export const castSchema: Joi.ObjectSchema = Joi.object({
+    profile_path: Joi.string().example("https://image.tmdb.org/t/p/w92/ajNaPmXVVMJFg9GWmu6MJzTaXdV.jpg").allow("").allow(null),
     name: Joi.string().required().example("Brad Pitt"),
-    character: Joi.string().example("Tyler Durden"),
+    character: Joi.string().example("Tyler Durden").allow("").allow(null),
 });
 
 export const episodeSchema: Joi.ObjectSchema = Joi.object({
@@ -21,7 +24,7 @@ export const episodeSchema: Joi.ObjectSchema = Joi.object({
     overview: Joi.string().example(
         "The Hound is judged by the gods. Jaime is judged by men. Jon proves himself. Robb is betrayed. Tyrion learns the cost of weddings."
     ).allow(null).allow(""),
-    runtime: Joi.number().integer().example(57),
+    runtime: Joi.number().integer().example(57).allow("").allow(null),
     still_path: Joi.string().example(
         "https://image.tmdb.org/t/p/w300/41CekEZyGvNLTJIJy7BqFDTitcC.jpg"
     ).allow(null).allow(""),
@@ -47,10 +50,15 @@ export const seasonSchema: Joi.ObjectSchema = Joi.object({
 
 export const titleAuthorSchema: Joi.ObjectSchema = Joi.object({
     // added_by
-    added_by: Joi.string().example("user001"),
+    added_by: ObjectIdSchema.required().example("6411c06ab4be7d8da5338cf7"),
     // last_modified_by
-    last_modified_by: Joi.string().example("user002"),
+    last_modified_by: ObjectIdSchema.required().example("6411c06ab4be7d8da5338cf7"),
 
+});
+
+export const countryCertification: Joi.ObjectSchema = Joi.object({
+    country: Joi.string().required().example("IN"),
+    ratting: Joi.string().required().example("A"),
 });
 
 export const newTitleInitialCheckSchema: Joi.ObjectSchema = Joi.object({
@@ -64,14 +72,20 @@ export const newTitleInitialCheckSchema: Joi.ObjectSchema = Joi.object({
         .required(),
 });
 
-export const  getAllTitlesQuerySchema = Joi.object({
-    search: Joi.string().example("Fight Club"),
-    // year: Joi.number().integer().example(1999),
-    title_type: Joi.string().valid(...Object.values(TitleType)),
-    genre: Joi.string().example('Action'),
-    language: Joi.string().example('en'),
-    minimal: Joi.boolean().example(false),
-    page: Joi.number().integer().example(1),
-    limit: Joi.number().integer().example(5),
+export const getAllTitlesQuerySchema = Joi.object({
+    search: Joi.string().example("Fight Club").allow(""),
+    genre: Joi.string().example('Action').allow(""),
+    language: Joi.string().example('en').allow(""),
+    movie: Joi.number().integer().example(1).min(0).max(1).required(),
+    tv: Joi.number().integer().example(1).min(0).max(1).required(),
+    starred: Joi.number().integer().example(1).min(0).max(1).required(),
+    favourite: Joi.number().integer().example(1).min(0).max(1).required(),
+    seen: Joi.number().integer().example(1).min(-1).max(1).required(),
+    "age.gte": Joi.number().min(0).max(26).example(8),
+    "age.lte": Joi.number().min(0).max(26).example(12),
+    country: Joi.string().example("IN").valid(...Object.values(Country)).required(),
     sort_by: Joi.string().example("createdAt.desc"),
-  });
+    limit: Joi.number().integer().example(5),
+    pageNo: Joi.number().integer().example(1),
+    minimal: Joi.boolean().example(false),
+});

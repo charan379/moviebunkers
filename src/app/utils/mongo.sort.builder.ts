@@ -1,25 +1,42 @@
+interface SortObject {
+    [key: string]: number;
+}
 
+/**
+ * Builds a MongoDB sort object based on the provided `sort_by` string.
+ *
+ * @param {string} sort_by - The string containing the sort fields and directions.
+ * @returns {SortObject} - The MongoDB sort object.
+ * @throws {Error} - If any of the sort elements are invalid.
+ */
+export default function buildMongoSortObject(sort_by: string): SortObject {
+    const sortFields: SortObject = {};
 
-export default async function MongoSortBuilder(sort_by: string) {
-
-    const elementRegex: RegExp = /(^[a-zA-Z0-9]\w+\.(desc$|asc$))/;
-
-    let sortElementsObject: object = {};
-
-    const sortElementsArray : string[] = sort_by.split(",");
-
-    for (let index: number = 0; index < sortElementsArray.length; index++) {
-        const element = sortElementsArray[index];
-
-        if (element.match(elementRegex)) {
-            const [key, value] = element.split(".");
-            sortElementsObject = { ...sortElementsObject, [key]: value };
-        }
+    // If sort_by is not provided or is empty, sort by createdAt in descending order
+    if (!sort_by) {
+        return { createdAt: -1 };
     }
 
-    if (Object.keys(sortElementsObject).length === 0) return {createdAt: 'desc'};
+    const sortElementRegex = /^[a-zA-Z0-9]\w+\.(desc|asc)$/;
 
-    return sortElementsObject;
+    // Split sort_by into individual sort elements and iterate over them
+    const sortElements: string[] = sort_by.split(",");
+    sortElements.forEach((element) => {
+        // Check if the sort element matches the expected pattern
+        if (!element.match(sortElementRegex)) {
+            throw new Error(`Invalid sort element: ${element}`);
+        }
 
-    
+        // Split the element into key and direction
+        const [key, direction] = element.split(".");
+
+        // Add the sort field to the sort object with the corresponding direction
+        if (direction === "desc") {
+            sortFields[key] = -1;
+        } else {
+            sortFields[key] = 1;
+        }
+    });
+
+    return sortFields;
 }

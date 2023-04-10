@@ -1,8 +1,11 @@
+import { ObjectId } from "mongoose";
 
 
 interface TitleAuthorDTO {
-    added_by?: string;
-    last_modified_by?: string;
+    added_by?: ObjectId;
+    last_modified_by?: ObjectId;
     createdAt?: Date;
     updatedAt?: Date;
 }
+
+export default TitleAuthorDTO;

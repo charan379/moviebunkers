@@ -1,7 +1,7 @@
 import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
 import Joi from "joi";
-import { castSchema, languageSchema } from "./common.title.joi.schemas";
+import { castSchema, countryCertification, languageSchema } from "./common.title.joi.schemas";
 
 
 const baseTitleSchema: Joi.ObjectSchema = Joi.object({
@@ -37,7 +37,7 @@ const baseTitleSchema: Joi.ObjectSchema = Joi.object({
     // ratting
     ratting: Joi.number().allow(null).allow(""),
     // age_ratting
-    age_ratting: Joi.number().allow(null).allow(""),
+    age_rattings: Joi.array().items(countryCertification).required(),
     // genres
     genres: Joi.array().items(Joi.string().example("Thriller")),
     // overview

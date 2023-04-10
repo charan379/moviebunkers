@@ -1,5 +1,3 @@
-import TitleDTO from "./title.dto";
-import { UserDTO } from "./user.dto";
 
 export default  interface PageDTO {
     page: number,

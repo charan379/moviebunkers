@@ -75,13 +75,14 @@ export const baseTitleExtendableSchema: Schema = new Schema(
             type: Number,
         },
         // age_ratting
-        age_ratting: {
-            type: Number,
+        age_rattings: {
+            type: [Object],
+            _id: false,
         },
         // genres
         genres: {
             type: [String],
-            default: ["unknown"],
+            default: ["Unknown"],
         },
         // overview
         overview: {

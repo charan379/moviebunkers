@@ -8,8 +8,8 @@ import { episodeSchema, seasonSchema, titleAuthorSchema } from "./common.title.j
 
 const tvSchema: Joi.ObjectSchema = baseTitleSchema.keys({
     title_type: Joi.string()
-    .valid(TitleType.TV)
-    .required(),
+        .valid(TitleType.TV)
+        .required(),
     //  in_production
     in_production: Joi.boolean().example(false),
     //  created_by
@@ -29,11 +29,6 @@ const tvSchema: Joi.ObjectSchema = baseTitleSchema.keys({
     number_of_episodes: Joi.number().integer().example(73),
     //  seasons
     seasons: Joi.array().items(seasonSchema).allow(null),
-}).append({
-    // added_by
-    added_by: Joi.string().example("user001"),
-    // last_modified_by
-    last_modified_by: Joi.string().example("user002"),
 })
 
 export default tvSchema;
