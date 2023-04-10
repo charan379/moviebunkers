@@ -73,7 +73,7 @@ class LinksService implements ILinksService {
     } catch (error: any) {
       // If any error occurs during the retrieval process, re-throw it to be handled by the caller
       throw new LinkException(
-        `Failed to retrive links`,
+        `${error?.reason}`,
         HttpCodes.BAD_REQUEST,
         `${error?.message}`,
         `LinksService.class: getLinksByParentId.method()`
@@ -97,7 +97,7 @@ class LinksService implements ILinksService {
     } catch (error: any) {
       // If an error occurs, re-throw it to be handled by the caller
       throw new LinkException(
-        `Failed to delete link`,
+        `${error?.reason}`,
         HttpCodes.BAD_REQUEST,
         `${error?.message}`,
         `LinksService.class: deleteById.method()`
@@ -129,7 +129,7 @@ class LinksService implements ILinksService {
     } catch (error: any) {
       // If any error occurs during the update process, re-throw it to be handled by the caller
       throw new LinkException(
-        `Failed to update link`,
+        `${error?.reason}`,
         HttpCodes.BAD_REQUEST,
         `${error?.message}`,
         `LinksService.class: updateById.method()`
@@ -153,7 +153,7 @@ class LinksService implements ILinksService {
       await this.linksRepository.deleteManyByParentId(objectId);
     } catch (error: any) {
       throw new LinkException(
-        `Failed to delete links`,
+        `${error?.reason}`,
         HttpCodes.BAD_REQUEST,
         `${error?.message}`,
         `LinksService.class: deleteManyByParentId.method()`

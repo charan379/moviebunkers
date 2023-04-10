@@ -1,9 +1,10 @@
 import HttpCodes from "../constants/http.codes.enum";
+import MoviebunkersException from "./moviebunkers.exception";
 
 /**
  * Custom error class for Moviebunkers application.
  */
-class RepositoryException extends Error {
+class RepositoryException extends MoviebunkersException {
   status?: HttpCodes | undefined;
   reason?: string;
 
@@ -20,16 +21,8 @@ class RepositoryException extends Error {
     reason?: string | undefined,
     stack?: string | undefined
   ) {
-    // Call the base Error class constructor with the message
-    super(message);
-
-    // Set the name of the error class
+    super(message, status, reason, stack);
     this.name = "RepositoryException";
-
-    // Set the status, reason, and stack properties if provided
-    this.status = status;
-    this.reason = reason;
-    this.stack = stack;
   }
 }
 
