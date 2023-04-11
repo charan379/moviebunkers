@@ -3,97 +3,162 @@ import UserDataModel from "@models/UserData.model";
 import { Model, Schema, UpdateQuery } from "mongoose";
 import { Service } from "typedi";
 import IUserDataRepository from "./interfaces/userdata.repository.interface";
+import RepositoryException from "@exceptions/repository.exception";
+import HttpCodes from "@constants/http.codes.enum";
+import MoviebunkersException from "@exceptions/moviebunkers.exception";
 
 
 
+/**
+ * UserDataRepository
+ * A class that handles CRUD operations for userData documents
+ */
 @Service()
 class UserDataRepository implements IUserDataRepository {
-
+    // The Mongoose model for the UserData documents
     private userDataModel: Model<IUserData>;
 
+    /**
+     * Creates a new instance of the UserDataRepository class.
+     * Initializes the userDataModel property with the UserDataModel.
+     */
     constructor() {
         this.userDataModel = UserDataModel;
     }
 
     /**
-     * create()
-     * @param userData 
-     * @returns 
+     * create() - creates a new user data document
+     * @param userData - the data to create the document
+     * @returns the created user data document
+     * @throws a RepositoryException if an error occurs
      */
     async create(userData: Partial<IUserData>): Promise<IUserData> {
-        return this.userDataModel.create<Partial<IUserData>>(userData);
+        try {
+            const newUserdata: IUserData = await this.userDataModel.create<Partial<IUserData>>(userData);
 
+            // If the user data object could not be created, throw an exception
+            if (!newUserdata) {
+                throw new RepositoryException(
+                    `Unable to initialize new userData`,
+                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    `Error while initializing userdata`,
+                    `UserDataRepository.class: create.method()`
+                );
+            }
+
+            return newUserdata;
+        } catch (error: any) {
+            // If the error is a known exception, re-throw it
+            if (error instanceof MoviebunkersException) {
+                throw error;
+            } else {
+                // Otherwise, wrap the error in a repository exception and re-throw it
+                throw new RepositoryException(
+                    `${error?.message}`,
+                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    `${error?.stack}`,
+                    `UserDataRepository.class: create.method()`
+                );
+            }
+        }
     }
 
+
     /**
-     * findByUserId()
-     * @param userId 
-     * @returns 
+     * findByUserId() - finds a user data document by user ID
+     * @param userId - the ID of the user
+     * @returns the found user data document or null if not found
+     * @throws a RepositoryException if an error occurs
      */
     async findByUserId(userId: Schema.Types.ObjectId): Promise<IUserData | null> {
-        return this.userDataModel
-            .findOne({ userId: userId }, { __v: 0 })
-            .exec();
+        try {
+            const userData = await this.userDataModel
+                .findOne({ userId: userId }, { __v: 0 })
+                .exec();
+
+            return userData;
+        } catch (error: any) {
+            // If the error is a known exception, re-throw it
+            if (error instanceof MoviebunkersException) {
+                throw error;
+            } else {
+                // Otherwise, wrap the error in a repository exception and re-throw it
+                throw new RepositoryException(
+                    `${error?.message}`,
+                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    `${error?.stack}`,
+                    `UserDataRepository.class: findByUserId.method()`
+                );
+            }
+        }
     }
 
+
     /**
-     * updateUserData()
-     * @param userId 
-     * @param update 
-     * @returns 
+     * updateUserData() -  Updates an existing user data document for the specified user ID
+     * @param userId - the ID of the user
+     * @param update - the update query to apply to the document
+     * @returns true if the document was updated, false otherwise
+     * @throws a RepositoryException if an error occurs
      */
     async updateUserData(userId: Schema.Types.ObjectId, update: UpdateQuery<IUserData>): Promise<boolean> {
+        try {
+            const result = await this.userDataModel.findOneAndUpdate({ userId: userId }, update, { new: true }).exec();
 
-        const result = await this.userDataModel.findOneAndUpdate({ userId: userId }, update, { new: true }).exec();
-        if (result) {
-            return true;
-        } else {
-            return false;
+            // If the update was successful, return true
+            if (result) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error: any) {
+            // If the error is a known exception, re-throw it
+            if (error instanceof MoviebunkersException) {
+                throw error;
+            } else {
+                // Otherwise, wrap the error in a repository exception and re-throw it
+                throw new RepositoryException(
+                    `${error?.message}`,
+                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    `${error?.stack}`,
+                    `UserDataRepository.class: updateUserData.method()`
+                );
+            }
         }
     }
 
     /**
-     * findAll()
-     * @returns 
+     * findAll() - Retrieves all user data documents and their associated user information
+     * @returns an array of user data documents
+     * @throws a RepositoryException if an error occurs
      */
     async findAll(): Promise<IUserData[]> {
-
-        return await this.userDataModel.find({}, { __v: 0 })
-            .populate({
+        try {
+            // Find all user data objects and populate them with associated user information
+            const userData = await this.userDataModel.find({}, { __v: 0 }).populate({
                 path: 'userId',
                 model: 'user',
                 localField: 'userId',
                 foreignField: '_id',
                 select: "userName email status role createdAt",
-            }).exec()
+            }).exec();
 
-        // same result as above but with aggregation
-        // will be implemented in future
-        // return await this.userDataModel.aggregate([
-        //     // {
-        //     //     $match: {
-        //     //       userId: userId
-        //     //     }
-        //     //   },
-        //     {
-        //         $lookup: {
-        //             from: 'users',
-        //             localField: 'userId',
-        //             foreignField: '_id',
-        //             as: 'user'
-        //         }
-        //     }, {
-        //         $addFields: {
-        //             user: {
-        //                 $arrayElemAt: [
-        //                     '$user', 0
-        //                 ]
-        //             }
-        //         }
-        //     }
-        // ]).exec();
+            return userData;
+        } catch (error: any) {
+            // If the error is a known exception, re-throw it
+            if (error instanceof MoviebunkersException) {
+                throw error;
+            } else {
+                // Otherwise, wrap the error in a repository exception and re-throw it
+                throw new RepositoryException(
+                    `${error?.message}`,
+                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    `${error?.stack}`,
+                    `UserDataRepository.class: findAll.method()`
+                );
+            }
+        }
     }
-
 }
 
 export default UserDataRepository;
