@@ -41,7 +41,7 @@ class LinksService implements ILinksService {
     } catch (error: any) {
       // If any error occurs during the creation process, re-throw it to be handled by the caller
       throw new LinkException(
-        `Link not created`,
+        `Failed to add new link`,
         HttpCodes.INTERNAL_SERVER_ERROR,
         `${error?.message}`,
         `LinksService.class: create.method()`
@@ -73,9 +73,9 @@ class LinksService implements ILinksService {
     } catch (error: any) {
       // If any error occurs during the retrieval process, re-throw it to be handled by the caller
       throw new LinkException(
-        `${error?.reason}`,
-        HttpCodes.BAD_REQUEST,
         `${error?.message}`,
+        HttpCodes.BAD_REQUEST,
+        `${error?.reason}`,
         `LinksService.class: getLinksByParentId.method()`
       );
     }
@@ -97,9 +97,9 @@ class LinksService implements ILinksService {
     } catch (error: any) {
       // If an error occurs, re-throw it to be handled by the caller
       throw new LinkException(
-        `${error?.reason}`,
-        HttpCodes.BAD_REQUEST,
         `${error?.message}`,
+        HttpCodes.BAD_REQUEST,
+        `${error?.reason}`,
         `LinksService.class: deleteById.method()`
       );
     }
@@ -129,9 +129,9 @@ class LinksService implements ILinksService {
     } catch (error: any) {
       // If any error occurs during the update process, re-throw it to be handled by the caller
       throw new LinkException(
-        `${error?.reason}`,
-        HttpCodes.BAD_REQUEST,
         `${error?.message}`,
+        HttpCodes.BAD_REQUEST,
+        `${error?.reason}`,
         `LinksService.class: updateById.method()`
       );
     }
@@ -153,9 +153,9 @@ class LinksService implements ILinksService {
       await this.linksRepository.deleteManyByParentId(objectId);
     } catch (error: any) {
       throw new LinkException(
-        `${error?.reason}`,
-        HttpCodes.BAD_REQUEST,
         `${error?.message}`,
+        HttpCodes.BAD_REQUEST,
+        `${error?.reason}`,
         `LinksService.class: deleteManyByParentId.method()`
       );
     }

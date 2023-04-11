@@ -86,9 +86,9 @@ class LinksRepository implements ILinksRespository {
       // If the document is not found, throw an error
       if (!updatedDocument) {
         throw new RepositoryException(
-          `Failed to update`,
+          `Link with id ${id} not found`,
           HttpCodes.BAD_REQUEST,
-          `Link with id ${id} not found.`,
+          `Failed to update link with id: ${id}`,
           `LinksRepository.class: updateById.method()`
         );
       }
@@ -119,9 +119,9 @@ class LinksRepository implements ILinksRespository {
       // If the document is not found, throw an error
       if (!deletedDocument) {
         throw new RepositoryException(
-          `Failed to delete`,
+          `Link with id ${id} not found`,
           HttpCodes.BAD_REQUEST,
-          `Link with id ${id} not found.`,
+          `Failed to delete link with id: ${id}`,
           `LinksRepository.class: deleteById.method()`
         );
       }
