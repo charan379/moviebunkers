@@ -5,6 +5,7 @@ import LinkModel from "@models/links.model";
 import { Service } from "typedi";
 import RepositoryException from "@exceptions/repository.exception";
 import HttpCodes from "@constants/http.codes.enum";
+import MoviebunkersException from "@exceptions/moviebunkers.exception";
 
 /**
  * A repository for interacting with the links collection in the database.
@@ -25,7 +26,7 @@ class LinksRepository implements ILinksRespository {
    * Creates a new document in the database with the given properties.
    * @param {Partial<ILink>} link - The properties of the new document to create
    * @returns {Promise<ILink>} A Promise that resolves to the created document
-   * @throws {Error} Throws an error if an error occurs while creating the document
+   * @throws {RepositoryException} Throws an RepositoryException if an error occurs while creating the document
    */
   async create(link: Partial<ILink>): Promise<ILink> {
     try {
@@ -34,9 +35,14 @@ class LinksRepository implements ILinksRespository {
 
       // Return the created document
       return createdLink;
-    } catch (error) {
-      // If an error occurs, throw it to the caller of this method
-      throw error;
+    } catch (error: any) {
+      // If an error occurs wrap it in RepositoryException, throw it to the caller of this method
+      throw new RepositoryException(
+        `${error?.message}`,
+        HttpCodes.INTERNAL_SERVER_ERROR,
+        `${JSON.stringify(error?.stack)}`,
+        `LinksRepository.class: create.method()`
+      );
     }
   }
 
@@ -44,7 +50,7 @@ class LinksRepository implements ILinksRespository {
    * Fetches all links from the database that have a given parentId value
    * @param {Types.ObjectId} parentId - The ObjectId value to search for in the parentId field
    * @returns {Promise<ILink[]>} A Promise that resolves to an array of ILink objects that match the search criteria
-   * @throws {Error} Throws an error if an error occurs while fetching the documents
+   * @throws {RepositoryException} Throws an RepositoryException if an error occurs while fetching the documents
    */
   async getAllByParentId(parentId: Types.ObjectId): Promise<ILink[]> {
     try {
@@ -58,9 +64,14 @@ class LinksRepository implements ILinksRespository {
 
       // Return the array of links
       return links;
-    } catch (error) {
-      // If an error occurs, throw it to the caller of this method
-      throw error;
+    } catch (error: any) {
+      // If an error occurs wrap it in RepositoryException, throw it to the caller of this method
+      throw new RepositoryException(
+        `${error?.message}`,
+        HttpCodes.INTERNAL_SERVER_ERROR,
+        `${JSON.stringify(error?.stack)}`,
+        `LinksRepository.class: getAllByParentId.method()`
+      );
     }
   }
 
@@ -69,7 +80,7 @@ class LinksRepository implements ILinksRespository {
    * @param {Types.ObjectId} id - The ObjectId of the document to update
    * @param {Partial<ILink>} update - The fields to update in the document
    * @returns {Promise<ILink>} A Promise that resolves with the updated document
-   * @throws {Error} Throws an error if an error occurs while updating the document
+   * @throws {RepositoryException} Throws an RepositoryException if an error occurs while updating the document
    */
   async updateById(id: Types.ObjectId, update: Partial<ILink>): Promise<ILink> {
     try {
@@ -95,9 +106,25 @@ class LinksRepository implements ILinksRespository {
 
       // Return the updated document
       return updatedDocument;
-    } catch (error) {
-      // If an error occurs, throw it to the caller of this method
-      throw error;
+    } catch (error: any) {
+      // If an error occurs, check if it is an instance of MoviebunkersException
+      if (error instanceof MoviebunkersException) {
+        // If it is, simply throw the error to the caller of this method
+        throw error
+      } else {
+        // If it's not a MoviebunkersException, wrap it in a new RepositoryException and throw it to the caller
+        throw new RepositoryException(
+          // Set the error message to the error's message, or null if it's undefined
+          `${error?.message}`,
+          // Set the HTTP status code to 500 (Internal Server Error)
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          // Set the error stack trace to a stringified version of the error's stack, or null if it's undefined
+          `${JSON.stringify(error?.stack)}`,
+          // Set the location of the error to the LinksRepository class and updateById method
+          `LinksRepository.class: updateById.method()`
+        );
+      }
+
     }
   }
 
@@ -105,7 +132,7 @@ class LinksRepository implements ILinksRespository {
    * Deletes a document from the database by its _id field
    * @param {Types.ObjectId} id - The ObjectId of the document to delete
    * @returns {Promise<void>} A Promise that resolves when the document is deleted
-   * @throws {Error} Throws an error if an error occurs while deleting the document, or if the document is not found
+   * @throws {RepositoryException} Throws an RepositoryException if an error occurs while deleting the document, or if the document is not found
    */
   async deleteById(id: Types.ObjectId): Promise<void> {
     try {
@@ -128,9 +155,25 @@ class LinksRepository implements ILinksRespository {
 
       // Document deleted successfully
       // You can optionally return the deleted document, but in this implementation, it is not necessary
-    } catch (error) {
-      // If an error occurs, throw it to the caller of this method
-      throw error;
+    } catch (error: any) {
+      // If an error occurs, check if it is an instance of MoviebunkersException
+      if (error instanceof MoviebunkersException) {
+        // If it is, simply throw the error to the caller of this method
+        throw error
+      } else {
+        // If it's not a MoviebunkersException, wrap it in a new RepositoryException and throw it to the caller
+        throw new RepositoryException(
+          // Set the error message to the error's message, or null if it's undefined
+          `${error?.message}`,
+          // Set the HTTP status code to 500 (Internal Server Error)
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          // Set the error stack trace to a stringified version of the error's stack, or null if it's undefined
+          `${JSON.stringify(error?.stack)}`,
+          // Set the location of the error to the LinksRepository class and deleteById method
+          `LinksRepository.class: deleteById.method()`
+        );
+      }
+
     }
   }
 
@@ -139,15 +182,24 @@ class LinksRepository implements ILinksRespository {
    *
    * @param {Types.ObjectId} parentId - ID of the parent document to delete links for.
    * @returns {Promise<void>} A Promise that resolves when the documents are deleted
-   * @throws {Error} If the deletion fails for any reason.
+   * @throws {RepositoryException} If the deletion fails for any reason.
    */
   async deleteManyByParentId(parentId: Types.ObjectId): Promise<void> {
     try {
       // Call the deleteMany method of the links repository to delete all links with the specified parent ID
       await this.linkModel.deleteMany({ parentId: parentId }).lean().exec();
-    } catch (error) {
+    } catch (error: any) {
       // If any error occurs during the deletion process, re-throw it to be handled by the caller
-      throw error;
+      throw new RepositoryException(
+        // Set the error message to the error's message, or null if it's undefined
+        `${error?.message}`,
+        // Set the HTTP status code to 500 (Internal Server Error)
+        HttpCodes.INTERNAL_SERVER_ERROR,
+        // Set the error stack trace to a stringified version of the error's stack, or null if it's undefined
+        `${JSON.stringify(error?.stack)}`,
+        // Set the location of the error to the LinksRepository class and deleteManyByParentId method
+        `LinksRepository.class: deleteManyByParentId.method()`
+      );
     }
   }
 }
