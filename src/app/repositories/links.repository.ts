@@ -36,11 +36,16 @@ class LinksRepository implements ILinksRespository {
       // Return the created document
       return createdLink;
     } catch (error: any) {
-      // If an error occurs wrap it in RepositoryException, throw it to the caller of this method
+      // If an error occurs during execution of the try block, catch it here and handle it
+      // Create a new RepositoryException with details about the error and throw it to the caller of this method
       throw new RepositoryException(
+        // Set the error message to the error's message, or null if it's undefined
         `${error?.message}`,
+        // Set the HTTP status code to 500 (Internal Server Error)
         HttpCodes.INTERNAL_SERVER_ERROR,
+        // Set the error stack trace to a stringified version of the error's stack, or null if it's undefined
         `${JSON.stringify(error?.stack)}`,
+        // Set the location of the error to the LinksRepository class and create method
         `LinksRepository.class: create.method()`
       );
     }
@@ -65,11 +70,16 @@ class LinksRepository implements ILinksRespository {
       // Return the array of links
       return links;
     } catch (error: any) {
-      // If an error occurs wrap it in RepositoryException, throw it to the caller of this method
+      // If an error occurs during execution of the try block, catch it here and handle it
+      // Create a new RepositoryException with details about the error and throw it to the caller of this method
       throw new RepositoryException(
+        // Set the error message to the error's message, or null if it's undefined
         `${error?.message}`,
+        // Set the HTTP status code to 500 (Internal Server Error)
         HttpCodes.INTERNAL_SERVER_ERROR,
+        // Set the error stack trace to a stringified version of the error's stack, or null if it's undefined
         `${JSON.stringify(error?.stack)}`,
+        // Set the location of the error to the LinksRepository class and getAllByParentId method
         `LinksRepository.class: getAllByParentId.method()`
       );
     }
@@ -145,10 +155,15 @@ class LinksRepository implements ILinksRespository {
 
       // If the document is not found, throw an error
       if (!deletedDocument) {
+        // Throw a new RepositoryException indicating that the link with the given id was not found
         throw new RepositoryException(
+          // Set the error message to a string that includes the id of the link that was not found
           `Link with id ${id} not found`,
+          // Set the HTTP status code to 400 (Bad Request)
           HttpCodes.BAD_REQUEST,
+          // Set the error message to indicate that the link deletion failed for the link with the given id
           `Failed to delete link with id: ${id}`,
+          // Set the location of the error to the LinksRepository class and deleteById method
           `LinksRepository.class: deleteById.method()`
         );
       }

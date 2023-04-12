@@ -6,6 +6,7 @@ import ILink from "@models/interfaces/ILinks";
 import mongoose from "mongoose";
 import LinkException from "@exceptions/link.exception";
 import HttpCodes from "@constants/http.codes.enum";
+import MoviebunkersException from "@exceptions/moviebunkers.exception";
 
 /**
  * The `LinksService` class is responsible for handling the business logic for
@@ -35,17 +36,21 @@ class LinksService implements ILinksService {
       // Call the create method of the links repository, passing in the link DTO
       const newLink = await this.linksRepository.create(linkDto);
       // If the new link document is null or undefined, throw an error
-      if (!newLink) throw Error("Link not created");
+      if (!newLink) throw new LinkException("Sorry unable to create link", HttpCodes.INTERNAL_SERVER_ERROR, " ", `LinksService.class: create.method()`);
       // Otherwise, return the new link document as a LinkDTO
       return newLink as LinkDTO;
     } catch (error: any) {
       // If any error occurs during the creation process, re-throw it to be handled by the caller
-      throw new LinkException(
-        `Failed to add new link`,
-        HttpCodes.INTERNAL_SERVER_ERROR,
-        `${error?.message}`,
-        `LinksService.class: create.method()`
-      );
+      if (error instanceof MoviebunkersException) {
+        throw error;
+      } else {
+        throw new LinkException(
+          `${error?.message}`,
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          `${error?.stack}`,
+          `LinksService.class: create.method()`
+        );
+      }
     }
   }
 
@@ -71,13 +76,17 @@ class LinksService implements ILinksService {
       // Return the resulting array of LinkDTOs
       return linkDTOs;
     } catch (error: any) {
-      // If any error occurs during the retrieval process, re-throw it to be handled by the caller
-      throw new LinkException(
-        `${error?.message}`,
-        HttpCodes.BAD_REQUEST,
-        `${error?.reason}`,
-        `LinksService.class: getLinksByParentId.method()`
-      );
+      // If any error occurs during the creation process, re-throw it to be handled by the caller
+      if (error instanceof MoviebunkersException) {
+        throw error;
+      } else {
+        throw new LinkException(
+          `${error?.message}`,
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          `${error?.reason}`,
+          `LinksService.class: getLinksByParentId.method()`
+        );
+      }
     }
   }
 
@@ -96,12 +105,16 @@ class LinksService implements ILinksService {
       await this.linksRepository.deleteById(objectId);
     } catch (error: any) {
       // If an error occurs, re-throw it to be handled by the caller
-      throw new LinkException(
-        `${error?.message}`,
-        HttpCodes.BAD_REQUEST,
-        `${error?.reason}`,
-        `LinksService.class: deleteById.method()`
-      );
+      if (error instanceof MoviebunkersException) {
+        throw error;
+      } else {
+        throw new LinkException(
+          `${error?.message}`,
+          HttpCodes.BAD_REQUEST,
+          `${error?.reason}`,
+          `LinksService.class: deleteById.method()`
+        );
+      }
     }
   }
 
@@ -123,17 +136,21 @@ class LinksService implements ILinksService {
         update
       );
       // If no link document was found with the specified ID, throw an error
-      if (!updatedLink) throw new Error(`Link with ID ${id} not found.`);
+      if (!updatedLink) throw new LinkException(`Link with ID ${id} not found.`, HttpCodes.BAD_REQUEST, " ", `LinksService.class: updateById.method()`);
       // Convert the updated link document to a LinkDTO and return it
       return updatedLink as LinkDTO;
     } catch (error: any) {
       // If any error occurs during the update process, re-throw it to be handled by the caller
-      throw new LinkException(
-        `${error?.message}`,
-        HttpCodes.BAD_REQUEST,
-        `${error?.reason}`,
-        `LinksService.class: updateById.method()`
-      );
+      if (error instanceof MoviebunkersException) {
+        throw error;
+      } else {
+        throw new LinkException(
+          `${error?.message}`,
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          `${error?.reason}`,
+          `LinksService.class: updateById.method()`
+        );
+      }
     }
   }
 
@@ -152,12 +169,18 @@ class LinksService implements ILinksService {
       // Call the deleteManyByParentId method on the linksRepository to delete all links with the given parentId.
       await this.linksRepository.deleteManyByParentId(objectId);
     } catch (error: any) {
-      throw new LinkException(
-        `${error?.message}`,
-        HttpCodes.BAD_REQUEST,
-        `${error?.reason}`,
-        `LinksService.class: deleteManyByParentId.method()`
-      );
+      // If any error occurs during the update process, re-throw it to be handled by the caller
+      if (error instanceof MoviebunkersException) {
+        throw error;
+      } else {
+        throw new LinkException(
+          `${error?.message}`,
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          `${error?.reason}`,
+          `LinksService.class: deleteManyByParentId.method()`
+        );
+      }
+
     }
   }
 }
