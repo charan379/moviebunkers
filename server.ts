@@ -103,6 +103,6 @@ function onListening() {
   // debug('Listening on ' + bind);
   debug("⚡️[server]: Server is running on " + bind);
   console.info("🚀 [server]: Server is running on " + bind);
-  // connect to be
+  // connect to database
   Database.connect();
 }
