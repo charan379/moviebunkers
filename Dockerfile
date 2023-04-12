@@ -2,7 +2,7 @@ FROM node:latest
 # Set environment variables
 # ENV DEBUG=moviebunkers:info \
 #     DOMAIN_NAME=localhost \
-#     MongoDB_SERVER_STRING=mongodb://127.0.0.1:27017/moviebunkers \
+#     MONGODB_SERVER_STRING=mongodb://127.0.0.1:27017/moviebunkers \
 #     HTTPS=false \
 #     COOKIE_SECRET= \
 #     JWT_SECRET=value \
