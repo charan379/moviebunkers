@@ -1,6 +1,6 @@
 # moviebunkers :clapper:
 
-[![VERSION](https://img.shields.io/badge/VERSION-v2.0.5-sucess)](https://github.com/charan379/moviebunkers) [![LAST UPDATE](https://img.shields.io/badge/LAST--UPDATED-10--April--2023-sucess)](https://github.com/charan379/moviebunkers) [![AGPL License](https://img.shields.io/badge/LICENSE-GNU%20AGPLv3-informational)](https://www.gnu.org/licenses/agpl-3.0.en.html)
+[![VERSION](https://img.shields.io/badge/VERSION-v2.0.5-sucess)](https://github.com/charan379/moviebunkers) [![LAST UPDATE](https://img.shields.io/badge/LAST--UPDATED-12--April--2023-sucess)](https://github.com/charan379/moviebunkers) [![AGPL License](https://img.shields.io/badge/LICENSE-GNU%20AGPLv3-informational)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 
 This is REST API application. Developed using Express, Nodejs , Typescript
 
@@ -9,7 +9,7 @@ This is REST API application. Developed using Express, Nodejs , Typescript
 To run this project, you will need to add the following environment variables to your .env file
 
 `DOMAIN_NAME`  
-`MongoDB_SERVER_STRING`  
+`MONGODB_SERVER_STRING`  
 `HTTPS`  
 `COOKIE_SECRET`  
 `JWT_SECRET`  
@@ -20,7 +20,7 @@ To run this project, you will need to add the following environment variables to
 #### Example
 
 `DOMAIN_NAME`=localhost  
-`MongoDB_SERVER_STRING`=mongodb://127.0.0.1:27017/moviebunkers  
+`MONGODB_SERVER_STRING`=mongodb://127.0.0.1:27017/moviebunkers  
 `HTTPS`=false  
 `COOKIE_SECRET`=my cookie secret  
 `JWT_SECRE`T=my jwt secret key  
