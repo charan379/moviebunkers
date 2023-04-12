@@ -14,7 +14,7 @@ WORKDIR /srv/moviebunkersAPI
 =======
 ENV DEBUG=moviebunkers:info \
     DOMAIN_NAME=localhost \
-    MongoDB_SERVER_STRING=mongodb+srv://moviebunkers0:swordFish%40379@cluster1.xtdu9ye.mongodb.net/moviebunkers?retryWrites=true&w=majority \
+    MongoDB_SERVER_STRING=mongodb+srv://charanteja379:swordFish%40379@cluster1.lwi7smq.mongodb.net/moviebunkers?retryWrites=true&w=majority \
     HTTPS=false \
     COOKIE_SECRET=boom*!%^boom&shakalak! \
     JWT_SECRET=attention~2`everyBody&%4@nenu^vasthuna!be+ready \
