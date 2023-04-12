@@ -5,6 +5,7 @@
  */
 
 import app from "@Applipcation";
+import Config from "@Config";
 import Database from "@utils/db";
 import debugLogger from "debug";
 import http from "http";
@@ -103,5 +104,6 @@ function onListening() {
   debug("⚡️[server]: Server is running on " + bind);
   console.info("🚀 [server]: Server is running on " + bind);
   // connect to be
+  console.log(Config)
   Database.connect();
 }
