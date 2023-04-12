@@ -104,6 +104,5 @@ function onListening() {
   debug("⚡️[server]: Server is running on " + bind);
   console.info("🚀 [server]: Server is running on " + bind);
   // connect to be
-  console.log(Config)
   Database.connect();
 }
