@@ -11,6 +11,7 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
       minlength: 5,
       maxlength: 18,
       unique: true,
+      index: true,
     },
     email: {
       type: String,
@@ -20,6 +21,7 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
         /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i,
         "Please provide a valid email address",
       ],
+      index: true,
     },
     password: {
       type: String,
@@ -45,7 +47,7 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
       createdAt: true,
       updatedAt: true,
     },
-    collection: "users"
+    collection: "users",
   }
 );
 

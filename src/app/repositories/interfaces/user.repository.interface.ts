@@ -5,11 +5,11 @@ import { FindAllQuery } from "./custom.types.interfaces";
 
 interface IUserRepository {
   create(user: Partial<IUser>): Promise<IUser>;
-  findById(id: string,projection : ProjectionFields<IUser>): Promise<IUser | null>;
-  findByUserName(userName: string,projection : ProjectionFields<IUser>): Promise<IUser | null>;
-  findByEmail(email: string,projection : ProjectionFields<IUser>): Promise<IUser | null>;
-  findAll({query, sort, limit, page}: FindAllQuery, projection: ProjectionFields<IUser>): Promise<PageDTO>;
-  update(id: string, user: Partial<IUser>): Promise<IUser | null>;
+  findById(id: string, projection: ProjectionFields<IUser>): Promise<IUser | null>;
+  findByUserName(userName: string, projection: ProjectionFields<IUser>): Promise<IUser | null>;
+  findByEmail(email: string, projection: ProjectionFields<IUser>): Promise<IUser | null>;
+  findAll({ query, sort, limit, page }: FindAllQuery, projection: ProjectionFields<IUser>): Promise<PageDTO>;
+  update(userName: string, user: Partial<IUser>): Promise<IUser | null>;
   delete(id: string): Promise<void>;
 }
 
