@@ -9,7 +9,7 @@ This is REST API application. Developed using Express, Nodejs , Typescript
 To run this project, you will need to add the following environment variables to your .env file
 
 `DOMAIN_NAME`  
-`MongoDB_SERVER_STRING`  
+`MONGODB_SERVER_STRING`  
 `HTTPS`  
 `COOKIE_SECRET`  
 `JWT_SECRET`  
@@ -20,7 +20,7 @@ To run this project, you will need to add the following environment variables to
 #### Example
 
 `DOMAIN_NAME`=localhost  
-`MongoDB_SERVER_STRING`=mongodb://127.0.0.1:27017/moviebunkers  
+`MONGODB_SERVER_STRING`=mongodb://127.0.0.1:27017/moviebunkers  
 `HTTPS`=false  
 `COOKIE_SECRET`=my cookie secret  
 `JWT_SECRE`T=my jwt secret key  
