@@ -1,4 +1,4 @@
-import LinkDTO from "@dto/link.dto";
+import LinkDTO, { ilinkToLinkDTOMapper } from "@dto/link.dto";
 import ILinksService from "./interfaces/links.service.interface";
 import { Inject, Service } from "typedi";
 import LinksRepository from "@repositories/links.repository";
@@ -38,14 +38,18 @@ class LinksService implements ILinksService {
       // If the new link document is null or undefined, throw an error
       if (!newLink) throw new LinkException("Sorry unable to create link", HttpCodes.INTERNAL_SERVER_ERROR, " ", `LinksService.class: create.method()`);
       // Otherwise, return the new link document as a LinkDTO
-      return newLink as LinkDTO;
+      return ilinkToLinkDTOMapper(newLink);
     } catch (error: any) {
       // If any error occurs during the creation process, re-throw it to be handled by the caller
       if (error instanceof MoviebunkersException) {
         throw error;
+      } else if (error.name === "MongoError" && error.code === 11000) {
+        // Error code 11000 indicates that a unique index constraint has been violated.
+        // In this case, we want to throw a more specific error message to indicate that the link already exists.
+        throw new LinkException("Link already exists.", HttpCodes.CONFLICT, `${error?.stack}`, `LinksService.class: create.method()`);
       } else {
         throw new LinkException(
-          `${error?.message}`,
+          `Failed to create new link document: ${error?.message}`,
           HttpCodes.INTERNAL_SERVER_ERROR,
           `${error?.stack}`,
           `LinksService.class: create.method()`
@@ -71,7 +75,7 @@ class LinksService implements ILinksService {
       );
       // Map each link document to a LinkDTO and add it to the result array
       links.map((ilink) => {
-        linkDTOs.push(ilink as LinkDTO);
+        linkDTOs.push(ilinkToLinkDTOMapper(ilink));
       });
       // Return the resulting array of LinkDTOs
       return linkDTOs;
@@ -138,7 +142,7 @@ class LinksService implements ILinksService {
       // If no link document was found with the specified ID, throw an error
       if (!updatedLink) throw new LinkException(`Link with ID ${id} not found.`, HttpCodes.BAD_REQUEST, " ", `LinksService.class: updateById.method()`);
       // Convert the updated link document to a LinkDTO and return it
-      return updatedLink as LinkDTO;
+      return ilinkToLinkDTOMapper(updatedLink);
     } catch (error: any) {
       // If any error occurs during the update process, re-throw it to be handled by the caller
       if (error instanceof MoviebunkersException) {

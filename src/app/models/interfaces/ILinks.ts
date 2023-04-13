@@ -2,10 +2,10 @@ import ContentQuality from "@constants/contenetQuality.enum";
 import ContentType from "@constants/contentTypes.enum";
 import LinkType from "@constants/linkTypes.enum";
 import LanguageDTO from "@dto/language.dto";
-import mongoose, { ObjectId } from "mongoose";
+import mongoose from "mongoose";
 
 interface ILink {
-    _id: ObjectId
+    _id: mongoose.Types.ObjectId;
     parentId: mongoose.Types.ObjectId;
     contentType: ContentType;
     languages: LanguageDTO[];
