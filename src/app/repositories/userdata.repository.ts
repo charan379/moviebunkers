@@ -1,13 +1,11 @@
 import IUserData from "@models/interfaces/IUserData";
 import UserDataModel from "@models/UserData.model";
-import { Model, Schema, UpdateQuery } from "mongoose";
+import mongoose, { Model, UpdateQuery } from "mongoose";
 import { Service } from "typedi";
 import IUserDataRepository from "./interfaces/userdata.repository.interface";
 import RepositoryException from "@exceptions/repository.exception";
 import HttpCodes from "@constants/http.codes.enum";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
-
-
 
 /**
  * UserDataRepository
@@ -70,10 +68,10 @@ class UserDataRepository implements IUserDataRepository {
      * @returns the found user data document or null if not found
      * @throws a RepositoryException if an error occurs
      */
-    async findByUserId(userId: Schema.Types.ObjectId): Promise<IUserData | null> {
+    async findByUserId(userId: mongoose.Types.ObjectId): Promise<IUserData | null> {
         try {
             const userData = await this.userDataModel
-                .findOne({ userId: userId }, { __v: 0 })
+                .findOne({ userId }, { __v: 0 })
                 .exec();
 
             return userData;
@@ -101,7 +99,7 @@ class UserDataRepository implements IUserDataRepository {
      * @returns true if the document was updated, false otherwise
      * @throws a RepositoryException if an error occurs
      */
-    async updateUserData(userId: Schema.Types.ObjectId, update: UpdateQuery<IUserData>): Promise<boolean> {
+    async updateUserData(userId: mongoose.Types.ObjectId, update: UpdateQuery<IUserData>): Promise<boolean> {
         try {
             const result = await this.userDataModel.findOneAndUpdate({ userId: userId }, update, { new: true }).exec();
 

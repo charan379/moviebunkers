@@ -1,11 +1,12 @@
-import { ObjectId } from "mongoose";
+import mongoose from "mongoose";
 
 interface IUserData {
-    userId: ObjectId;
-    seenTitles: ObjectId[];
-    unseenTitles: ObjectId[];
-    starredTitles: ObjectId[];
-    favouriteTitles: ObjectId[];
+    _id: mongoose.Types.ObjectId;
+    userId: mongoose.Types.ObjectId;
+    seenTitles: mongoose.Types.ObjectId[];
+    unseenTitles: mongoose.Types.ObjectId[];
+    starredTitles: mongoose.Types.ObjectId[];
+    favouriteTitles: mongoose.Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
 }

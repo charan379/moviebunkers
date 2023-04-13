@@ -344,7 +344,7 @@ class TitleController {
 
             const validQuery: FindAllTitlesQueryDTO = await JoiValidator(getAllTitlesQuerySchema, req.query, { abortEarly: false, stripUnknown: true });
 
-            const userData = await this.userDataService.getUserData(userDto._id as ObjectId);
+            const userData = await this.userDataService.getUserData(userDto._id as string);
 
             const page: PageDTO = await this.titleService.getAllTitlesWithUserData(validQuery, userDto?._id as ObjectId, userData);
 
