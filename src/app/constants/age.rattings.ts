@@ -1,3 +1,7 @@
+
+/**
+ * AgeRatings object stores certification and age ranges for different regions.
+ */
 const AgeRatings = {
     IN: [ // India
         { certification: "U", age: [0, 11] },
