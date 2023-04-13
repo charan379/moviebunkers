@@ -62,14 +62,14 @@ export async function verifyJwtToken(jwtToken: string): Promise<JwtPayload> {
         } else if (error.message === "jwt expired") {
             throw new AuthorizationException(
                 "Authentication Expired Please Login!",
-                HttpCodes.UNATHORIZED,
+                HttpCodes.UNAUTHORIZED,
                 "Token Expired Re-authenticate",
                 `@verifyJwtToken.function(): jwt expired, ReceivedToken: ${jwtToken} , ${error?.stack}`
             );
         } else {
             throw new AuthorizationException(
                 "Internal Server Error",
-                HttpCodes.UNATHORIZED,
+                HttpCodes.UNAUTHORIZED,
                 "Unknown Error Occoured while decoding token",
                 `@verifyJwtToken.function(): Unknown Error, ReceivedToken: ${jwtToken} , ${error?.stack}`
             );
