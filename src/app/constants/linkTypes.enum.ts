@@ -1,5 +1,8 @@
-
-
+/**
+ * Enumeration of link types.
+ * @readonly
+ * @enum {string}
+ */
 enum LinkType {
     DIRECT_FILE = 'Direct File',
     TORRENT_MAGNET = 'Torrent Magnet',

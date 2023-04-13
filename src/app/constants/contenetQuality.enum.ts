@@ -1,5 +1,7 @@
-
-
+/**
+ * Enum representing the quality of video content.
+ * @enum {string}
+ */
 enum ContentQuality {
     VIDEO_HD = 'HD',
     VIDEO_UHD = 'Ultra HD',

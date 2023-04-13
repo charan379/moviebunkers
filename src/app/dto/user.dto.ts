@@ -2,6 +2,9 @@ import UserRoles from "@constants/user.roles.enum";
 import UserStatus from "@constants/user.status.enum";
 import IUser from "@models/interfaces/user.interface";
 
+/**
+ * Data transfer object for User entities.
+ */
 export interface UserDTO {
     _id: string,
     userName: string;
@@ -14,6 +17,9 @@ export interface UserDTO {
     updatedAt: Date;
 }
 
+/**
+ * Data transfer object for creating new User entities.
+ */
 export interface NewUserDTO {
     userName: string;
     email: string;
@@ -22,6 +28,9 @@ export interface NewUserDTO {
     role?: UserRoles;
 }
 
+/**
+ * Data transfer object for querying User entities.
+ */
 export interface FindAllUsersQueryDTO {
     userName?: string,
     email?: string,
@@ -33,18 +42,32 @@ export interface FindAllUsersQueryDTO {
     limit?: number
 }
 
+/**
+ * Data transfer object for updating User entities.
+ */
 export interface UpdateUserDTO {
     role?: UserRoles.GUEST | UserRoles.USER | UserRoles.MODERATOR,
     status?: UserStatus,
     last_modified_by?: string,
 }
 
+/**
+ * Data transfer object for user login.
+ */
 export interface LoginDTO {
     userName: string;
     password: string;
 }
 
-export function iuserToUserDTOMapper(iuser: IUser, options: { withPassword: boolean } = { withPassword: false }) {
+/**
+ * Maps an IUser instance to a UserDTO instance.
+ * @param iuser - The IUser instance to map to a UserDTO.
+ * @param options - An optional object that contains a boolean value for `withPassword` option.
+ * If true, maps the `password` field to the UserDTO instance.
+ * Default is false.
+ * @returns A new UserDTO instance with data from the provided IUser instance.
+ */
+export function iuserToUserDTOMapper(iuser: IUser, options: { withPassword: boolean } = { withPassword: false }): UserDTO {
     let userDTO: UserDTO;
     if (options.withPassword) {
         userDTO = {
