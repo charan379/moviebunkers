@@ -9,7 +9,7 @@ export const swaggerOptions = {
     info: {
       title: "moviebunkers",
       description: "moviebunkers backend server",
-      version: "2.0.6",
+      version: "2.0.7",
       contact: {
         name: "charan379",
         url: "#",

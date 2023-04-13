@@ -1,17 +1,15 @@
 import UserDataDTO from "@dto/userdata.dto";
-import { ObjectId } from "mongoose";
-
 
 interface IUserDataService {
-    create(userId: ObjectId): Promise<Partial<UserDataDTO>>;
-    getUserData(userId: ObjectId): Promise<UserDataDTO>;
+    create(userId: string): Promise<Partial<UserDataDTO>>;
+    getUserData(userId: string): Promise<UserDataDTO>;
     getAllUsersData(): Promise<UserDataDTO[]>;
-    addToSeenTitles(userId: ObjectId, titileId: ObjectId): Promise<boolean>;
-    addToUnSeenTitles(userId: ObjectId, titileId: ObjectId): Promise<boolean>;
-    addToFavouriteTitles(userId: ObjectId, titileId: ObjectId): Promise<boolean>;
-    removeFromFavouriteTitles(userId: ObjectId, titileId: ObjectId): Promise<boolean>;
-    addToStarredTitles(userId: ObjectId, titileId: ObjectId): Promise<boolean>;
-    removeFromStarredTitles(userId: ObjectId, titileId: ObjectId): Promise<boolean>;
+    addToSeenTitles(userId: string, titileId: string): Promise<boolean>;
+    addToUnSeenTitles(userId: string, titileId: string): Promise<boolean>;
+    addToFavouriteTitles(userId: string, titileId: string): Promise<boolean>;
+    removeFromFavouriteTitles(userId: string, titileId: string): Promise<boolean>;
+    addToStarredTitles(userId: string, titileId: string): Promise<boolean>;
+    removeFromStarredTitles(userId: string, titileId: string): Promise<boolean>;
 }
 
 export default IUserDataService;

@@ -10,18 +10,32 @@ import { CookieOptions, NextFunction, Request, Response, Router } from "express"
 import { Inject, Service } from "typedi";
 
 /**
- * @Controller("/auth") => AuthController.class
+ * Controller for handling AUTH related API requests
+ * @class AuthController
  */
 @Service()
 class AuthController {
 
+    /**
+     * Instance of AuthService class
+     * @private
+     */
     private authService: AuthService;
 
+    /**
+     * Express router instance
+     * @public
+     */
     public router: Router = Router();
+
+    /**
+     * Initializes AuthController class with AuthService dependency injection
+     * @constructor
+     * @param {AuthService} authService - instance of AuthService class
+     */
     constructor(@Inject() authService: AuthService) {
         this.authService = authService;
 
-        //login
         /**
          * @swagger
          * /auth/cookie-auth:
@@ -66,7 +80,6 @@ class AuthController {
          */
         this.router.post("/token-auth", this.tokenAuth.bind(this));
 
-        //logout
         /**
          * @swagger
          * /auth/logout:
@@ -104,17 +117,22 @@ class AuthController {
 
 
     /**
-     * @Post("/cookie-auth") => cookieAuth() Controller
-     * @param req 
-     * @param res 
-     * @param next 
+     * Controller method to handle authentication via cookie
+     *
+     * @route POST /auth/cookie-auth
+     * 
+     * @param {Request} req - Express request object
+     * @param {Response} res - Express response object
+     * @param {NextFunction} next - Express next middleware function
+     * @returns {Promise<void>} - Returns a promise that resolves with void when the function completes.
      */
     private async cookieAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            // Validate user login information using the login schema
             const validLoginDTO: LoginDTO = await JoiValidator(lgoinSchema, req?.body, { allowUnknown: false, stripUnknown: true, abortEarly: false });
 
+            // Generate a JWT token and store it in a cookie
             const token: string = await this.authService.login(validLoginDTO);
-
             res.cookie("auth", `Bearer ${token}`, {
                 maxAge: 30 * 24 * 60 * 60 * 1000,
                 httpOnly: true,
@@ -125,73 +143,95 @@ class AuthController {
             } as CookieOptions)
                 .status(HttpCodes.OK)
                 .json({ message: "Successfully Logged In" });
-
         } catch (error) {
-
+            // Pass any errors to the next middleware function
             next(error)
         }
     }
 
+
     /**
-     * @Post("/token-auth") => tokenAuth() Controller
-     * @param req 
-     * @param res 
-     * @param next 
+     * Controller method to handle API requests for authenticating users with tokens.
+     * 
+     * @route POST /auth/token-auth
+     * 
+     * @param {Request} req - Express request object
+     * @param {Response} res - Express response object
+     * @param {NextFunction} next - Express next middleware function
+     * @returns {Promise<void>} - Returns a promise that resolves with void when the function completes.
      */
     private async tokenAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            // Validate the login credentials sent in the request body
             const validLoginDTO: LoginDTO = await JoiValidator(lgoinSchema, req?.body, { allowUnknown: false, stripUnknown: true, abortEarly: false });
 
+            // Attempt to authenticate the user with the provided credentials and retrieve a token
             const token: string = await this.authService.login(validLoginDTO);
 
+            // Send a success response with the authentication token
             res.status(HttpCodes.OK)
                 .json({ message: "Successfully authenticated", token: token });
 
         } catch (error) {
-
+            // If an error occurs, pass it to the next middleware function in the request chain
             next(error)
         }
     }
 
+
     /**
-     * @Get("/logout") => logout() Controller
-     * @param req 
-     * @param res 
-     * @param next 
+     * Controller method to handle API requests for user logout.
+     *
+     * @route GET /auth/logout
+     * 
+     * @param {Request} req - Express request object
+     * @param {Response} res - Express response object
+     * @param {NextFunction} next - Express next middleware function
+     * @returns {Promise<void>} - Returns a promise that resolves with void when the function completes.
      */
     private async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            // Clear the auth cookie
+            res.clearCookie("auth", {
+                sameSite: "none",
+                httpOnly: true,
+                secure: Config.HTTPS
+            });
 
-            res.clearCookie("auth", { sameSite: "none", httpOnly: true, secure: Config.HTTPS })
-                .status(HttpCodes.OK)
-                .json({ message: "Successfully Logged Out" })
-
+            // Return success response
+            res.status(HttpCodes.OK).json({ message: "Successfully Logged Out" });
         } catch (error) {
-
-            next(error)
-
+            // Forward any errors to the error handling middleware
+            next(error);
         }
     }
 
+
     /**
-     * @Get("/who-am-i") => getWhoAmI() Controller
-     * @param req 
-     * @param res 
-     * @param next 
+     * Controller to handle API requests for getting the details of the currently logged-in user
+     *
+     * @route GET /auth/who-am-i
+     *
+     * @param {Request} req - Express request object
+     * @param {Response} res - Express response object
+     * @param {NextFunction} next - Express next middleware function
+     * @returns {Promise<void>} - Returns a promise that resolves with void when the function completes.
      */
     private async getWhoAmI(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const userName: string | undefined = req?.userName;
 
+            // Get user details from the authService
             const userDTO: UserDTO = await this.authService.WhoAmI(userName);
 
-            delete userDTO.password;
-
+            // Send the user details in the response
             res.status(HttpCodes.OK).json(userDTO);
         } catch (error) {
+            // Pass any error to the next middleware function
             next(error);
         }
     }
+
 
 }
 

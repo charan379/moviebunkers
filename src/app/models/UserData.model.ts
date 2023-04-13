@@ -5,6 +5,7 @@ const userDataSchema: Schema<IUserData> = new Schema<IUserData>(
   {
     userId: {
       type: Schema.Types.ObjectId,
+      required: [true, 'userId is required to init userData'],
       unique: true,
       index: true,
     },

@@ -11,6 +11,7 @@ import { Inject, Service } from "typedi";
 
 /**
  * Controller for handling Link related API requests
+ * @class LinksController
  */
 @Service()
 class LinksController {
@@ -66,11 +67,7 @@ class LinksController {
      *       401:
      *          description: Unauthorized
      */
-    this.router.get(
-      "/parent/:parentId",
-      Authorize(LevelOne),
-      this.getByParentId.bind(this)
-    );
+    this.router.get("/parent/:parentId", Authorize(LevelOne), this.getByParentId.bind(this));
 
     /**
      * Endpoint for updating an existing new Link
@@ -99,11 +96,7 @@ class LinksController {
      *       401:
      *          description: Unauthorized
      */
-    this.router.put(
-      "/update/:id",
-      Authorize(LevelTwo),
-      this.updateLink.bind(this)
-    );
+    this.router.put("/update/:id", Authorize(LevelTwo), this.updateLink.bind(this));
 
     /**
      * Endpoint for deleting a link with _id
@@ -127,11 +120,7 @@ class LinksController {
      *       401:
      *          description: Unauthorized
      */
-    this.router.delete(
-      "/delete/:id",
-      Authorize(LevelThere),
-      this.delete.bind(this)
-    );
+    this.router.delete("/delete/:id", Authorize(LevelThere), this.delete.bind(this));
 
     /**
      * Endpoint for deleting all links by Parent ID
@@ -155,25 +144,20 @@ class LinksController {
      *       401:
      *          description: Unauthorized
      */
-    this.router.delete(
-      "/delete-many/:parentId",
-      Authorize(LevelThere),
-      this.deleteMany.bind(this)
-    );
+    this.router.delete("/delete-many/:parentId", Authorize(LevelThere), this.deleteMany.bind(this));
   }
 
   /**
    * Controller method for creating a new link.
+   * 
+   * @route POST /links/new
+   * 
    * @param {Request} req - The Express Request object.
    * @param {Response} res - The Express Response object.
    * @param {NextFunction} next - The Express middleware NextFunction.
    * @returns {Promise<void>} - A Promise that resolves to nothing.
    */
-  private async newLink(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  private async newLink(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       // Validate the incoming request body against the link schema.
       const newLink: ILink = await JoiValidator(linkSchema, req?.body, {
@@ -196,16 +180,14 @@ class LinksController {
   /**
    * Controller method to get all links associated with a parent ID.
    *
+   * @route POST /links/parent/:parentId
+   * 
    * @param req - Express Request object.
    * @param res - Express Response object.
    * @param next - Express NextFunction object.
    * @returns void
    */
-  private async getByParentId(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  private async getByParentId(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       // Validate parent ID using Joi.
       const parentId: string = await JoiValidator(
@@ -229,16 +211,15 @@ class LinksController {
 
   /**
    * Controller method for updating an existing link.
+   * 
+   * @route PUT /links/update/:id
+   * 
    * @param {Request} req - The Express Request object.
    * @param {Response} res - The Express Response object.
    * @param {NextFunction} next - The Express middleware NextFunction.
    * @returns {Promise<void>} - A Promise that resolves to nothing.
    */
-  private async updateLink(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  private async updateLink(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       // Validate object ID using Joi.
       const objectId: string = await JoiValidator(
@@ -271,6 +252,8 @@ class LinksController {
   /**
    * Controller method to delete link associated with a ID.
    *
+   * @route DELETE /links/delete/:id
+   * 
    * @param req - Express Request object.
    * @param res - Express Response object.
    * @param next - Express NextFunction object.
@@ -299,6 +282,8 @@ class LinksController {
   /**
    * Controller method to delete all links associated with a parentId.
    *
+   * @route DELETE /links/delete-many/:parentId
+   * 
    * @param req - Express Request object.
    * @param res - Express Response object.
    * @param next - Express NextFunction object.

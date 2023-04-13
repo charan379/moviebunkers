@@ -5,10 +5,8 @@ import ITitle from "@models/interfaces/title.interface";
 import TitleModel from "@models/title.model";
 import mongoose, {
     Model,
-    ObjectId,
     PipelineStage,
     ProjectionFields,
-    Schema,
 } from "mongoose";
 import { Service } from "typedi";
 import { FindAllQuery } from "./interfaces/custom.types.interfaces";
@@ -171,13 +169,13 @@ class TitleRepository implements ITitleRepository {
      * @returns
      */
     async findByIdWithUserData(
-        titleId: string,
-        userId: ObjectId,
+        titleId: mongoose.Types.ObjectId,
+        userId: mongoose.Types.ObjectId,
         projection: ProjectionFields<ITitle> = { __v: 0, userData: 0 }
     ): Promise<ITitle | null> {
         const matchQuery: PipelineStage.Match = {
             $match: {
-                _id: new mongoose.Types.ObjectId(titleId),
+                _id: titleId,
             },
         };
 
@@ -324,144 +322,145 @@ class TitleRepository implements ITitleRepository {
      * @param projection
      * @returns
      */
-    async findAllWithUserData(
-        { query, sort, limit, page }: FindAllQuery,
-        userId: Schema.Types.ObjectId,
-        projection: ProjectionFields<ITitle>
-    ): Promise<PageDTO> {
-        const lookupUserData: PipelineStage.Lookup = {
-            $lookup: {
-                from: "userData",
-                let: {
-                    externalUserId: userId,
-                },
-                pipeline: [
-                    {
-                        $match: {
-                            $expr: {
-                                $eq: ["$userId", "$$externalUserId"],
+    async findAllWithUserData({ query, sort, limit, page }: FindAllQuery, userId: mongoose.Types.ObjectId, projection: ProjectionFields<ITitle>): Promise<PageDTO> {
+        try {
+            const lookupUserData: PipelineStage.Lookup = {
+                $lookup: {
+                    from: "userData",
+                    let: {
+                        externalUserId: userId,
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$userId", "$$externalUserId"],
+                                },
                             },
                         },
-                    },
-                    {
-                        $project: {
-                            __v: 0,
-                            createdAt: 0,
-                            updatedAt: 0,
+                        {
+                            $project: {
+                                __v: 0,
+                                createdAt: 0,
+                                updatedAt: 0,
+                            },
                         },
-                    },
-                ],
-                as: "userData",
-            },
-        };
-
-        const addUserDataDoc: PipelineStage.AddFields = {
-            $addFields: {
-                userData: {
-                    $arrayElemAt: ["$userData", 0],
+                    ],
+                    as: "userData",
                 },
-            },
-        };
+            };
 
-        const addUserDataFields: PipelineStage.AddFields = {
-            $addFields: {
-                seenByUser: {
-                    $cond: {
-                        if: {
-                            $in: ["$_id", "$userData.seenTitles"],
-                        },
-                        then: true,
-                        else: false,
+            const addUserDataDoc: PipelineStage.AddFields = {
+                $addFields: {
+                    userData: {
+                        $arrayElemAt: ["$userData", 0],
                     },
                 },
-                unseenByUser: {
-                    $cond: {
-                        if: {
-                            $in: ["$_id", "$userData.unseenTitles"],
+            };
+
+            const addUserDataFields: PipelineStage.AddFields = {
+                $addFields: {
+                    seenByUser: {
+                        $cond: {
+                            if: {
+                                $in: ["$_id", "$userData.seenTitles"],
+                            },
+                            then: true,
+                            else: false,
                         },
-                        then: true,
-                        else: false,
+                    },
+                    unseenByUser: {
+                        $cond: {
+                            if: {
+                                $in: ["$_id", "$userData.unseenTitles"],
+                            },
+                            then: true,
+                            else: false,
+                        },
+                    },
+                    starredByUser: {
+                        $cond: {
+                            if: {
+                                $in: ["$_id", "$userData.starredTitles"],
+                            },
+                            then: true,
+                            else: false,
+                        },
+                    },
+                    favouriteByUser: {
+                        $cond: {
+                            if: {
+                                $in: ["$_id", "$userData.favouriteTitles"],
+                            },
+                            then: true,
+                            else: false,
+                        },
                     },
                 },
-                starredByUser: {
-                    $cond: {
-                        if: {
-                            $in: ["$_id", "$userData.starredTitles"],
-                        },
-                        then: true,
-                        else: false,
-                    },
-                },
-                favouriteByUser: {
-                    $cond: {
-                        if: {
-                            $in: ["$_id", "$userData.favouriteTitles"],
-                        },
-                        then: true,
-                        else: false,
-                    },
-                },
-            },
-        };
+            };
 
-        const sortDocs: PipelineStage.Sort = {
-            $sort: sort,
-        };
-        const matchQuery: PipelineStage.Match = {
-            $match: query,
-        };
+            const sortDocs: PipelineStage.Sort = {
+                $sort: sort,
+            };
+            const matchQuery: PipelineStage.Match = {
+                $match: query,
+            };
 
-        const countTotalResults: PipelineStage.Count = {
-            $count: "total_results",
-        };
+            const countTotalResults: PipelineStage.Count = {
+                $count: "total_results",
+            };
 
-        const skipDocs: PipelineStage.Skip = {
-            $skip: (page - 1) * limit,
-        };
+            const skipDocs: PipelineStage.Skip = {
+                $skip: (page - 1) * limit,
+            };
 
-        const limitDocs: PipelineStage.Limit = {
-            $limit: limit === 0 ? await this.titleModel.find({}).countDocuments().lean().exec() : limit,
-        };
+            const limitDocs: PipelineStage.Limit = {
+                $limit: limit === 0 ? await this.titleModel.find({}).countDocuments().lean().exec() : limit,
+            };
 
-        const projectionStage: PipelineStage.Project = {
-            $project: projection,
-        };
-        const titlesCount = await this.titleModel.aggregate([
-            matchQuery,
-            lookupUserData,
-            addUserDataDoc,
-            addUserDataFields,
-            countTotalResults,
-        ]);
+            const projectionStage: PipelineStage.Project = {
+                $project: projection,
+            };
+            const titlesCount = await this.titleModel.aggregate([
+                matchQuery,
+                lookupUserData,
+                addUserDataDoc,
+                addUserDataFields,
+                countTotalResults,
+            ]);
 
-        const titlesList = await this.titleModel.aggregate([
-            matchQuery,
-            lookupUserData,
-            addUserDataDoc,
-            addUserDataFields,
-            sortDocs,
-            skipDocs,
-            limitDocs,
-            projectionStage,
-        ]);
+            const titlesList = await this.titleModel.aggregate([
+                matchQuery,
+                lookupUserData,
+                addUserDataDoc,
+                addUserDataFields,
+                sortDocs,
+                skipDocs,
+                limitDocs,
+                projectionStage,
+            ]);
 
-        const titleDTOs: TitleDTO[] = titlesList.map((iTitle) => {
-            return iTitle as TitleDTO;
-        });
+            const titleDTOs: TitleDTO[] = titlesList.map((iTitle) => {
+                return iTitle as TitleDTO;
+            });
 
-        let result: PageDTO = {
-            page: page,
-            total_pages: Math.ceil((titlesCount[0]?.total_results ?? 0) / (limit === 0 ? 1 : limit)),
-            total_results: titlesCount[0]?.total_results ?? 0,
-            sort_order: sort,
-            list: titleDTOs,
-        };
+            let result: PageDTO = {
+                page: page,
+                total_pages: Math.ceil((titlesCount[0]?.total_results ?? 0) / (limit === 0 ? 1 : limit)),
+                total_results: titlesCount[0]?.total_results ?? 0,
+                sort_order: sort,
+                list: titleDTOs,
+            };
 
-        if (!limit) {
-            result = { ...result, total_pages: 1 }
+            if (!limit) {
+                result = { ...result, total_pages: 1 }
+            }
+
+            return result;
+        } catch (error) {
+            console.log(error)
+            throw error
         }
-
-        return result;
     }
 
     /**
@@ -620,7 +619,7 @@ class TitleRepository implements ITitleRepository {
      * deleteTitleById()
      * @param titleId
      */
-    async deleteTitleById(titleId: string): Promise<void> {
+    async deleteTitleById(titleId: mongoose.Types.ObjectId): Promise<void> {
         await this.titleModel.deleteOne({ _id: titleId }).lean().exec();
     }
 

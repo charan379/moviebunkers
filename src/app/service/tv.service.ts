@@ -32,7 +32,7 @@ class TvService implements ITvService {
 
         const validTV: TvDTO = await JoiValidator(tvSchema, tvDTO, { abortEarly: false, stripUnknown: true, allowUnknown: false });
 
-        const tv: TvDTO = { ...validTV, added_by: userDTO._id as ObjectId, last_modified_by: userDTO._id as ObjectId }
+        const tv: TvDTO = { ...validTV, added_by: userDTO._id as unknown as ObjectId, last_modified_by: userDTO._id as unknown as ObjectId }
 
         const newMovie = await this.tvRepository.create(tv as Partial<ITv>) as TvDTO;
 

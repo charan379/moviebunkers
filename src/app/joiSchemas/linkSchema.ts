@@ -14,7 +14,7 @@ const linkSchema: Joi.ObjectSchema = Joi.object({
     quality: Joi.array().items(Joi.string().valid(...Object.values(ContentQuality))).required().example([ContentQuality.VIDEO_1080, ContentQuality.VIDEO_HD]),
     link: Joi.string().required().example('http://103.237.37.181/server1/Movies/South_Indian/Hindi%20Dubbed/2019/Saaho%20%282019%29%20Hindi%20Dubbed%20Proper%20720p/Saaho.2019.Hindi.1080p.NF.WEBRip.mp4'),
     title: Joi.string().required().example('Saaho.2019.Hindi.1080p.NF.WEBRip.mp4'),
-    remarks: Joi.string().example("not working")
+    remarks: Joi.string().example("not working").allow(""),
 })
 
 export default linkSchema

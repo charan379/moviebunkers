@@ -31,7 +31,7 @@ class MovieService implements IMovieService {
 
         const validMovie: MovieDTO = await JoiValidator(movieSchema, movieDTO, { abortEarly: false, stripUnknown: true, allowUnknown: false });
 
-        const movie: MovieDTO = { ...validMovie, added_by: userDTO._id as ObjectId, last_modified_by: userDTO._id as ObjectId }
+        const movie: MovieDTO = { ...validMovie, added_by: userDTO._id as unknown as ObjectId, last_modified_by: userDTO._id as unknown as ObjectId }
 
         const newMovie = await this.movieRepository.create(movie as Partial<IMovie>) as MovieDTO;
 
