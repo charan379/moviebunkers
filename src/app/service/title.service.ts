@@ -14,7 +14,7 @@ import { FindAllQuery } from "@repositories/interfaces/custom.types.interfaces";
 import TitleRepository from "@repositories/title.repository";
 import getCertificationsByAgeRange from "@utils/getCertificationsByAgeRange";
 import MongoSortBuilder from "@utils/mongo.sort.builder";
-import { FilterQuery, ObjectId, ProjectionFields } from "mongoose";
+import mongoose, { FilterQuery, ObjectId, ProjectionFields } from "mongoose";
 import { Inject, Service } from "typedi";
 import ITitleService from "./interfaces/title.service.interface";
 import MovieService from "./movie.service";
@@ -150,9 +150,9 @@ class TitleService implements ITitleService {
      * @param titleId 
      * @param userId 
      */
-    async getTitleByIdWithUserData(titleId: string, userId: ObjectId): Promise<TitleDTO> {
+    async getTitleByIdWithUserData(titleId: string, userId: string): Promise<TitleDTO> {
 
-        const title = await this.titleRepository.findByIdWithUserData(titleId, userId);
+        const title = await this.titleRepository.findByIdWithUserData(new mongoose.Types.ObjectId(titleId), new mongoose.Types.ObjectId(userId));
 
         if (!title) throw new TitleException("Title Not Found !", HttpCodes.NOT_FOUND, `Title not found for given Id: ${titleId}`, `@TitleService.class: @getTitleByIdWithUserData.method() requested title Id: ${titleId}`);
 
@@ -168,112 +168,117 @@ class TitleService implements ITitleService {
       * @param userId
       * @returns Promise<PageDTO>
       */
-    async getAllTitlesWithUserData(queryDTO: FindAllTitlesQueryDTO, userId: ObjectId, userData: UserDataDTO): Promise<PageDTO> {
+    async getAllTitlesWithUserData(queryDTO: FindAllTitlesQueryDTO, userId: string, userData: UserDataDTO): Promise<PageDTO> {
+        try {
 
-        const title_types = [{ type: "movie", include: queryDTO?.movie ?? 0 }, { type: "tv", include: queryDTO?.tv ?? 0 }];
+            const title_types = [{ type: "movie", include: queryDTO?.movie ?? 0 }, { type: "tv", include: queryDTO?.tv ?? 0 }];
 
-        const age_filter = await getCertificationsByAgeRange(queryDTO?.["age.gte"] ?? 0, queryDTO?.["age.lte"] ?? 26, queryDTO?.country ?? 'IN')
+            const age_filter = await getCertificationsByAgeRange(queryDTO?.["age.gte"] ?? 0, queryDTO?.["age.lte"] ?? 26, queryDTO?.country ?? 'IN')
 
 
-        let arraysOfIds = [];
+            let arraysOfIds = [];
 
-        if (queryDTO.seen === 1) {
-            arraysOfIds.push(userData.seenTitles);
-        } else if (queryDTO.seen === -1) {
-            arraysOfIds.push(userData.unseenTitles);
-        }
-
-        if (queryDTO.starred === 1) {
-            arraysOfIds.push(userData.starredTitles)
-        }
-
-        if (queryDTO.favourite === 1) {
-            arraysOfIds.push(userData.favouriteTitles);
-        }
-
-        const idsToFilter = arraysOfIds.length ? arraysOfIds.reduce((accumulator, currentArray) =>
-            accumulator.filter(value => currentArray.includes(value))
-        ) : [];
-
-        let idFilter = {};
-
-        if (arraysOfIds.length > 0) {
-            idFilter = { ...idFilter, _id: { $in: idsToFilter } }
-        }
-
-        let titleFilter = {};
-
-        if (queryDTO.search) {
-            titleFilter = { ...titleFilter, title: { $regex: new RegExp(`${queryDTO.search}`, "i") } }
-        }
-
-        let languageFilter = {};
-
-        if (queryDTO.language) {
-            languageFilter = { ...languageFilter, "languages.ISO_639_1_code": { $regex: new RegExp(`^${queryDTO.language}`, "i") }, }
-        }
-
-        let genresFilter = {};
-
-        if (queryDTO.genre) {
-            genresFilter = { ...genresFilter, genres: { $regex: new RegExp(`${queryDTO.genre}`, "i") }, }
-        }
-
-        let ageFilter = {}
-
-        if ((queryDTO["age.lte"] !== 26) || (queryDTO["age.gte"] !== 0)) {
-            ageFilter = {
-                ...ageFilter,
-                'age_rattings.country': { $in: (queryDTO["age.lte"] > 21) ? [queryDTO.country, 'default'] : [queryDTO.country] },
-                'age_rattings.ratting': { $in: age_filter },
+            if (queryDTO.seen === 1) {
+                arraysOfIds.push(userData.seenTitles);
+            } else if (queryDTO.seen === -1) {
+                arraysOfIds.push(userData.unseenTitles);
             }
-        }
-        const query: FilterQuery<ITitle> = {
-            $and: [
-                {
-                    ...idFilter,
-                    title_type: { $in: title_types.map(title_type => { if (title_type.include === 1) return title_type.type }).filter(Boolean) },
-                    ...languageFilter,
-                    ...genresFilter,
-                    ...titleFilter,
+
+            if (queryDTO.starred === 1) {
+                arraysOfIds.push(userData.starredTitles)
+            }
+
+            if (queryDTO.favourite === 1) {
+                arraysOfIds.push(userData.favouriteTitles);
+            }
+
+            const idsToFilter = arraysOfIds.length ? arraysOfIds.reduce((accumulator, currentArray) =>
+                accumulator.filter(value => currentArray.includes(value))
+            ) : [];
+
+            let idFilter = {};
+
+            if (arraysOfIds.length > 0) {
+                idFilter = { ...idFilter, _id: { $in: idsToFilter.map(id => new mongoose.Types.ObjectId(id)) } }
+            }
+
+            let titleFilter = {};
+
+            if (queryDTO.search) {
+                titleFilter = { ...titleFilter, title: { $regex: new RegExp(`${queryDTO.search}`, "i") } }
+            }
+
+            let languageFilter = {};
+
+            if (queryDTO.language) {
+                languageFilter = { ...languageFilter, "languages.ISO_639_1_code": { $regex: new RegExp(`^${queryDTO.language}`, "i") }, }
+            }
+
+            let genresFilter = {};
+
+            if (queryDTO.genre) {
+                genresFilter = { ...genresFilter, genres: { $regex: new RegExp(`${queryDTO.genre}`, "i") }, }
+            }
+
+            let ageFilter = {}
+
+            if ((queryDTO["age.lte"] !== 26) || (queryDTO["age.gte"] !== 0)) {
+                ageFilter = {
                     ...ageFilter,
+                    'age_rattings.country': { $in: (queryDTO["age.lte"] > 21) ? [queryDTO.country, 'default'] : [queryDTO.country] },
+                    'age_rattings.ratting': { $in: age_filter },
                 }
-            ]
+            }
+
+            const query: FilterQuery<ITitle> = {
+                $and: [
+                    {
+                        ...idFilter,
+                        title_type: { $in: title_types.map(title_type => { if (title_type.include === 1) return title_type.type }).filter(Boolean) },
+                        ...languageFilter,
+                        ...genresFilter,
+                        ...titleFilter,
+                        ...ageFilter,
+                    }
+                ]
+            }
+
+            const minimalProjection: ProjectionFields<ITitle> = {
+                _id: 1,
+                title_type: 1,
+                tmdb_id: 1,
+                imdb_id: 1,
+                title: 1,
+                ratting: 1,
+                year: 1,
+                poster_path: 1,
+                genres: 1,
+                seenByUser: 1,
+                unseenByUser: 1,
+                starredByUser: 1,
+                favouriteByUser: 1,
+            }
+
+            const normalProjection: ProjectionFields<ITitle> = {
+                __v: 0,
+                userData: 0
+            }
+
+            const sort = MongoSortBuilder(queryDTO?.sort_by as string);
+
+            const q: FindAllQuery = {
+                query,
+                sort: sort,
+                limit: queryDTO?.limit ?? 0,
+                page: queryDTO?.pageNo ?? 1,
+            }
+
+            const page: PageDTO = await this.titleRepository.findAllWithUserData(q, new mongoose.Types.ObjectId(userId), queryDTO.minimal ? minimalProjection : normalProjection);
+
+            return page;
+        } catch (error) {
+            throw error
         }
-
-        const minimalProjection: ProjectionFields<ITitle> = {
-            _id: 1,
-            title_type: 1,
-            tmdb_id: 1,
-            imdb_id: 1,
-            title: 1,
-            ratting: 1,
-            year: 1,
-            poster_path: 1,
-            genres: 1,
-            seenByUser: 1,
-            unseenByUser: 1,
-            starredByUser: 1,
-            favouriteByUser: 1,
-        }
-
-        const normalProjection: ProjectionFields<ITitle> = {
-            __v: 0,
-            userData: 0
-        }
-
-        const sort = MongoSortBuilder(queryDTO?.sort_by as string);
-
-        const q: FindAllQuery = {
-            query,
-            sort: sort,
-            limit: queryDTO?.limit ?? 0,
-            page: queryDTO?.pageNo ?? 1,
-        }
-
-        const page: PageDTO = await this.titleRepository.findAllWithUserData(q, userId, queryDTO.minimal ? minimalProjection : normalProjection);
-
-        return page;
     }
 
 
@@ -301,7 +306,7 @@ class TitleService implements ITitleService {
 
         await this.getTitleById(titleId);
 
-        await this.titleRepository.deleteTitleById(titleId);
+        await this.titleRepository.deleteTitleById(new mongoose.Types.ObjectId(titleId));
     }
 
     /**

@@ -3,7 +3,7 @@ import { FindAllUsersQueryDTO, NewUserDTO, UpdateUserDTO, UserDTO } from "@dto/u
 
 interface IUserService {
   getUserById(id: string): Promise<UserDTO>;
-  getUserByUserName(userName: string): Promise<UserDTO>;
+  getUserByUserName(userName: string, withPassword: boolean): Promise<UserDTO>;
   getUserByEmail(email: string): Promise<UserDTO>;
   getAllUsers(queryDTO: FindAllUsersQueryDTO): Promise<PageDTO>;
   updateUserByUserName(userName: string, userUpdateDTO: UpdateUserDTO): Promise<UserDTO>;

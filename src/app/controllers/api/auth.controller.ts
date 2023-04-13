@@ -185,8 +185,6 @@ class AuthController {
 
             const userDTO: UserDTO = await this.authService.WhoAmI(userName);
 
-            delete userDTO.password;
-
             res.status(HttpCodes.OK).json(userDTO);
         } catch (error) {
             next(error);

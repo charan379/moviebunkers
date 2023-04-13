@@ -129,10 +129,11 @@ class UserDataService implements IUserDataService {
         try {
             // Get the user's existing data, creating a new record if necessary
             const userDataDto = await this.getUserData(userId);
-
+            console.log(userDataDto.unseenTitles.includes(titleId))
+            console.log(userDataDto.unseenTitles.includes(titleId))
             // If the title is in the user's unseen titles list, remove it from that list
             if (userDataDto.unseenTitles.includes(titleId)) {
-                await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $pull: { unseenTitles: titleId } })
+                await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $pull: { unseenTitles: new Types.ObjectId(titleId) } })
             }
 
             // Add the title to the user's seen titles list
@@ -178,11 +179,12 @@ class UserDataService implements IUserDataService {
 
             // If the title is in the user's seen titles list, remove it from that list
             if (userDataDto.seenTitles.includes(titleId)) {
-                await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $pull: { seenTitles: titleId } })
+                console.log(`removed form seen`)
+                await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $pull: { seenTitles: new Types.ObjectId(titleId) } })
             }
 
             // Add the title to the user's unseen titles list
-            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $addToSet: { unseenTitles: titleId } })
+            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $addToSet: { unseenTitles: new Types.ObjectId(titleId) } })
 
             // Return true if the title was successfully added, false otherwise
             if (result) {
@@ -228,7 +230,7 @@ class UserDataService implements IUserDataService {
             }
 
             // Add the title to the user's favourite titles list
-            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $addToSet: { favouriteTitles: titleId } })
+            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $addToSet: { favouriteTitles: new Types.ObjectId(titleId) } })
 
             // Return true if the title was successfully added, false otherwise
             if (result) {
@@ -266,7 +268,7 @@ class UserDataService implements IUserDataService {
     async removeFromFavouriteTitles(userId: string, titleId: string): Promise<boolean> {
         try {
             // Remove the title from the user's favourite titles list
-            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $pull: { favouriteTitles: titleId } });
+            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $pull: { favouriteTitles: new Types.ObjectId(titleId) } });
 
             // Return true if the title was successfully removed, false otherwise
             if (result) {
@@ -305,7 +307,7 @@ class UserDataService implements IUserDataService {
     async addToStarredTitles(userId: string, titleId: string): Promise<boolean> {
         try {
             // Add the title to the user's starred titles list
-            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $addToSet: { starredTitles: titleId } })
+            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $addToSet: { starredTitles: new Types.ObjectId(titleId) } })
 
             // Return true if the title was successfully added, false otherwise
             if (result) {
@@ -343,7 +345,7 @@ class UserDataService implements IUserDataService {
     async removeFromStarredTitles(userId: string, titleId: string): Promise<boolean> {
         try {
             // Attempt to remove the specified title from the user's starred titles list
-            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $pull: { starredTitles: titleId } });
+            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $pull: { starredTitles: new Types.ObjectId(titleId) } });
 
             // Return true if the title was successfully removed, false otherwise
             if (result) {

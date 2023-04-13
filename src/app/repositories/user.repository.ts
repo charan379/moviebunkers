@@ -1,5 +1,5 @@
 import PageDTO from "@dto/page.dto";
-import { UserDTO } from "@dto/user.dto";
+import { UserDTO, iuserToUserDTOMapper } from "@dto/user.dto";
 import IUserRepository from "@repositories/interfaces/user.repository.interface";
 import { Model, ProjectionFields } from "mongoose";
 import { Service } from "typedi";
@@ -154,16 +154,10 @@ class UserRepository implements IUserRepository {
         .skip((page - 1) * limit)
         .limit(limit);
 
-      // Map the usersList to UserDTO objects.
-      const userDTOs: UserDTO[] = usersList.map(({ userName, email, status, role, last_modified_by, createdAt, updatedAt }) => ({
-        userName,
-        email,
-        status,
-        role,
-        last_modified_by,
-        createdAt,
-        updatedAt,
-      }));
+      // Map the iusers List to UserDTO objects.
+      const userDTOs: UserDTO[] = usersList.map((iuser) => (
+        iuserToUserDTOMapper(iuser)
+      ));
 
       // Return a PageDTO object with the results.
       const result: PageDTO = {

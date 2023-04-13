@@ -6,7 +6,7 @@ import MongoSortBuilder from "@utils/mongo.sort.builder";
 import { FilterQuery } from "mongoose";
 import { Inject, Service } from "typedi";
 import HttpCodes from "../constants/http.codes.enum";
-import { FindAllUsersQueryDTO, NewUserDTO, UpdateUserDTO, UserDTO } from "../dto/user.dto";
+import { FindAllUsersQueryDTO, NewUserDTO, UpdateUserDTO, UserDTO, iuserToUserDTOMapper } from "../dto/user.dto";
 import UserException from "../exceptions/user.exception";
 import UserRepository from "../repositories/user.repository";
 import IUserService from "./interfaces/user.service.interface";
@@ -66,18 +66,9 @@ export class UserService implements IUserService {
         throw new UserException("User creation failed", HttpCodes.INTERNAL_SERVER_ERROR, `Unknown Reason contact developer`);
       }
 
-      // Create a user DTO with the user's information.
-      const userDTO = {
-        userName: user.userName,
-        email: user.email,
-        status: user.status,
-        role: user.role,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      };
-
       // Return the newly created user DTO.
-      return userDTO;
+      return iuserToUserDTOMapper(user);
+
     } catch (error: any) {
       // Catch any exceptions thrown and rethrow them as UserExceptions.
       if (error instanceof MoviebunkersException) {
@@ -105,11 +96,9 @@ export class UserService implements IUserService {
         throw new UserException("User not found", HttpCodes.NOT_FOUND, `User not found for ID: ${id}`);
       }
 
-      // Create a user DTO with the user's information.
-      const userDTO: UserDTO = user;
-
       // Return the user DTO.
-      return userDTO;
+      return iuserToUserDTOMapper(user);
+
     } catch (error: any) {
       // Catch any exceptions thrown and rethrow them as UserExceptions.
       if (error instanceof MoviebunkersException) {
@@ -123,10 +112,11 @@ export class UserService implements IUserService {
   /**
    * Retrieves a user by their username.
    * @param {string} userName - The username of the user to retrieve.
+   * @param {boolean} withPassword - The option whether to retrive user with password or not.
    * @returns {Promise<UserDTO>} - A Promise that resolves to the user's information.
    * @throws {UserException} - Throws an exception if the user is not found.
    */
-  async getUserByUserName(userName: string): Promise<UserDTO> {
+  async getUserByUserName(userName: string, withPassword: boolean = false): Promise<UserDTO> {
     try {
       // Get the user from the repository by their username.
       const user = await this.userRepository.findByUserName(userName);
@@ -141,11 +131,9 @@ export class UserService implements IUserService {
         );
       }
 
-      // Create a DTO with the user's information.
-      const userDTO: UserDTO = user;
-
       // Return the user DTO.
-      return userDTO;
+      return iuserToUserDTOMapper(user, { withPassword });
+
     } catch (error: any) {
       // Catch any exceptions thrown and rethrow them as UserExceptions.
       if (error instanceof MoviebunkersException) {
@@ -178,19 +166,8 @@ export class UserService implements IUserService {
         );
       }
 
-      // Create a DTO with the user's information.
-      const userDTO: UserDTO = {
-        userName: user.userName,
-        email: user.email,
-        status: user.status,
-        role: user.role,
-        last_modified_by: user?.last_modified_by,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      };
-
       // Return the user DTO.
-      return userDTO;
+      return iuserToUserDTOMapper(user);
     } catch (error: any) {
       // Catch any exceptions thrown and rethrow them as UserExceptions.
       if (error instanceof MoviebunkersException) {
@@ -284,19 +261,8 @@ export class UserService implements IUserService {
         );
       }
 
-      // Create a DTO with the updated user's information.
-      const userDTO: UserDTO = {
-        userName: updatedUser.userName,
-        email: updatedUser.email,
-        status: updatedUser.status,
-        role: updatedUser.role,
-        last_modified_by: updatedUser?.last_modified_by,
-        createdAt: updatedUser.createdAt,
-        updatedAt: updatedUser.updatedAt,
-      };
-
       // Return the updated user DTO.
-      return userDTO;
+      return iuserToUserDTOMapper(updatedUser);
     } catch (error: any) {
       // Catch any exceptions thrown and rethrow them as UserExceptions.
       if (error instanceof UserException) {
