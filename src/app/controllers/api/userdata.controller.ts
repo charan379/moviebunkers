@@ -12,6 +12,7 @@ import { NextFunction, Request, Response, Router } from "express";
 import { Inject, Service } from "typedi";
 
 /**
+ * @class UserDataController
 * Controller class for handling CRUD operations related to user data.
 * Uses middleware for authorization and validation using JoiValidator.
 * Injects UserDataService and UserService for accessing user data and user information.
@@ -252,7 +253,7 @@ class UserDataController {
     /**
      * Creates a new user data for the authenticated user and returns it as a JSON response.
      * 
-     * @route POST /init
+     * @route POST /userdata/init
      * 
      * @param req - Express request object.
      * @param res - Express response object.
@@ -325,7 +326,7 @@ class UserDataController {
     /**
       * Adds a title to the user's list of seen titles.
       * 
-      * @route POST /add-to-seen/:titleId
+      * @route POST /userdata/add-to-seen/:titleId
       * 
       * @param {Request} req - Express request object.
       * @param {Response} res - Express response object.
@@ -371,7 +372,7 @@ class UserDataController {
     /**
      * Adds a title to a user's unseen titles list.
      * 
-     * @route POST /add-to-unseen/:titleId
+     * @route POST /userdata/add-to-unseen/:titleId
      * 
      * @param req - The request object.
      * @param res - The response object.
@@ -414,7 +415,7 @@ class UserDataController {
     /**
     * Controller method to add a title to the user's favorite titles.
     * 
-    * @route POST /add-to-favourite/:titleId
+    * @route POST /userdata/add-to-favourite/:titleId
     * 
     * @param {Object} req - The request object.
     * @param {Object} res - The response object.
@@ -456,7 +457,7 @@ class UserDataController {
     /**
       * Removes a title from the user's list of favorite titles.
       * 
-      * @route GET /remove-from-favourite/:titleId
+      * @route GET /userdata/remove-from-favourite/:titleId
       * 
       * @param req The request object.
       * @param res The response object.
@@ -497,7 +498,7 @@ class UserDataController {
     /**
      * Adds a title to the user's starred titles list.
      * 
-     * @route POST /add-to-starred/:titleId
+     * @route POST /userdata/add-to-starred/:titleId
      * 
      * @param {Request} req - The Express request object.
      * @param {Response} res - The Express response object.
@@ -539,7 +540,7 @@ class UserDataController {
     /**
       * Removes a title from the user's list of starred titles.
       * 
-      * @route GET /remove-from-starred/:titleId
+      * @route GET /userdata/remove-from-starred/:titleId
       * 
       * @param req The request object containing the user name and title ID
       * @param res The response object used to send the response to the client
@@ -579,7 +580,7 @@ class UserDataController {
     /**
      * Gets all users data
       * 
-      * @route GET /get-all
+      * @route GET /userdata/get-all
       * 
       * @param req The request object containing the user name and title ID
       * @param res The response object used to send the response to the client

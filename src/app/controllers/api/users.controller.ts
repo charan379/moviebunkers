@@ -12,6 +12,7 @@ import { LevelOne, LevelThere, LevelTwo } from "@constants/user.roles.enum";
 
 /**
  * Controller for handling user related API requests
+ * @class UserController
  */
 @Service()
 class UserController {
@@ -212,7 +213,7 @@ class UserController {
   /**
   * Controller method for handling GET requests to retrieve all users
   * 
-  * @route GET /
+  * @route GET /users
   * 
   * @returns {PageDTO} - Page of users
   * @param {Request} req - The HTTP request object
@@ -240,7 +241,7 @@ class UserController {
   /**
    * Controller method for getting a user by ID
    *
-   * @route GET /id/:id
+   * @route GET /users/id/:id
    * 
    * @param {Request} req - The incoming request object
    * @param {Response} res - The outgoing response object
@@ -268,7 +269,7 @@ class UserController {
   /**
    * Controller to handle API requests for getting user by username
    * 
-   * @route GET /:userName
+   * @route GET /users/:userName
    * 
    * @param {Request} req - Express request object
    * @param {Response} res - Express response object
@@ -298,7 +299,7 @@ class UserController {
   /**
    * Controller to handle API requests for getting user by email
    * 
-   * @route GET /email/:email
+   * @route GET /users/email/:email
    * 
    * @param {Request} req - Express request object
    * @param {Response} res - Express response object
@@ -326,7 +327,7 @@ class UserController {
   /**
    * Controller to handle API requests for creating new user
    * 
-   * @route POST /new
+   * @route POST /users/new
    * 
    * @param {Request} req - Express request object
    * @param {Response} res - Express response object
@@ -355,7 +356,7 @@ class UserController {
    * Controller to handle API requests for updateing user
    * updateUser ( role, status only)
    * 
-   * @route POST /update/:userName
+   * @route POST /users/update/:userName
    * 
    * @param {Request} req - Express request object
    * @param {Response} res - Express response object
