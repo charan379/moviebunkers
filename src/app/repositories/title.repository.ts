@@ -132,7 +132,7 @@ class TitleRepository implements ITitleRepository {
         { query, sort, limit, page }: FindAllQuery,
         projection: ProjectionFields<ITitle> = { __v: 0 }
     ): Promise<PageDTO> {
-        const total_results = await this.titleModel
+        const total_results: any = await this.titleModel
             .find({ ...query })
             .countDocuments()
             .lean()
@@ -415,7 +415,7 @@ class TitleRepository implements ITitleRepository {
             };
 
             const limitDocs: PipelineStage.Limit = {
-                $limit: limit === 0 ? await this.titleModel.find({}).countDocuments().lean().exec() : limit,
+                $limit: limit === 0 ? await this.titleModel.find({}).countDocuments().lean().exec() as any : limit,
             };
 
             const projectionStage: PipelineStage.Project = {
