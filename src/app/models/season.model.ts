@@ -6,7 +6,8 @@ const seasonSchema: Schema<ISeason> = new Schema<ISeason>(
     {
         tv_show_id: {
             type: Schema.Types.ObjectId,
-            required: [true, "tv_show_id is required"]
+            required: [true, "tv_show_id is required"],
+            index: true,
         },
         air_date: {
             type: Date

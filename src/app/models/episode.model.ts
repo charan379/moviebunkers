@@ -6,11 +6,13 @@ const episodeSchema: Schema<IEpisode> = new Schema<IEpisode>(
     {
         tv_show_id: {
             type: Schema.Types.ObjectId,
-            required: [true, "tv_show_id is required"]
+            required: [true, "tv_show_id is required"],
+            index: true,
         },
         season_id: {
             type: Schema.Types.ObjectId,
-            required: [true, "season_id is requried"]
+            required: [true, "season_id is requried"],
+            index: true,
         },
         air_date: {
             type: Date
