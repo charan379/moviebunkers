@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from "mongoose";
-import ILink from "./interfaces/ILinks";
+import ILink from "./interfaces/link.interface";
 import ContentType from "@constants/contentTypes.enum";
 import LinkType from "@constants/linkTypes.enum";
 import ContentQuality from "@constants/contenetQuality.enum";

@@ -2,7 +2,7 @@ import LinkDTO, { ilinkToLinkDTOMapper } from "@dto/link.dto";
 import ILinksService from "./interfaces/links.service.interface";
 import { Inject, Service } from "typedi";
 import LinksRepository from "@repositories/links.repository";
-import ILink from "@models/interfaces/ILinks";
+import ILink from "@models/interfaces/link.interface";
 import mongoose from "mongoose";
 import LinkException from "@exceptions/link.exception";
 import HttpCodes from "@constants/http.codes.enum";

@@ -1,7 +1,7 @@
 import HttpCodes from "@constants/http.codes.enum";
 import UserDataDTO, { iuserDataToUserDataDTOMapper } from "@dto/userdata.dto";
 import UserDataException from "@exceptions/userdata.exception";
-import IUserData from "@models/interfaces/IUserData";
+import IUserData from "@models/interfaces/user.data.interface";
 import UserDataRepository from "@repositories/userdata.repository";
 import mongoose, { Types } from "mongoose";
 import { Inject, Service } from "typedi";

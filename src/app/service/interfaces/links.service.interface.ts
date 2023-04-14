@@ -1,5 +1,5 @@
 import LinkDTO from "@dto/link.dto";
-import ILink from "@models/interfaces/ILinks";
+import ILink from "@models/interfaces/link.interface";
 
 interface ILinksService {
   create(linkDto: Partial<ILink>): Promise<LinkDTO>;

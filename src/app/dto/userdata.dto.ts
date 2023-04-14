@@ -1,4 +1,4 @@
-import IUserData from "@models/interfaces/IUserData";
+import IUserData from "@models/interfaces/user.data.interface";
 
 /**
  * Data Transfer Object (DTO) representing user data

@@ -1,5 +1,5 @@
-import IUserData from "@models/interfaces/IUserData";
-import UserDataModel from "@models/UserData.model";
+import IUserData from "@models/interfaces/user.data.interface";
+import UserDataModel from "@models/user.data.model";
 import mongoose, { Model, UpdateQuery } from "mongoose";
 import { Service } from "typedi";
 import IUserDataRepository from "./interfaces/userdata.repository.interface";

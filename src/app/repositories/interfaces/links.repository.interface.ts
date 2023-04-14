@@ -1,4 +1,4 @@
-import ILink from "@models/interfaces/ILinks";
+import ILink from "@models/interfaces/link.interface";
 import mongoose from "mongoose";
 
 interface ILinksRespository {

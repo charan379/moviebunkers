@@ -3,7 +3,7 @@ import LinkDTO from "@dto/link.dto";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
 import linkSchema from "@joiSchemas/linkSchema";
 import Authorize from "@middlewares/authorization.middleware";
-import ILink from "@models/interfaces/ILinks";
+import ILink from "@models/interfaces/link.interface";
 import LinksService from "@service/links.service";
 import JoiValidator from "@utils/joi.validator";
 import { NextFunction, Request, Response, Router } from "express";
