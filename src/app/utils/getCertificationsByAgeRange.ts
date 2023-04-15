@@ -1,5 +1,6 @@
 import AgeRatings from '@constants/age.rattings';
 import Country from '@constants/country.enum';
+import { AgeCertification } from 'src/@types';
 
 /**
  * Returns an array of certifications within the given age range and country.
@@ -21,8 +22,8 @@ async function getCertificationsByAgeRange(lowerAgeLimit: number, upperAgeLimit:
 
   // Filter the age ratings that match the given age range, and extract the certification values.
   const certifications = ageRatings
-    .filter((rating: AgeRating) => rating.age[0] <= upperAgeLimit && rating.age[1] >= lowerAgeLimit)
-    .map((rating: AgeRating) => rating.certification);
+    .filter((rating: AgeCertification) => rating.age[0] <= upperAgeLimit && rating.age[1] >= lowerAgeLimit)
+    .map((rating: AgeCertification) => rating.certification);
 
   return certifications;
 }

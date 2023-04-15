@@ -3,10 +3,11 @@ import TitleType from "@constants/titile.types.enum";
 import MovieDTO from "./movie.dto";
 import TitleAuthorDTO from "./title.author.dto";
 import TvDTO from "./Tv.dto";
+import { Types } from "mongoose";
 
 
 interface TitleDTO extends MovieDTO, TvDTO, TitleAuthorDTO {
-    _id?: Object | string;
+    _id?: Object | string | Types.ObjectId;
 }
 
 export default TitleDTO;

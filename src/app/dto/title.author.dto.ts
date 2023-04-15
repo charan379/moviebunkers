@@ -1,9 +1,9 @@
-import { ObjectId } from "mongoose";
+import { ObjectId, Types } from "mongoose";
 
 
 interface TitleAuthorDTO {
-    added_by?: ObjectId;
-    last_modified_by?: ObjectId;
+    added_by?: Types.ObjectId;
+    last_modified_by?: Types.ObjectId;
     createdAt?: Date;
     updatedAt?: Date;
 }

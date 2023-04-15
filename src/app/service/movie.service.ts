@@ -8,7 +8,7 @@ import MovieRepository from "@repositories/movie.repository";
 import deleteImage from "@utils/deleteImage";
 import downloadImageFromUrl from "@utils/downloadImageFromUrl";
 import JoiValidator from "@utils/joi.validator";
-import { ObjectId } from "mongoose";
+import { ObjectId, Types } from "mongoose";
 import { Inject, Service } from "typedi";
 import IMovieService from "./interfaces/movie.service.interface";
 
@@ -31,7 +31,7 @@ class MovieService implements IMovieService {
 
         const validMovie: MovieDTO = await JoiValidator(movieSchema, movieDTO, { abortEarly: false, stripUnknown: true, allowUnknown: false });
 
-        const movie: MovieDTO = { ...validMovie, added_by: userDTO._id as unknown as ObjectId, last_modified_by: userDTO._id as unknown as ObjectId }
+        const movie: MovieDTO = { ...validMovie, added_by: new Types.ObjectId(userDTO._id), last_modified_by: new Types.ObjectId(userDTO._id) }
 
         const newMovie = await this.movieRepository.create(movie as Partial<IMovie>) as MovieDTO;
 

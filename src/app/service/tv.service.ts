@@ -8,7 +8,7 @@ import TvRepository from "@repositories/tv.repository";
 import deleteImage from "@utils/deleteImage";
 import downloadImageFromUrl from "@utils/downloadImageFromUrl";
 import JoiValidator from "@utils/joi.validator";
-import { ObjectId } from "mongoose";
+import { ObjectId, Types } from "mongoose";
 import { Inject, Service } from "typedi";
 import ITvService from "./interfaces/tv.service.interface";
 
@@ -32,7 +32,7 @@ class TvService implements ITvService {
 
         const validTV: TvDTO = await JoiValidator(tvSchema, tvDTO, { abortEarly: false, stripUnknown: true, allowUnknown: false });
 
-        const tv: TvDTO = { ...validTV, added_by: userDTO._id as unknown as ObjectId, last_modified_by: userDTO._id as unknown as ObjectId }
+        const tv: TvDTO = { ...validTV, added_by: new Types.ObjectId(userDTO._id), last_modified_by: new Types.ObjectId(userDTO._id) }
 
         const newMovie = await this.tvRepository.create(tv as Partial<ITv>) as TvDTO;
 
