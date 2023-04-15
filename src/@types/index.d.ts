@@ -1,4 +1,4 @@
-import { type } from "os";
+import { FilterQuery } from "mongoose";
 
 type NonNullableObject<T> = {
     [K in keyof T as T[K] extends null ? never : K]: T[K];
@@ -26,7 +26,7 @@ type Language = {
     native_name?: string,
 }
 
-type Page = {
+type Page<T> = {
     /** The current page number */
     page: number,
     /** The total number of pages */
@@ -35,6 +35,14 @@ type Page = {
     total_results: number,
     /** An optional object specifying the sort order of the list */
     sort_order?: Object,
-    /** The list of items on the current page */
-    list: any[],
+    /** The list T of items on the current page */
+    list: T[],
+}
+
+type FindAllQuery<T> = {
+    query: FilterQuery<T>,
+    sort: any,
+    limit: number,
+    page: number,
+
 }
