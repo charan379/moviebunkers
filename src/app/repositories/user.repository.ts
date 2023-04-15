@@ -1,13 +1,12 @@
-import PageDTO from "@dto/page.dto";
 import { UserDTO, iuserToUserDTOMapper } from "@dto/user.dto";
 import IUserRepository from "@repositories/interfaces/user.repository.interface";
 import { Model, ProjectionFields } from "mongoose";
 import { Service } from "typedi";
 import IUser from "@models/interfaces/user.interface";
 import UserModel from "@models/user.model";
-import { FindAllQuery } from "./interfaces/custom.types.interfaces";
 import RepositoryException from "@exceptions/repository.exception";
 import HttpCodes from "@constants/http.codes.enum";
+import { FindAllQuery, Page } from "src/@types";
 
 /**
  * Repository class for User model
@@ -136,10 +135,10 @@ class UserRepository implements IUserRepository {
   * @param limit - The maximum number of users to return.
   * @param page - The page number to return.
   * @param projection - The fields to be returned in the result. By default, includes all fields except _id, password, and __v.
-  * @returns A promise that resolves to a PageDTO object.
+  * @returns A promise that resolves to a Page object.
   * @throws {RepositoryException} If there was an error while executing the query
   */
-  async findAll({ query, sort, limit, page }: FindAllQuery, projection: ProjectionFields<IUser> = { _id: 0, password: 0, __v: 0 }): Promise<PageDTO> {
+  async findAll({ query, sort, limit, page }: FindAllQuery<IUser>, projection: ProjectionFields<IUser> = { _id: 0, password: 0, __v: 0 }): Promise<Page<UserDTO>> {
     try {
       // Get the total number of results based on the query.
       const total_results = await this.userModel
@@ -159,8 +158,8 @@ class UserRepository implements IUserRepository {
         iuserToUserDTOMapper(iuser)
       ));
 
-      // Return a PageDTO object with the results.
-      const result: PageDTO = {
+      // Return a Page object with the results.
+      const result: Page<UserDTO> = {
         page,
         total_pages: Math.ceil(total_results / limit),
         total_results,
