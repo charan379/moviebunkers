@@ -3,6 +3,7 @@ import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
 import { IEpisode } from "./episode.interface";
 import { AgeRatting, Cast, Language } from "src/@types";
+import IUser from "./user.interface";
 
 interface ITitle {
     _id: Types.ObjectId;
@@ -39,6 +40,8 @@ interface ITitle {
     number_of_episodes: number; // tv specific
     added_by: Types.ObjectId;
     last_modified_by: Types.ObjectId;
+    title_owner: Partial<IUser>;
+    last_modified_user: Partial<IUser>;
     createdAt: Date;
     updatedAt: Date;
 
