@@ -74,7 +74,7 @@ class SeasonRepository implements ISeasonRepository {
     async updateById(id: Types.ObjectId, update: Partial<ISeason>): Promise<ISeason | null> {
         try {
             // Find and update the season by ID, returning the updated document and running validators
-            const updatedSeason = await this.seasonModel.findByIdAndUpdate(id, update, { new: true, runValidators: true }).lean().exec();
+            const updatedSeason = await this.seasonModel.findByIdAndUpdate(id, { $set: update }, { new: true, runValidators: true }).lean().exec();
             // Return the updated season
             return updatedSeason;
         } catch (error: any) {
