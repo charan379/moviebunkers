@@ -2,7 +2,6 @@ import mongoose, { Model, Schema } from "mongoose";
 import ITitle from "./interfaces/title.interface";
 import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
-import { type } from "os";
 
 
 const titleSchema: Schema<ITitle> = new Schema<ITitle>(
@@ -226,6 +225,18 @@ const titleSchema: Schema<ITitle> = new Schema<ITitle>(
         number_of_episodes: {
             type: Number,
         },
+
+        // added_by
+        added_by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user',
+        },
+
+        // last_modified_by
+        last_modified_by: {
+            type: Schema.Types.ObjectId,
+            ref: 'user',
+        },
     },
     {
         timestamps: {
@@ -237,6 +248,7 @@ const titleSchema: Schema<ITitle> = new Schema<ITitle>(
 );
 
 titleSchema.index({ title_type: 1 })
+
 const TitleModel: Model<ITitle> = mongoose.model<ITitle>("title", titleSchema);
 
 export default TitleModel;
