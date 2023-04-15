@@ -1,10 +1,237 @@
 import mongoose, { Model, Schema } from "mongoose";
 import ITitle from "./interfaces/title.interface";
+import TitleType from "@constants/titile.types.enum";
+import TitleSource from "@constants/title.souces.enum";
+import { type } from "os";
 
 
 const titleSchema: Schema<ITitle> = new Schema<ITitle>(
-    {},
     {
+        // title_type
+        title_type: {
+            type: String,
+            enum: Object.values(TitleType),
+            required: [true, "titile_type required"],
+        },
+
+        // source
+        source: {
+            type: String,
+            enum: Object.values(TitleSource),
+            required: [true, "title source requried"],
+        },
+
+        // imdb_id
+        imdb_id: {
+            type: String,
+            trim: true,
+            index: {
+                unique: true,
+                partialFilterExpression: { imdb_id: { $type: "string" } },
+            },
+        },
+
+        // tmdb_id
+        tmdb_id: {
+            type: Number,
+            trim: true,
+            index: {
+                unique: true,
+                partialFilterExpression: { tmdb_id: { $type: "int" } },
+            },
+        },
+
+        // title
+        title: {
+            type: String,
+            required: [true, "title is Required"],
+        },
+
+        // original_title
+        original_title: {
+            type: String,
+            required: [true, "originalTitle is Required"],
+        },
+
+        // original_language
+        original_language: {
+            type: {
+                ISO_639_1_code: {
+                    type: String,
+                    required: [true, "Language ISO_639_1_code is required"],
+                },
+                english_name: {
+                    type: String,
+                    required: [true, "Language english_name is required"],
+                },
+                native_name: {
+                    type: String,
+                    required: [true, "Language native_name is required"],
+                },
+            },
+            _id: false,
+        },
+
+        // lanuages
+        languages: {
+            type: [{
+                ISO_639_1_code: {
+                    type: String,
+                    required: [true, "Language ISO_639_1_code is required"],
+                },
+                english_name: {
+                    type: String,
+                    required: [true, "Language english_name is required"],
+                },
+                native_name: {
+                    type: String,
+                    required: [true, "Language native_name is required"],
+                },
+            }],
+            _id: false,
+        },
+
+        // tagline
+        tagline: {
+            type: String,
+        },
+
+        // poster_path
+        poster_path: {
+            type: String,
+        },
+
+        // year
+        year: {
+            type: Number,
+        },
+
+        // runtime
+        runtime: {
+            type: Number,
+        },
+
+        // ratting
+        ratting: {
+            type: Number,
+        },
+
+        // age_ratting
+        age_rattings: {
+            type: [{
+                country: {
+                    type: String,
+                },
+                ratting: {
+                    type: String,
+                },
+            }],
+            _id: false,
+        },
+
+        // genres
+        genres: {
+            type: [String],
+            default: ["Unknown"],
+        },
+
+        // overview
+        overview: {
+            type: String,
+        },
+
+        // production_companies
+        production_companies: {
+            type: [String],
+        },
+
+        // production_countries
+        production_countries: {
+            type: [String],
+        },
+
+        // status
+        status: {
+            type: String,
+            default: "unknown",
+        },
+
+        // in_production
+        in_production: { // TV specific
+            type: Boolean,
+        },
+
+        // release_date
+        release_date: {
+            type: Date,
+        },
+
+        // providers
+        providers: {
+            type: [String],
+        },
+
+        // directors
+        directors: {
+            type: [String],
+        },
+
+        // created_by
+        created_by: { // TV specific
+            type: [String],
+        },
+
+        // cast
+        cast: {
+            type: [{
+                profile_path: {
+                    type: String,
+                },
+                name: {
+                    type: String,
+                },
+                character: {
+                    type: String,
+                },
+            }],
+            _id: false,
+        },
+
+        // last_aired_date
+        last_aired_date: {
+            type: Date,
+        },
+
+        // last_episode_aired
+        last_episode_aired: {
+            type: Object,
+            _id: false,
+        },
+        // next_episode_to_air
+        next_episode_to_air: {
+            type: Object,
+            _id: false,
+        },
+        // networks
+        networks: {
+            type: [String],
+            _id: false,
+        },
+
+        // number_of_seasons
+        number_of_seasons: {
+            type: Number,
+        },
+        // number_of_episodes
+        number_of_episodes: {
+            type: Number,
+        },
+    },
+    {
+        timestamps: {
+            createdAt: true,
+            updatedAt: true,
+        },
         collection: "titles",
     }
 );
