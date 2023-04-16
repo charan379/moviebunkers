@@ -70,29 +70,29 @@ export interface LoginDTO {
  * @returns A new UserDTO instance with data from the provided IUser instance.
  * @throws {UserException} If DTO mapping failed
  */
-export function iuserToUserDTOMapper(iuser: IUser, options: { withPassword: boolean } = { withPassword: false }): UserDTO {
+export function iuserToUserDTOMapper(iuser: IUser | any, options: { withPassword: boolean } = { withPassword: false }): UserDTO {
     try {
         let userDTO: UserDTO;
         if (options.withPassword) {
             userDTO = {
-                _id: iuser?._id.toString(),
-                userName: iuser?.userName,
-                email: iuser?.email,
-                status: iuser?.status,
-                password: iuser?.password,
-                role: iuser?.role,
-                createdAt: iuser?.createdAt,
-                updatedAt: iuser?.updatedAt,
+                _id: iuser?._id.toString() ?? "",
+                userName: iuser?.userName ?? "",
+                email: iuser?.email ?? "",
+                status: iuser?.status ?? "",
+                password: iuser?.password ?? "",
+                role: iuser?.role ?? "",
+                createdAt: iuser?.createdAt ?? "",
+                updatedAt: iuser?.updatedAt ?? "",
             }
         } else {
             userDTO = {
-                _id: iuser?._id.toString(),
-                userName: iuser?.userName,
-                email: iuser?.email,
-                status: iuser?.status,
-                role: iuser?.role,
-                createdAt: iuser?.createdAt,
-                updatedAt: iuser?.updatedAt,
+                _id: iuser?._id.toString() ?? "",
+                userName: iuser?.userName ?? "",
+                email: iuser?.email ?? "",
+                status: iuser?.status ?? "",
+                role: iuser?.role ?? "",
+                createdAt: iuser?.createdAt ?? "",
+                updatedAt: iuser?.updatedAt ?? "",
             }
         }
 
