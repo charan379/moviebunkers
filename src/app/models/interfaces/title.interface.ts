@@ -40,8 +40,12 @@ interface ITitle {
     number_of_episodes: number; // tv specific
     added_by: Types.ObjectId;
     last_modified_by: Types.ObjectId;
-    title_owner: Partial<IUser>;
-    last_modified_user: Partial<IUser>;
+    title_owner?: IUser;
+    last_modified_user?: IUser;
+    seenByUser?: boolean;
+    unseenByUser?: boolean;
+    starredByUser?: boolean;
+    favouriteByUser?: boolean;
     createdAt: Date;
     updatedAt: Date;
 
