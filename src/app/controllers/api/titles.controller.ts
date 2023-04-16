@@ -9,6 +9,7 @@ import baseTitleSchema from "@joiSchemas/base.joi.title.schema";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
 import { getAllTitlesQuerySchema } from "@joiSchemas/common.title.joi.schemas";
 import Authorize from "@middlewares/authorization.middleware";
+import ITitle from "@models/interfaces/title.interface";
 import TitleService from "@service/title.service";
 import { UserService } from "@service/user.service";
 import UserDataService from "@service/userdata.service";
@@ -400,9 +401,9 @@ class TitleController {
 
             const userDto: UserDTO = await this.userService.getUserByUserName(userName);
 
-            const titleDTO: Partial<TitleDTO> = await JoiValidator(baseTitleSchema, req.body, { abortEarly: false, allowUnknown: true, stripUnknown: false });
+            const ititle: Partial<ITitle> = await JoiValidator(baseTitleSchema, req.body, { abortEarly: false, allowUnknown: true, stripUnknown: false });
 
-            const newTitle: TitleDTO = await this.titleService.createTitle(titleDTO, userDto);
+            const newTitle: TitleDTO = await this.titleService.createTitle(ititle, userDto);
 
             res.status(201).json({ message: "New Title Added Successfully", new_title_id: newTitle._id })
 
@@ -481,7 +482,7 @@ class TitleController {
 
             const titleId = await JoiValidator(ObjectIdSchema, Buffer.from(req?.params?.id, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true })
 
-            const validTitleDTO: Partial<TitleDTO> = { ...req.body, last_modified_by };
+            const validTitleDTO: Partial<ITitle> = { ...req.body, last_modified_by };
 
             const updateTitleDTO: TitleDTO = await this.titleService.updateTitleById(titleId, validTitleDTO);
 
