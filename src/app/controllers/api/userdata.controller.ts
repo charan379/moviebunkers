@@ -266,7 +266,10 @@ class UserDataController {
             const userName: string | undefined = req?.userName;
 
             // Throw an exception if the username does not exist in the request object.
-            if (!userName) throw new UserDataException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@UserDataController.createUserData()`);
+            if (!userName) throw new UserDataException(
+                "User details missing in request",
+                HttpCodes.BAD_REQUEST,
+                `userName: ${userName}, userName not exists in request object`, `@UserDataController.createUserData()`);
 
             // Get the authenticated user's user DTO using the username.
             const userDto: UserDTO = await this.userService.getUserByUserName(userName);
@@ -301,7 +304,10 @@ class UserDataController {
             const userName: string | undefined = req?.userName;
 
             // Check if the user name exists in the request object
-            if (!userName) throw new UserDataException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@UserDataController.getUserData()`);
+            if (!userName) throw new UserDataException(
+                "User details missing in request",
+                HttpCodes.BAD_REQUEST,
+                `userName: ${userName}, userName not exists in request object`, `@UserDataController.getUserData()`);
 
             // Retrieve user data from the user service based on the user name
             const userDto: UserDTO = await this.userService.getUserByUserName(userName);
@@ -339,7 +345,9 @@ class UserDataController {
 
             // If the user name is missing, throw an exception.
             if (!userName) {
-                throw new UserDataException("Internal Server Error", HttpCodes.INTERNAL_SERVER_ERROR,
+                throw new UserDataException(
+                    "User details missing in request",
+                    HttpCodes.BAD_REQUEST,
                     `userName: ${userName}, userName not exists in request object`, `@UserDataController.addToSeenTitles()`);
             }
 
@@ -385,7 +393,10 @@ class UserDataController {
             const userName: string | undefined = req?.userName;
 
             // If the username is undefined, throw a UserDataException.
-            if (!userName) throw new UserDataException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@UserDataController.addToUnSeenTitles()`);
+            if (!userName) throw new UserDataException(
+                "User details missing in request",
+                HttpCodes.BAD_REQUEST,
+                `userName: ${userName}, userName not exists in request object`, `@UserDataController.addToUnSeenTitles()`);
 
             // Get the user DTO by username.
             const userDto: UserDTO = await this.userService.getUserByUserName(userName);
@@ -428,7 +439,10 @@ class UserDataController {
             const userName: string | undefined = req?.userName;
 
             // If the username doesn't exist, throw an exception
-            if (!userName) throw new UserDataException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@UserDataController.addToFavouriteTitles()`);
+            if (!userName) throw new UserDataException(
+                "User details missing in request",
+                HttpCodes.BAD_REQUEST,
+                `userName: ${userName}, userName not exists in request object`, `@UserDataController.addToFavouriteTitles()`);
 
             // Get the user DTO based on the username
             const userDto: UserDTO = await this.userService.getUserByUserName(userName);
@@ -469,7 +483,10 @@ class UserDataController {
             const userName: string | undefined = req?.userName;
 
             // Throw an error if the username is not defined
-            if (!userName) throw new UserDataException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@UserDataController.removeFromFavouriteTitles()`);
+            if (!userName) throw new UserDataException(
+                "User details missing in request",
+                HttpCodes.BAD_REQUEST,
+                `userName: ${userName}, userName not exists in request object`, `@UserDataController.removeFromFavouriteTitles()`);
 
             // Get the user's data from the database
             const userDto: UserDTO = await this.userService.getUserByUserName(userName);
@@ -511,7 +528,11 @@ class UserDataController {
             const userName: string | undefined = req?.userName;
 
             // If the username doesn't exist, throw an exception
-            if (!userName) throw new UserDataException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@UserDataController.addToStarredTitles()`);
+            if (!userName) throw new UserDataException(
+                "User details missing in request",
+                HttpCodes.BAD_REQUEST,
+                `userName: ${userName}, userName not exists in request object`,
+                `@UserDataController.addToStarredTitles()`);
 
             // Get the user DTO from the UserService
             const userDto: UserDTO = await this.userService.getUserByUserName(userName);
@@ -552,7 +573,10 @@ class UserDataController {
             const userName: string | undefined = req?.userName;
 
             // Throw an error if the user name is missing
-            if (!userName) throw new UserDataException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@UserDataController.removeFromStarredTitles()`);
+            if (!userName) throw new UserDataException(
+                "User details missing in request",
+                HttpCodes.BAD_REQUEST,
+                `userName: ${userName}, userName not exists in request object`, `@UserDataController.removeFromStarredTitles()`);
 
             // Get the user DTO using the user name
             const userDto: UserDTO = await this.userService.getUserByUserName(userName);
