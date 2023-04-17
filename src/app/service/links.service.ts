@@ -70,7 +70,7 @@ class LinksService implements ILinksService {
       // Initialize an empty array to hold the resulting link DTOs
       let linkDTOs: LinkDTO[] = [];
       // Call the getAllByParentId method of the links repository, passing in the parent ID as an ObjectID
-      const links: ILink[] = await this.linksRepository.getAllByParentId(
+      const links: ILink[] = await this.linksRepository.findAllByParentId(
         new mongoose.Types.ObjectId(parentId)
       );
       // Map each link document to a LinkDTO and add it to the result array

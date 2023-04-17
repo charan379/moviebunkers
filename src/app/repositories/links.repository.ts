@@ -57,7 +57,7 @@ class LinksRepository implements ILinksRespository {
    * @returns {Promise<ILink[]>} A Promise that resolves to an array of ILink objects that match the search criteria
    * @throws {RepositoryException} Throws an RepositoryException if an error occurs while fetching the documents
    */
-  async getAllByParentId(parentId: Types.ObjectId): Promise<ILink[]> {
+  async findAllByParentId(parentId: Types.ObjectId): Promise<ILink[]> {
     try {
       // Use Mongoose's find method to fetch all documents that have the given parentId value
       // The lean method is used to return plain JavaScript objects instead of Mongoose documents
