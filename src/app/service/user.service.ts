@@ -1,6 +1,4 @@
-import PageDTO from "@dto/page.dto";
 import IUser from "@models/interfaces/user.interface";
-import { FindAllQuery } from "@repositories/interfaces/custom.types.interfaces";
 import { generateHash } from "@utils/bcrypt";
 import MongoSortBuilder from "@utils/mongo.sort.builder";
 import { FilterQuery } from "mongoose";
@@ -11,6 +9,7 @@ import UserException from "../exceptions/user.exception";
 import UserRepository from "../repositories/user.repository";
 import IUserService from "./interfaces/user.service.interface";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
+import { FindAllQuery, Page } from "src/@types";
 
 /**
  * The `UserService` class is responsible for handling the business logic for
@@ -186,7 +185,7 @@ export class UserService implements IUserService {
  * @returns {Promise<PageDTO>} - A Promise that resolves to a page of user information.
  * @throws {UserException} - Throws an exception if an unexpected error occurs.
  */
-  async getAllUsers(queryDTO: FindAllUsersQueryDTO): Promise<PageDTO> {
+  async getAllUsers(queryDTO: FindAllUsersQueryDTO): Promise<Page<UserDTO>> {
     try {
       // Build the filter query using the provided query parameters.
       const query: FilterQuery<IUser> = {
@@ -202,7 +201,7 @@ export class UserService implements IUserService {
 
       // Build the findAll query object using the filter query, sort options, and pagination parameters.
       const sort = queryDTO.sort_by ? await MongoSortBuilder(queryDTO.sort_by) : { createdAt: "desc" };
-      const q: FindAllQuery = {
+      const q: FindAllQuery<IUser> = {
         query,
         sort,
         limit: queryDTO?.limit ?? 5,
@@ -210,7 +209,7 @@ export class UserService implements IUserService {
       };
 
       // Retrieve a page of users information using the findAll query.
-      const page: PageDTO = await this.userRepository.findAll(q);
+      const page: Page<UserDTO> = await this.userRepository.findAll(q);
 
       // Return the page of users information.
       return page;
