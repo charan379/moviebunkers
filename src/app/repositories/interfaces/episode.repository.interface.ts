@@ -4,6 +4,7 @@ import { Types } from "mongoose";
 
 
 interface IEpisodeRepository {
+    create(episode: Partial<IEpisode>): Promise<IEpisode | null>;
     findByTvSeasonId(tvShowId: Types.ObjectId, seasonId: Types.ObjectId): Promise<IEpisode[]>;
     updateById(tvShowId: Types.ObjectId, seasonId: Types.ObjectId, update: Partial<IEpisode>): Promise<IEpisode | null>;
     deleteById(id: Types.ObjectId): Promise<void>;

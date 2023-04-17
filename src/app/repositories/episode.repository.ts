@@ -27,6 +27,39 @@ class EpisodeRepository implements IEpisodeRepository {
     }
 
     /**
+     * Create new episode document.
+     * 
+     * @async
+     * 
+     * @method
+     * 
+     * @param {Partial<IEpisode>} episode - New episode to be created for TV shows season.
+     * @returns {Promise<IEpisode | null>} - A promise that resolves to an newly created episode or null .
+     * @throws {RepositoryException} - If an error occurs while creating new episode.
+     */
+    async create(episode: Partial<IEpisode>): Promise<IEpisode | null> {
+        try {
+            // Use Mongoose's create method to create the new document with the given properties
+            const newEpisode: IEpisode = await this.episodeModel.create<Partial<IEpisode>>(episode);
+            // Return the created document
+            return newEpisode;
+        } catch (error: any) {
+            // If the error is a known exception, re-throw it
+            if (error instanceof MoviebunkersException) {
+                throw error;
+            } else {
+                // Otherwise, wrap the error in a repository exception and re-throw it
+                throw new RepositoryException(
+                    `${error?.message}`,
+                    HttpCodes.CONFLICT,
+                    `${error?.stack}`,
+                    `EpisodeRepository.class: create.method()`
+                );
+            }
+        }
+    }
+
+    /**
      * Finds all episodes that match the given tvShowId and seasonId.
      * 
      * @param {Types.ObjectId} tvShowId - The id of the TV show to filter by.
