@@ -26,6 +26,38 @@ class SeasonRepository implements ISeasonRepository {
 
 
     /**
+     * Create new season document.
+     * 
+     * @async
+     * 
+     * @method
+     * 
+     * @param {Partial<ISeason>} season - New season to be created for TV show.
+     * @returns {Promise<ISeason | null>} - A promise that resolves to an newly created season or null .
+     * @throws {RepositoryException} - If an error occurs while creating new season.
+     */
+    async create(season: Partial<ISeason>): Promise<ISeason | null> {
+        try {
+            // Use Mongoose's create method to create the new document with the given properties
+            const newSeason: ISeason = await this.seasonModel.create<Partial<ISeason>>(season);
+            // Return the created document
+            return newSeason
+        } catch (error: any) {
+            // If the error is a known exception, re-throw it
+            if (error instanceof MoviebunkersException) {
+                throw error;
+            } else {
+                // Otherwise, wrap the error in a repository exception and re-throw it
+                throw new RepositoryException(
+                    `${error?.message}`,
+                    HttpCodes.CONFLICT,
+                    `${error?.stack}`,
+                    `SeasonRepository.class: create.method()`
+                );
+            }
+        }
+    }
+    /**
      * Finds all seasons associated with a given TV show ID.
      * 
      * @async
