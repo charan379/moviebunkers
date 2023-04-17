@@ -1,9 +1,9 @@
 import HttpCodes from "@constants/http.codes.enum";
-import { LevelOne, LevelThere, LevelTwo, LevelZero } from "@constants/user.roles.enum";
+import { LevelThere, LevelTwo, LevelZero } from "@constants/user.roles.enum";
 import LanguageDTO from "@dto/language.dto";
-import PageDTO from "@dto/page.dto";
 import TitleDTO, { FindAllTitlesQueryDTO } from "@dto/title.dto";
 import { UserDTO } from "@dto/user.dto";
+import UserDataDTO from "@dto/userdata.dto";
 import TitleException from "@exceptions/title.exeception";
 import baseTitleSchema from "@joiSchemas/base.joi.title.schema";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
@@ -15,11 +15,12 @@ import { UserService } from "@service/user.service";
 import UserDataService from "@service/userdata.service";
 import JoiValidator from "@utils/joi.validator";
 import { NextFunction, Request, Response, Router } from "express";
-import { ObjectId } from "mongoose";
+import { Page } from "src/@types";
 import { Inject, Service } from "typedi";
 
 /**
- * @Controller("/titles") => TitleController.class
+ * Controller for handling title related API requests
+ * @class TitleController
  */
 @Service()
 class TitleController {
@@ -29,6 +30,12 @@ class TitleController {
     private userService: UserService;
     private userDataService: UserDataService;
 
+    /**
+      * Constructor of TitleController class, creates a new instance for TitleController class
+      * @param titleService An instance of TitleService class
+      * @param userService An instance of UserService class
+      * @param userDataService An instance of UserDataService class
+      */
     constructor(
         @Inject()
         titleService: TitleService,
@@ -37,10 +44,8 @@ class TitleController {
         this.titleService = titleService;
         this.userService = userService;
         this.userDataService = userDataService;
-
         this.router = Router();
 
-        //get
         /**
          * @swagger
          * /titles:
@@ -165,7 +170,6 @@ class TitleController {
          */
         this.router.get("/", Authorize(LevelZero), this.getAllTitles.bind(this));
 
-        //get
         /**
          * @swagger
          * /titles/id/{id}:
@@ -191,7 +195,6 @@ class TitleController {
          */
         this.router.get("/id/:id", Authorize(LevelZero), this.getTitleById.bind(this));
 
-        //post
         /**
          * @swagger
          * /titles/new:
@@ -222,7 +225,6 @@ class TitleController {
          */
         this.router.post("/new", Authorize(LevelTwo), this.createTitle.bind(this));
 
-        //get
         /**
          * @swagger
          * /titles/available-languages:
@@ -242,7 +244,6 @@ class TitleController {
          */
         this.router.get("/available-languages", this.getAllAvailableLanguages.bind(this));
 
-        //get
         /**
          * @swagger
          * /titles/available-genres:
@@ -262,7 +263,6 @@ class TitleController {
          */
         this.router.get("/available-genres", this.getAllAvailableGenres.bind(this));
 
-        //DELETE
         /**
          * @swagger
          * /titles/delete/id/{id}:
@@ -288,7 +288,6 @@ class TitleController {
          */
         this.router.delete("/delete/id/:id", Authorize(LevelThere), this.deleteTitleById.bind(this));
 
-        //PUT
         /**
          * @swagger
          * /titles/update/id/{id}:
@@ -325,174 +324,270 @@ class TitleController {
         this.router.put("/update/id/:id", Authorize(LevelTwo), this.updateTitleById.bind(this));
     }
 
+
     /**
-     * @Get("/") => getAllTitles() Controller
-     * @param req 
-     * @param res 
-     * @param next 
-     */
-    private async getAllTitles(req: Request, res: Response, next: NextFunction) {
-
+    * Controller method for handling GET requests to retrieve all titles based on query
+    * 
+    * @route GET /titles/
+    * 
+    * @param {Request} req - The HTTP request object
+    * @param {Response} res - The HTTP response object
+    * @param {NextFunction} next - The function to call to pass the request to the next middleware function
+    * @returns {Promise<void>} - void, and sends Page<TitlesDTO> as response
+    */
+    private async getAllTitles(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-
+            // Get the username from the request object
             const userName: string | undefined = req?.userName;
+            // Throw an exception if the username is missing
+            if (!userName) throw new TitleException(
+                "User details missing in request",
+                HttpCodes.BAD_REQUEST,
+                `userName: ${userName}, userName not exists in request object`,
+                `@TitleController.getAllTitles()`);
 
-            if (!userName) throw new TitleException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@TitleController.getAllTitles()`);
-
+            // Get the user DTO for the given username
             const userDto: UserDTO = await this.userService.getUserByUserName(userName);
 
+            // Validate that the user ID is a valid ObjectID
             await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@TitleController.getAllTitles() - userId`);
 
+            // Validate the query parameters for retrieving all titles
             const validQuery: FindAllTitlesQueryDTO = await JoiValidator(getAllTitlesQuerySchema, req.query, { abortEarly: false, stripUnknown: true });
 
-            const userData = await this.userDataService.getUserData(userDto._id as string);
+            // Get the user data for the given user ID
+            const userData: UserDataDTO = await this.userDataService.getUserData(userDto._id);
 
-            const page: PageDTO = await this.titleService.getAllTitlesWithUserData(validQuery, userDto?._id, userData);
+            // Get a paginated list of all titles with user data
+            const page: Page<TitleDTO> = await this.titleService.getAllTitlesWithUserData(validQuery, userDto?._id, userData);
 
+            // Send the page of titles as the HTTP response
             res.status(HttpCodes.OK).json(page);
 
         } catch (error) {
+            // Catch any errors that occur and pass them to the next middleware function in the chain (e.g. error-handler or logger)
             next(error)
         }
     }
 
-    /**
-     * @Get("/id/:id") => getTitleById() Controller
-     * @param req 
-     * @param res 
-     * @param next 
-     */
-    private async getTitleById(req: Request, res: Response, next: NextFunction) {
 
+    /**
+    * Controller method for handling GET requests to retrieve title based on id
+    * 
+    * @route GET /titles/id/:id
+    * 
+    * @param {Request} req - The HTTP request object
+    * @param {Response} res - The HTTP response object
+    * @param {NextFunction} next - The function to call to pass the request to the next middleware function
+    * @returns {Promise<void>} - void, and sends TitleDTO as response
+    */
+    private async getTitleById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            // Get the username from the request object
             const userName: string | undefined = req?.userName;
 
-            if (!userName) throw new TitleException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@TitleController.getTitleById()`);
+            // Throw an exception if the username is missing from the request object
+            if (!userName) throw new TitleException(
+                "User details missing in request",
+                HttpCodes.BAD_REQUEST,
+                `userName: ${userName}, userName not exists in request object`,
+                `@TitleController.getTitleById()`);
 
+            // Get the UserDTO object for the given username
             const userDto: UserDTO = await this.userService.getUserByUserName(userName);
 
+            // Validate that the user ID is a valid object ID
             await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@TitleController.getTitleById() - userId`);
 
+            // Decode the title ID from base64 format and validate that it is a valid object ID
             const titleId = await JoiValidator(ObjectIdSchema, Buffer.from(req?.params?.id, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true })
 
+            // Get the TitleDTO object for the given title ID and user ID
             const titileDTO: TitleDTO = await this.titleService.getTitleByIdWithUserData(titleId, userDto._id);
 
+            // Send the TitleDTO object as the response
             res.status(200).json(titileDTO)
 
         } catch (error) {
 
+            // Pass any errors to the next middleware function in the chain (e.g. error-handler or logger)
             next(error)
         }
     }
 
+
     /**
-     * @Post("/new") => createTitle() Controller
-     * @param req 
-     * @param res 
-     * @param next 
-     */
-    private async createTitle(req: Request, res: Response, next: NextFunction) {
-
+    * Controller method for handling POST request to create new title
+    * 
+    * @route POST /titles/new
+    * 
+    * @param {Request} req - The HTTP request object
+    * @param {Response} res - The HTTP response object
+    * @param {NextFunction} next - The function to call to pass the request to the next middleware function
+    * @returns {Promise<void>} - void, and sends newly created title id and success message as response
+    */
+    private async createTitle(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-
+            // Get the user name from the request
             const userName: string | undefined = req?.userName;
 
-            if (!userName) throw new TitleException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@TitleController.getTitleById()`);
+            // If user name doesn't exist, throw an exception
+            if (!userName) throw new TitleException(
+                "User details missing in request",
+                HttpCodes.BAD_REQUEST,
+                `userName: ${userName}, userName not exists in request object`,
+                `@TitleController.getTitleById()`
+            );
 
+            // Get the user DTO object by user name
             const userDto: UserDTO = await this.userService.getUserByUserName(userName);
 
-            const ititle: Partial<ITitle> = await JoiValidator(baseTitleSchema, req.body, { abortEarly: false, allowUnknown: true, stripUnknown: false });
+            // Validate the request body against the base title schema
+            const ititle: Partial<ITitle> = await JoiValidator(
+                baseTitleSchema,
+                req.body,
+                { abortEarly: false, allowUnknown: true, stripUnknown: false }
+            );
 
+            // Create a new title DTO object
             const newTitle: TitleDTO = await this.titleService.createTitle(ititle, userDto);
 
-            res.status(201).json({ message: "New Title Added Successfully", new_title_id: newTitle._id })
+            // Send success response with newly created title ID and success message
+            res.status(201).json({ message: "New Title Added Successfully", new_title_id: newTitle._id });
 
         } catch (error) {
-
-            next(error)
-        }
-    }
-
-
-    /**
-    * @Get("/available-languages") => getAllAvailableLanguages()
-    * @param req 
-    * @param res 
-    * @param next 
-    */
-    private async getAllAvailableLanguages(req: Request, res: Response, next: NextFunction) {
-        try {
-
-            const languages: LanguageDTO[] = await this.titleService.getAllAvailableLanguages();
-
-            res.status(200).json(languages)
-        } catch (error) {
-            next(error)
-        }
-    }
-
-
-    /**
-     * @Get("/available-genres") => getAllAvailableGenres()
-     * @param req 
-     * @param res 
-     * @param next 
-     */
-    private async getAllAvailableGenres(req: Request, res: Response, next: NextFunction) {
-        try {
-
-            const genres: string[] = await this.titleService.getAllAvailableGenres();
-
-            res.status(200).json(genres)
-
-        } catch (error) {
-
-            next(error)
-        }
-    }
-
-    /**
-     * @Delete("/delete/id/:id")
-     * @param req 
-     * @param res 
-     * @param next 
-     */
-    private async deleteTitleById(req: Request, res: Response, next: NextFunction) {
-        try {
-            const titleId = await JoiValidator(ObjectIdSchema, Buffer.from(req?.params?.id, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true })
-
-            await this.titleService.deleteTitleById(titleId);
-
-            res.status(200).json({ message: "Title successfully deleted" })
-        } catch (error) {
-
+            // Catch any errors that occur and pass them to the next middleware function in the chain (e.g. error-handler or logger)
             next(error);
         }
     }
 
-    private async updateTitleById(req: Request, res: Response, next: NextFunction) {
+
+
+    /**
+     * Controller method for handling GET request to fetch all available languages for titles
+     * 
+     * @route GET /titles/available-languages
+     * 
+     * @param {Request} req - The HTTP request object
+     * @param {Response} res - The HTTP response object
+     * @param {NextFunction} next - The function to call to pass the request to the next middleware function
+     * @returns {Promise<void>} - A Promise that resolves to void and sends an array of LanguageDTO objects as the response
+     */
+    private async getAllAvailableLanguages(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const userName: string | undefined = req?.userName;
+            // Call the getAllAvailableLanguages method of the titleService object
+            // to get an array of LanguageDTO objects
+            const languages: LanguageDTO[] = await this.titleService.getAllAvailableLanguages();
+            // Send a JSON response with the status code 200 and the array of LanguageDTO objects
+            res.status(200).json(languages);
+        } catch (error) {
+            // If an error occurs, call the next function with the error object
+            // to pass the error to the next middleware function
+            next(error);
+        }
+    }
 
-            if (!userName) throw new TitleException("Internal Servicer Error", HttpCodes.INTERNAL_SERVER_ERROR, `userName: ${userName}, userName not exists in request object`, `@TitleController.updateTitleById()`);
 
-            const userDto: UserDTO = await this.userService.getUserByUserName(userName);
+    /**
+     * Controller method for handling GET request to fetch all available genres for titles
+     * 
+     * @route GET /titles/available-genres
+     * 
+     * @param {Request} req - The HTTP request object
+     * @param {Response} res - The HTTP response object
+     * @param {NextFunction} next - The function to call to pass the request to the next middleware function
+     * @returns {Promise<void>} - A Promise that resolves to void and sends an array of genres as the response
+     */
+    private async getAllAvailableGenres(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            // Call the titleService to retrieve an array of available genres
+            const genres: string[] = await this.titleService.getAllAvailableGenres();
 
-            const last_modified_by = await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@TitleController.updateTitleById() - userId`);
+            // Send a JSON response containing the array of genres
+            res.status(200).json(genres)
 
+        } catch (error) {
+            // If an error occurs, pass it to the next middleware function to handle it
+            next(error)
+        }
+    }
+
+
+    /**
+     * Controller method for handling DELETE request to for deleting existing titles
+     * 
+     * @route GET /titles/delete/id/:id
+     * 
+     * @param {Request} req - The HTTP request object
+     * @param {Response} res - The HTTP response object
+     * @param {NextFunction} next - The function to call to pass the request to the next middleware function
+     * @returns {Promise<void>} - A Promise that resolves to void and sends success message as the response
+     */
+    private async deleteTitleById(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            // Decode the ID from base64 and validate it using JoiValidator
             const titleId = await JoiValidator(ObjectIdSchema, Buffer.from(req?.params?.id, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true })
 
+            // Call the titleService to delete the title with the given ID
+            await this.titleService.deleteTitleById(titleId);
+
+            // Send a success message as the response
+            res.status(200).json({ message: "Title successfully deleted" })
+        } catch (error) {
+            // Pass the error to the next middleware function
+            next(error);
+        }
+    }
+
+
+    /**
+     * Controller method for handling PUT request to for updating existing titles
+     * 
+     * @route GET /titles/update/id/:id
+     * 
+     * @param {Request} req - The HTTP request object
+     * @param {Response} res - The HTTP response object
+     * @param {NextFunction} next - The function to call to pass the request to the next middleware function
+     * @returns {Promise<void>} - A Promise that resolves to void and sends success message and updated titleDTO as the response
+     */
+    private async updateTitleById(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            // Extract username from request object
+            const userName: string | undefined = req?.userName;
+
+            // Throw an error if username is missing from the request object
+            if (!userName) throw new TitleException(
+                "User details missing in request",
+                HttpCodes.BAD_REQUEST,
+                `userName: ${userName}, 
+                userName not exists in request object`,
+                `@TitleController.updateTitleById()`);
+
+            // Get user details from the database based on the extracted username
+            const userDto: UserDTO = await this.userService.getUserByUserName(userName);
+
+            // Get the user's ID for the last_modified_by field of the updated title
+            const last_modified_by = await JoiValidator(ObjectIdSchema, userDto._id?.toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@TitleController.updateTitleById() - userId`);
+
+            // Decode and validate the title ID from the request parameters
+            const titleId = await JoiValidator(ObjectIdSchema, Buffer.from(req?.params?.id, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true })
+
+            // Create a validTitleDTO object by merging the request body with the last_modified_by field
             const validTitleDTO: Partial<ITitle> = { ...req.body, last_modified_by };
 
+            // Update the title based on the ID and the validTitleDTO object
             const updateTitleDTO: TitleDTO = await this.titleService.updateTitleById(titleId, validTitleDTO);
 
+            // Send success message and the updated title object in the response
             res.status(200).json({ message: "Title Updated Successfully", title: updateTitleDTO })
 
         } catch (error) {
 
+            // Pass the error to the next middleware function
             next(error)
         }
     }
+
 }
 
 export default TitleController;
