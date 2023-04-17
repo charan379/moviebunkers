@@ -14,6 +14,7 @@ import { Inject, Service } from "typedi";
 import ITitleService from "./interfaces/title.service.interface";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
 import { FindAllQuery, Language, Page } from "src/@types";
+import downloadImageFromUrl from "@utils/downloadImageFromUrl";
 
 
 /**
@@ -552,6 +553,15 @@ class TitleService implements ITitleService {
         try {
             // Ensure the title exists before attempting to update it
             await this.getTitleById(titleId);
+
+
+            // commenting out until buying a VPS
+            // try {
+            //     title = { ...title, poster_path: await downloadImageFromUrl(title?.poster_path as string, titleId) }
+            // } catch (error) {
+            //     title = { ...title, poster_path: title?.poster_path }
+            // }
+
 
             // Update the title with the given changes
             const updatedTitle: ITitle | null = await this.titleRepository.updateTitleById(new Types.ObjectId(titleId), title);
