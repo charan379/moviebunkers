@@ -97,20 +97,15 @@ class EpisodeRepository implements IEpisodeRepository {
     /**
       * Update an episode document by the given tv show and season ids with the given update object
       * 
-      * @param {Types.ObjectId} tvShowId - The id of the tv show associated with the episode to update
-      * @param {Types.ObjectId} seasonId - The id of the season associated with the episode to update
+      * @param {Types.ObjectId} id - The id of the episode document to update
       * @param {Partial<IEpisode>} update - The partial update object containing the fields to update
       * @returns {Promise<IEpisode|null>} - The updated episode document, or null if no document was found
       * @throws {RepositoryException} - If an unexpected error occurs during the update operation
       */
-    async updateById(tvShowId: Types.ObjectId, seasonId: Types.ObjectId, update: Partial<IEpisode>): Promise<IEpisode | null> {
+    async updateById(id: Types.ObjectId, update: Partial<IEpisode>): Promise<IEpisode | null> {
         try {
             // Find the episode document to update and apply the given update object
-            const episode = await this.episodeModel.findOneAndUpdate(
-                {
-                    tv_show_id: tvShowId,
-                    season_id: seasonId
-                },
+            const episode = await this.episodeModel.findByIdAndUpdate(id,
                 {
                     $set: update
                 },
@@ -232,3 +227,5 @@ class EpisodeRepository implements IEpisodeRepository {
     }
 
 }
+
+export default EpisodeRepository
