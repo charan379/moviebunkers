@@ -133,13 +133,15 @@ class UserDataRepository implements IUserDataRepository {
     async findAll(): Promise<IUserData[]> {
         try {
             // Find all user data objects and populate them with associated user information
-            const userData = await this.userDataModel.find({}, { __v: 0 }).populate({
-                path: 'userId',
-                model: 'user',
-                localField: 'userId',
-                foreignField: '_id',
-                select: "userName email status role createdAt",
-            }).exec();
+            const userData = await this.userDataModel.find({}, { __v: 0 })
+                // .populate({
+                //     path: 'userId',
+                //     model: 'user',
+                //     localField: 'userId',
+                //     foreignField: '_id',
+                //     select: "userName email status role createdAt",
+                // })
+                .exec();
 
             return userData;
         } catch (error: any) {

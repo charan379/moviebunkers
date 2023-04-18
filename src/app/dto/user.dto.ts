@@ -75,7 +75,7 @@ export function iuserToUserDTOMapper(iuser: IUser | any, options: { withPassword
         let userDTO: UserDTO;
         if (options.withPassword) {
             userDTO = {
-                _id: iuser?._id.toString() ?? "",
+                _id: iuser?._id?.toString() ?? "",
                 userName: iuser?.userName ?? "",
                 email: iuser?.email ?? "",
                 status: iuser?.status ?? "",
@@ -86,7 +86,7 @@ export function iuserToUserDTOMapper(iuser: IUser | any, options: { withPassword
             }
         } else {
             userDTO = {
-                _id: iuser?._id.toString() ?? "",
+                _id: iuser?._id?.toString() ?? "",
                 userName: iuser?.userName ?? "",
                 email: iuser?.email ?? "",
                 status: iuser?.status ?? "",

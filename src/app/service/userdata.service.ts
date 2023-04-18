@@ -3,7 +3,7 @@ import UserDataDTO, { iuserDataToUserDataDTOMapper } from "@dto/userdata.dto";
 import UserDataException from "@exceptions/userdata.exception";
 import IUserData from "@models/interfaces/user.data.interface";
 import UserDataRepository from "@repositories/userdata.repository";
-import mongoose, { Types } from "mongoose";
+import { Types } from "mongoose";
 import { Inject, Service } from "typedi";
 import IUserDataService from "./interfaces/userdata.service.interface";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
@@ -41,7 +41,7 @@ class UserDataService implements IUserDataService {
             };
 
             // Check if user data already exists for the given user id.
-            const existingUserData = await this.userDataRepository.findByUserId(new Types.ObjectId(userId));
+            const existingUserData: IUserData | null = await this.userDataRepository.findByUserId(new Types.ObjectId(userId));
             if (existingUserData) {
                 // If user data already exists, throw a UserDataException with details about the error.
                 throw new UserDataException(
@@ -55,6 +55,7 @@ class UserDataService implements IUserDataService {
             // If user data does not already exist, create the new user data object and return it.
             const userDataCreated: IUserData = await this.userDataRepository.create(userData);
 
+            // Map user document into userDTO using `iuserDataToUserDataDTOMapper` and retun it
             return iuserDataToUserDataDTOMapper(userDataCreated)
 
         } catch (error: any) {
@@ -66,7 +67,7 @@ class UserDataService implements IUserDataService {
                 // If the error is not a MoviebunkersException, wrap it in a UserDataException and throw it to the caller.
                 throw new UserDataException(
                     `Unable to initialize user data: ${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${JSON.stringify(error?.stack)}`
                 );
             }
@@ -83,7 +84,7 @@ class UserDataService implements IUserDataService {
     async getUserData(userId: string): Promise<UserDataDTO> {
         try {
             // Try to find the user data for the given user id.
-            let userData = await this.userDataRepository.findByUserId(new Types.ObjectId(userId));
+            let userData: IUserData | null = await this.userDataRepository.findByUserId(new Types.ObjectId(userId));
 
             // If the user data doesn't exist yet, initialize it.
             if (!userData) await this.create(userId);
@@ -92,12 +93,13 @@ class UserDataService implements IUserDataService {
             userData = await this.userDataRepository.findByUserId(new Types.ObjectId(userId));
 
             // If the user data still doesn't exist, throw an exception.
-            if (!userData) throw new UserDataException("UserData not found",
+            if (!userData) throw new UserDataException(
+                "UserData not found",
                 HttpCodes.BAD_REQUEST,
                 `UserData Doc for userId: ${userId.toString()} doesn't exist`,
                 `UserDataService.class: getUserData.method()`);
 
-            // Return the user data object.
+            // Map user document into userDTO using `iuserDataToUserDataDTOMapper` and retun it
             return iuserDataToUserDataDTOMapper(userData);
         } catch (error: any) {
             // If an error occurs, catch it here and handle it.
@@ -108,7 +110,8 @@ class UserDataService implements IUserDataService {
                 // If the error is not a MoviebunkersException, wrap it in a UserDataException and throw it to the caller.
                 throw new UserDataException(
                     `Failed to get user data: ${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR, `${JSON.stringify(error?.stack)}`,
+                    HttpCodes.CONFLICT,
+                    `${JSON.stringify(error?.stack)}`,
                     `UserDataService.class: getUserData.method()`);
             }
         }
@@ -129,32 +132,31 @@ class UserDataService implements IUserDataService {
         try {
             // Get the user's existing data, creating a new record if necessary
             const userDataDto = await this.getUserData(userId);
-            console.log(userDataDto.unseenTitles.includes(titleId))
-            console.log(userDataDto.unseenTitles.includes(titleId))
+
             // If the title is in the user's unseen titles list, remove it from that list
             if (userDataDto.unseenTitles.includes(titleId)) {
                 await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $pull: { unseenTitles: new Types.ObjectId(titleId) } })
             }
 
             // Add the title to the user's seen titles list
-            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $addToSet: { seenTitles: titleId } })
+            const result: boolean = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $addToSet: { seenTitles: titleId } })
 
             // Return true if the title was successfully added, false otherwise
             if (result) {
                 return true;
             } else {
-                return false
+                return false;
             }
         } catch (error: any) {
             // If an error occurs, wrap it in a UserDataException and throw it to the caller
             if (error instanceof MoviebunkersException) {
                 // If the error is a MoviebunkersException, re-throw it to the caller.
-                throw error
+                throw error;
             } else {
                 // If the error is not a MoviebunkersException, wrap it in a UserDataException and throw it to the caller.
                 throw new UserDataException(
                     `Failed to add title ${titleId} to seen titles list: ${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${JSON.stringify(error?.stack)}`,
                     `UserDataService.class: addToSeenTitles.method()`
                 );
@@ -184,24 +186,24 @@ class UserDataService implements IUserDataService {
             }
 
             // Add the title to the user's unseen titles list
-            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $addToSet: { unseenTitles: new Types.ObjectId(titleId) } })
+            const result: boolean = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $addToSet: { unseenTitles: new Types.ObjectId(titleId) } })
 
             // Return true if the title was successfully added, false otherwise
             if (result) {
                 return true;
             } else {
-                return false
+                return false;
             }
         } catch (error: any) {
             // If an error occurs, wrap it in a UserDataException and throw it to the caller
             if (error instanceof MoviebunkersException) {
                 // If the error is a MoviebunkersException, re-throw it to the caller.
-                throw error
+                throw error;
             } else {
                 // If the error is not a MoviebunkersException, wrap it in a UserDataException and throw it to the caller.
                 throw new UserDataException(
                     `Failed to add title ${titleId} to unseen titles list: ${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${JSON.stringify(error?.stack)}`,
                     `UserDataService.class: addToUnSeenTitles.method()`
                 );
@@ -230,24 +232,24 @@ class UserDataService implements IUserDataService {
             }
 
             // Add the title to the user's favourite titles list
-            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $addToSet: { favouriteTitles: new Types.ObjectId(titleId) } })
+            const result: boolean = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $addToSet: { favouriteTitles: new Types.ObjectId(titleId) } })
 
             // Return true if the title was successfully added, false otherwise
             if (result) {
                 return true;
             } else {
-                return false
+                return false;
             }
         } catch (error: any) {
             // If an error occurs, wrap it in a UserDataException and throw it to the caller
             if (error instanceof MoviebunkersException) {
                 // If the error is a MoviebunkersException, re-throw it to the caller.
-                throw error
+                throw error;
             } else {
                 // If the error is not a MoviebunkersException, wrap it in a UserDataException and throw it to the caller.
                 throw new UserDataException(
                     `Failed to add title ${titleId} to favourite titles list: ${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${JSON.stringify(error?.stack)}`,
                     `UserDataService.class: addToFavouriteTitles.method()`
                 );
@@ -268,7 +270,7 @@ class UserDataService implements IUserDataService {
     async removeFromFavouriteTitles(userId: string, titleId: string): Promise<boolean> {
         try {
             // Remove the title from the user's favourite titles list
-            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $pull: { favouriteTitles: new Types.ObjectId(titleId) } });
+            const result: boolean = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $pull: { favouriteTitles: new Types.ObjectId(titleId) } });
 
             // Return true if the title was successfully removed, false otherwise
             if (result) {
@@ -285,7 +287,7 @@ class UserDataService implements IUserDataService {
                 // If the error is not a MoviebunkersException, wrap it in a UserDataException and throw it to the caller.
                 throw new UserDataException(
                     `Failed to remove title ${titleId} from favourite titles list: ${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${JSON.stringify(error?.stack)}`,
                     `UserDataService.class: removeFromFavouriteTitles.method()`
                 );
@@ -307,24 +309,24 @@ class UserDataService implements IUserDataService {
     async addToStarredTitles(userId: string, titleId: string): Promise<boolean> {
         try {
             // Add the title to the user's starred titles list
-            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $addToSet: { starredTitles: new Types.ObjectId(titleId) } })
+            const result: boolean = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $addToSet: { starredTitles: new Types.ObjectId(titleId) } })
 
             // Return true if the title was successfully added, false otherwise
             if (result) {
                 return true;
             } else {
-                return false
+                return false;
             }
         } catch (error: any) {
             // If an error occurs, wrap it in a UserDataException and throw it to the caller
             if (error instanceof MoviebunkersException) {
                 // If the error is a MoviebunkersException, re-throw it to the caller.
-                throw error
+                throw error;
             } else {
                 // If the error is not a MoviebunkersException, wrap it in a UserDataException and throw it to the caller.
                 throw new UserDataException(
                     `Failed to add title ${titleId} to starred titles list: ${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${JSON.stringify(error?.stack)}`,
                     `UserDataService.class: addToStarredTitles.method()`
                 );
@@ -345,19 +347,19 @@ class UserDataService implements IUserDataService {
     async removeFromStarredTitles(userId: string, titleId: string): Promise<boolean> {
         try {
             // Attempt to remove the specified title from the user's starred titles list
-            const result = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $pull: { starredTitles: new Types.ObjectId(titleId) } });
+            const result: boolean = await this.userDataRepository.updateUserData(new Types.ObjectId(userId), { $pull: { starredTitles: new Types.ObjectId(titleId) } });
 
             // Return true if the title was successfully removed, false otherwise
             if (result) {
                 return true;
             } else {
-                return false
+                return false;
             }
         } catch (error: any) {
             // If an error occurs, wrap it in a UserDataException and throw it to the caller
             if (error instanceof MoviebunkersException) {
                 // If the error is a MoviebunkersException, re-throw it to the caller.
-                throw error
+                throw error;
             } else {
                 // If the error is not a MoviebunkersException, wrap it in a UserDataException and throw it to the caller.
                 throw new UserDataException(
@@ -397,7 +399,7 @@ class UserDataService implements IUserDataService {
                 // stack trace, and method signature.
                 throw new UserDataException(
                     `Failed to retrieve user data: ${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${JSON.stringify(error?.stack)}`,
                     `UserDataService.class: getAllUsersData.method()`
                 );
