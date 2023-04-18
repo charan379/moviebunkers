@@ -67,7 +67,7 @@ class SeasonRepository implements ISeasonRepository {
     * 
     * @param {Types.ObjectId} id - _id of the season documnet to be fetched.
     * @returns {Promise<ISeason | null>} - A promise that resolves to an fetched season or null .
-     * @throws {RepositoryException} - If an error occurs while fetching season.
+    * @throws {RepositoryException} - If an error occurs while fetching season.
     */
     async findById(id: Types.ObjectId): Promise<ISeason | null> {
         try {
