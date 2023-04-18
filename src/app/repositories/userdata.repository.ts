@@ -38,7 +38,7 @@ class UserDataRepository implements IUserDataRepository {
             if (!newUserdata) {
                 throw new RepositoryException(
                     `Unable to initialize new userData`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `Error while initializing userdata`,
                     `UserDataRepository.class: create.method()`
                 );
@@ -53,7 +53,7 @@ class UserDataRepository implements IUserDataRepository {
                 // Otherwise, wrap the error in a repository exception and re-throw it
                 throw new RepositoryException(
                     `${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${error?.stack}`,
                     `UserDataRepository.class: create.method()`
                 );
@@ -83,7 +83,7 @@ class UserDataRepository implements IUserDataRepository {
                 // Otherwise, wrap the error in a repository exception and re-throw it
                 throw new RepositoryException(
                     `${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${error?.stack}`,
                     `UserDataRepository.class: findByUserId.method()`
                 );
@@ -117,7 +117,7 @@ class UserDataRepository implements IUserDataRepository {
                 // Otherwise, wrap the error in a repository exception and re-throw it
                 throw new RepositoryException(
                     `${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${error?.stack}`,
                     `UserDataRepository.class: updateUserData.method()`
                 );
@@ -150,7 +150,7 @@ class UserDataRepository implements IUserDataRepository {
                 // Otherwise, wrap the error in a repository exception and re-throw it
                 throw new RepositoryException(
                     `${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${error?.stack}`,
                     `UserDataRepository.class: findAll.method()`
                 );
