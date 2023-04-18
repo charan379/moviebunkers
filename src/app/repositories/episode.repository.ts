@@ -60,6 +60,40 @@ class EpisodeRepository implements IEpisodeRepository {
     }
 
     /**
+     * Fetch episode document by ist documnet _id.
+     * 
+     * @async
+     * 
+     * @method
+     * 
+     * @param {Types.ObjectId} id - _id of the episode documnet to be fetched.
+     * @returns {Promise<IEpisode | null>} - A promise that resolves to an fetched episode or null .
+     * @throws {RepositoryException} - If an error occurs while fetching episode.
+     */
+    async findById(id: Types.ObjectId): Promise<IEpisode | null> {
+        try {
+            // Use Mongoose's findById method to fetch document with the given properties
+            const episode: IEpisode | null = await this.episodeModel.findById(id, { _v: 0 });
+            // Return the fetchend document
+            return episode;
+        } catch (error: any) {
+            // If the error is a known exception, re-throw it
+            if (error instanceof MoviebunkersException) {
+                throw error;
+            } else {
+                // Otherwise, wrap the error in a repository exception and re-throw it
+                throw new RepositoryException(
+                    `${error?.message}`,
+                    HttpCodes.CONFLICT,
+                    `${error?.stack}`,
+                    `EpisodeRepository.class: findById.method()`
+                );
+            }
+        }
+    }
+
+
+    /**
      * Finds all episodes that match the given tvShowId and seasonId.
      * 
      * @param {Types.ObjectId} tvShowId - The id of the TV show to filter by.

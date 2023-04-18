@@ -113,6 +113,44 @@ class EpisodeService implements IEpisodeService {
         }
     }
 
+    /**
+     * GET an episode by its ID
+     * @param {string} id - The ID of the episode to be fetched
+     * @returns {Promise<EpisodeDTO>} - The fetched episode as an EpisodeDTO object
+     * @throws {EpisodeException} - If there is an error while fetching the episode
+     */
+    async getEpisodeById(id: string): Promise<EpisodeDTO> {
+        try {
+            // Get episode with the given ID using the episode repository's findById method
+            const episode: IEpisode | null = await this.episodeRepository.findById(new Types.ObjectId(id));
+
+            if (!episode) {
+                // If the episode with id not found, throw an EpisodeException with the appropriate error message, HTTP status code, and error details
+                throw new EpisodeException(
+                    `Episode Not Found`,
+                    HttpCodes.CONFLICT,
+                    `No Episodes available with id: ${id}`,
+                    `@EpisodeService.class: @getEpisodeById.method()`
+                )
+            } else {
+                // If the episode is fetched successfully, map the IEpisode object to an EpisodeDTO object using the `iEpisodeToEpisodeDTOMapper` function and return the result
+                return iEpisodeToEpisodeDTOMapper(episode)
+            }
+        } catch (error: any) {
+            // If the error is already an instance of MoviebunkersException, simply rethrow it
+            if (error instanceof MoviebunkersException) {
+                throw error;
+            } else { // Otherwise, wrap the error in a EpisodeException and rethrow it
+                throw new EpisodeException(
+                    `${error?.message}`,
+                    HttpCodes.CONFLICT,
+                    `${JSON.stringify(error)}`,
+                    `@EpisodeService.class: @getEpisodeById.method()`
+                );
+            }
+        }
+    }
+
 
     /**
      * Updates an episode by its ID
