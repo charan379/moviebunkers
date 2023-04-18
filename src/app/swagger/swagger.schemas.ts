@@ -1,5 +1,7 @@
+import { episodeSchema } from "@joiSchemas/episode.joi.schema";
 import linkSchema from "@joiSchemas/linkSchema";
 import movieSchema from "@joiSchemas/movie.joi.schema";
+import { seasonSchema } from "@joiSchemas/season.joi.schema";
 import tvSchema from "@joiSchemas/tv.joi.schema";
 import { lgoinSchema, newUserSchema, userUpdateSchema } from "@joiSchemas/user.joi.schemas";
 import joiToSwagger from "joi-to-swagger";
@@ -10,7 +12,9 @@ const swaggerSchemas = {
     update_user: joiToSwagger(userUpdateSchema).swagger,
     new_movie: joiToSwagger(movieSchema).swagger,
     new_tv: joiToSwagger(tvSchema).swagger,
-    new_link: joiToSwagger(linkSchema).swagger,
+    link: joiToSwagger(linkSchema).swagger,
+    episode: joiToSwagger(episodeSchema).swagger,
+    season: joiToSwagger(seasonSchema).swagger,
 }
 
 export default swaggerSchemas;
