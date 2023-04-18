@@ -4,9 +4,10 @@ import ContentType from "@constants/contentTypes.enum";
 import LinkType from "@constants/linkTypes.enum";
 import ContentQuality from "@constants/contenetQuality.enum";
 import { languageSchema } from "./common.title.joi.schemas";
+import ILink from "@models/interfaces/link.interface";
 
 
-const linkSchema: Joi.ObjectSchema = Joi.object({
+const linkSchema: Joi.ObjectSchema<ILink> = Joi.object({
     parentId: ObjectIdSchema.required().example('64134d08661b4da2fb891d48'),
     contentType: Joi.string().valid(...Object.values(ContentType)).required().example(ContentType.VIDEO),
     languages: Joi.array().items(languageSchema),
