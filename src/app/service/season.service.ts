@@ -70,6 +70,44 @@ class SeasonService implements ISeasonService {
         }
     }
 
+    /**
+    * Retrieves an season by its ID
+    * @param {string} id - The ID of the season to be fetched
+    * @returns {Promise<SeasonDTO>} - The fetched season as an SeasonDTO object
+    * @throws {SeasonException} - If there is an error while fetching the season
+    */
+    async getSeasonById(id: string): Promise<SeasonDTO> {
+        try {
+            // Call the findById method of the season repository and pass in the id of season to fetch
+            const season: ISeason | null = await this.seasonRepository.findById(new Types.ObjectId(id));
+
+            // If the returned season is null, throw a SeasonException with the appropriate error message and details
+            if (!season) {
+                throw new SeasonException(
+                    `Season Not Found`,
+                    HttpCodes.CONFLICT,
+                    `Season with id: ${id} not found`,
+                    `@SeasonService.class: @getSeasonById.method()`
+                )
+            } else {
+                // Otherwise, map the returned season to a SeasonDTO and return it
+                return iSeasonToSeasonDTOMapper(season);
+            }
+        } catch (error: any) {
+            // If the error is already an instance of MoviebunkersException, simply rethrow it
+            if (error instanceof MoviebunkersException) {
+                throw error;
+            } else { // Otherwise, wrap the error in a SeasonException and rethrow it
+                throw new SeasonException(
+                    `${error?.message}`,
+                    HttpCodes.CONFLICT,
+                    `${JSON.stringify(error)}`,
+                    `@SeasonService.class: @getSeasonById.method()`
+                );
+            }
+        }
+    }
+
 
     /**
      * Retrieves all seasons belonging to a TV show with the specified ID.

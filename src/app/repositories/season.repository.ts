@@ -57,6 +57,41 @@ class SeasonRepository implements ISeasonRepository {
             }
         }
     }
+
+    /**
+    * Fetch season document by ist documnet _id.
+    * 
+    * @async
+    * 
+    * @method
+    * 
+    * @param {Types.ObjectId} id - _id of the season documnet to be fetched.
+    * @returns {Promise<ISeason | null>} - A promise that resolves to an fetched season or null .
+     * @throws {RepositoryException} - If an error occurs while fetching season.
+    */
+    async findById(id: Types.ObjectId): Promise<ISeason | null> {
+        try {
+            // Use Mongoose's findById method to fetch document with the given properties
+            const season: ISeason | null = await this.seasonModel.findById(id, { _v: 0 });
+            // Return the fetchend document
+            return season;
+        } catch (error: any) {
+            // If the error is a known exception, re-throw it
+            if (error instanceof MoviebunkersException) {
+                throw error;
+            } else {
+                // Otherwise, wrap the error in a repository exception and re-throw it
+                throw new RepositoryException(
+                    `${error?.message}`,
+                    HttpCodes.CONFLICT,
+                    `${error?.stack}`,
+                    `SeasonRepository.class: findById.method()`
+                );
+            }
+        }
+    }
+
+
     /**
      * Finds all seasons associated with a given TV show ID.
      * 
@@ -126,7 +161,6 @@ class SeasonRepository implements ISeasonRepository {
     }
 
 
-
     /**
      * Deletes a season by its ID.
      * 
@@ -158,6 +192,7 @@ class SeasonRepository implements ISeasonRepository {
         }
     }
 
+
     /**
      * Deletes all seasons associated with a given TV show ID.
      * 
@@ -188,10 +223,6 @@ class SeasonRepository implements ISeasonRepository {
             }
         }
     }
-
-
-
-
 
 }
 
