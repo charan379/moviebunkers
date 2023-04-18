@@ -34,7 +34,7 @@ class LinksController {
      *      content:
      *        application/json:
      *          schema:
-     *              $ref: '#/components/schemas/new_link'
+     *              $ref: '#/components/schemas/link'
      *   responses:
      *       201:
      *          description: Success
@@ -107,7 +107,7 @@ class LinksController {
      *      content:
      *        application/json:
      *          schema:
-     *              $ref: '#/components/schemas/new_link'
+     *              $ref: '#/components/schemas/link'
      *   parameters:
      *     - in: path
      *       name: id
