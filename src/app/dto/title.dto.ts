@@ -1,9 +1,5 @@
 import Country from "@constants/country.enum";
 import TitleType from "@constants/titile.types.enum";
-import MovieDTO from "./movie.dto";
-import TitleAuthorDTO from "./title.author.dto";
-import TvDTO from "./Tv.dto";
-import { Types } from "mongoose";
 import TitleSource from "@constants/title.souces.enum";
 import { AgeRatting, Cast, Language } from "src/@types";
 import EpisodeDTO, { iEpisodeToEpisodeDTOMapper } from "./episode.dto";

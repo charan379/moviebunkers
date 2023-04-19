@@ -5,9 +5,9 @@ import TitleDTO, { FindAllTitlesQueryDTO } from "@dto/title.dto";
 import { UserDTO } from "@dto/user.dto";
 import UserDataDTO from "@dto/userdata.dto";
 import TitleException from "@exceptions/title.exeception";
-import baseTitleSchema from "@joiSchemas/base.joi.title.schema";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
 import { getAllTitlesQuerySchema } from "@joiSchemas/common.title.joi.schemas";
+import titleSchema from "@joiSchemas/title.joi.schema";
 import Authorize from "@middlewares/authorization.middleware";
 import ITitle from "@models/interfaces/title.interface";
 import TitleService from "@service/title.service";
@@ -206,14 +206,8 @@ class TitleController {
          *   requestBody:
          *      content:
          *        application/json:
-         *          description: movie
          *          schema:
-         *              #$ref: '#/components/schemas/new_movie'
-         *              #$ref: '#/components/schemas/new_tv'
-         *              oneOf:
-         *                  - $ref: '#/components/schemas/new_movie'
-         *                  - $ref: '#/components/schemas/new_tv'
-         *                
+         *              $ref: '#/components/schemas/title'
          *   responses:
          *       200:
          *          description: Success
@@ -304,14 +298,8 @@ class TitleController {
          *   requestBody:
          *      content:
          *        application/json:
-         *          description: movie
          *          schema:
-         *              #$ref: '#/components/schemas/new_movie'
-         *              #$ref: '#/components/schemas/new_tv'
-         *              oneOf:
-         *                  - $ref: '#/components/schemas/new_movie'
-         *                  - $ref: '#/components/schemas/new_tv'
-         *                
+         *              $ref: '#/components/schemas/title'
          *   responses:
          *       200:
          *          description: Success
@@ -444,7 +432,7 @@ class TitleController {
 
             // Validate the request body against the base title schema
             const ititle: Partial<ITitle> = await JoiValidator(
-                baseTitleSchema,
+                titleSchema,
                 req.body,
                 { abortEarly: false, allowUnknown: true, stripUnknown: false }
             );
@@ -572,8 +560,10 @@ class TitleController {
             // Decode and validate the title ID from the request parameters
             const titleId = await JoiValidator(ObjectIdSchema, Buffer.from(req?.params?.id, 'base64').toString(), { abortEarly: false, allowUnknown: false, stripUnknown: true })
 
+            const title: ITitle = await JoiValidator(titleSchema, req?.body, { abortEarly: false, allowUnknown: false, stripUnknown: true }, `@TitleController.updateTitleById()`)
+
             // Create a validTitleDTO object by merging the request body with the last_modified_by field
-            const validTitleDTO: Partial<ITitle> = { ...req.body, last_modified_by };
+            const validTitleDTO: Partial<ITitle> = { ...title, last_modified_by };
 
             // Update the title based on the ID and the validTitleDTO object
             const updateTitleDTO: TitleDTO = await this.titleService.updateTitleById(titleId, validTitleDTO);

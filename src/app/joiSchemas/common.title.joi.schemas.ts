@@ -31,23 +31,6 @@ export const episodeSchema: Joi.ObjectSchema = Joi.object({
     directors: Joi.array().items(Joi.string().example("Alex Graves")).allow(null).allow(""),
 });
 
-export const seasonSchema: Joi.ObjectSchema = Joi.object({
-    air_date: Joi.date().example("2013-03-31").allow(null).allow(""),
-    season_number: Joi.number().required().example(3),
-    episode_count: Joi.number().required().example("10"),
-    name: Joi.string().required().example("Season 3"),
-    overview: Joi.string()
-        .example(
-            "Daenerys Targaryen--reunited with her dragons--attempts to raise an army in her quest for the Iron Throne."
-        )
-        .allow(null)
-        .allow(""),
-    poster_path: Joi.string()
-        .example("https://image.tmdb.org/t/p/w300/5MkZjRnCKiIGn3bkXrXfndEzqOU.jpg")
-        .allow(null)
-        .allow(""),
-});
-
 export const titleAuthorSchema: Joi.ObjectSchema = Joi.object({
     // added_by
     added_by: ObjectIdSchema.required().example("6411c06ab4be7d8da5338cf7"),
