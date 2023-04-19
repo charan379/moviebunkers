@@ -209,7 +209,7 @@ class SeasonRepository implements ISeasonRepository {
     async deleteManyByTvShowId(tvShowId: Types.ObjectId): Promise<void> {
         try {
             // Delete all seasons associated with the given TV show ID
-            await this.seasonModel.deleteMany({ tvShow: tvShowId }).exec();
+            await this.seasonModel.deleteMany({ tv_show_id: tvShowId }).exec();
         } catch (error: any) {
             // If the error is a known exception, re-throw it
             if (error instanceof MoviebunkersException) {
