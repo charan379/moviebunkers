@@ -5,12 +5,14 @@ import SeasonModel from "@models/season.model";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
 import RepositoryException from "@exceptions/repository.exception";
 import HttpCodes from "@constants/http.codes.enum";
+import { Service } from "typedi";
 
 /**
  * A repository class for managing season data in the database
  * @class
  * @implements ISeasonRepository
  */
+@Service()
 class SeasonRepository implements ISeasonRepository {
 
     private seasonModel: Model<ISeason>;
