@@ -144,6 +144,29 @@ class SeasonController {
           *          description: Unauthorized
           */
         this.router.delete("/delete/:id", this.deleteSeasonById.bind(this));
+
+        /**
+          * @swagger
+          * /seasons/delete-many/{tvShowId}:
+          *  delete:
+          *   tags:
+          *     - Seasons
+          *   summary: API to delete seasons based on tv show id id
+          *   description: deleted season
+          *   parameters:
+          *     - in: path
+          *       name: tvShowId
+          *       schema:
+          *          type: string
+          *   responses:
+          *       200:
+          *          description: Success
+          *       400:
+          *          description: Invalid id
+          *       401:
+          *          description: Unauthorized
+          */
+        this.router.delete("/delete-many/:id", this.deleteSeasonsByTvShowId.bind(this));
     }
 
     /**
@@ -290,6 +313,35 @@ class SeasonController {
 
             // call deleteSeasonById method of seasonService class to delete season
             await this.seasonService.deleteSeasonById(validId);
+
+            // respond with status code 200 after deleting
+            res.status(HttpCodes.OK).json({ message: 'Successfully Deleted' });
+        } catch (error) {
+            // pass error to next() function in chain, probably an error-handler or logger
+            next(error)
+        }
+    }
+
+    /**
+   * Controller to handle API requests for deleting all seasons by tv show id id
+   * 
+   * @route DELETE /seasons/delete-many/:id
+   * 
+   * @param {Request} req - Express request object
+   * @param {Response} res - Express response object
+   * @param {NextFunction} next - Express next middleware function
+   * @returns {Promise<void>} - Returns a promise that resolves with void when the function completes.
+   */
+    private async deleteSeasonsByTvShowId(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            // Validate tvshow id
+            const validId = await JoiValidator(ObjectIdSchema, req?.params?.id, {
+                abortEarly: false,
+                stripUnknown: true
+            });
+
+            // call deleteAllSeasonByTVShowId method of seasonService class to delete all seasons
+            await this.seasonService.deleteAllSeasonByTVShowId(validId);
 
             // respond with status code 200 after deleting
             res.status(HttpCodes.OK).json({ message: 'Successfully Deleted' });
