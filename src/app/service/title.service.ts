@@ -14,7 +14,9 @@ import { Inject, Service } from "typedi";
 import ITitleService from "./interfaces/title.service.interface";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
 import { FindAllQuery, Language, Page } from "src/@types";
-import downloadImageFromUrl from "@utils/downloadImageFromUrl";
+import LinksService from "./links.service";
+import SeasonService from "./season.service";
+import EpisodeService from "./episode.service";
 
 
 /**
@@ -28,6 +30,9 @@ class TitleService implements ITitleService {
 
     // Instance of TitleRepository class
     private titleRepository: TitleRepository;
+    private linkService: LinksService;
+    private seasonService: SeasonService;
+    private episodeService: EpisodeService;
 
     /**
        * Constructor to initialize the UserService instance.
@@ -36,7 +41,10 @@ class TitleService implements ITitleService {
        */
     constructor(
         @Inject()
-        titleRepository: TitleRepository) {
+        titleRepository: TitleRepository,
+        linkService: LinksService,
+        seasonService: SeasonService,
+        episodeService: EpisodeService) {
         this.titleRepository = titleRepository;
     }
 
@@ -526,6 +534,14 @@ class TitleService implements ITitleService {
             // Delete the title from the repository by its ID.
             await this.titleRepository.deleteTitleById(new mongoose.Types.ObjectId(titleId));
 
+            // Delete all links associated with this titleId
+            await this.linkService.deleteManyByParentId(titleId);
+
+            // Delete all seasons associated with this titleId
+            await this.seasonService.deleteAllSeasonByTVShowId(titleId);
+
+            // Delete all episodes associated with this titleId
+            await this.episodeService.deleteManyByTvShowId(titleId);
         } catch (error: any) {
             if (error instanceof MoviebunkersException) {
                 throw error;
