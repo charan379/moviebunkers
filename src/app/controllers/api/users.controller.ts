@@ -29,6 +29,30 @@ class UserController {
 
     /**
      * @swagger
+     * /users/new:
+     *  post:
+     *   tags:
+     *     - Users
+     *   summary: API to create new user
+     *   description: create a user for valid user object
+     *   requestBody:
+     *      content:
+     *        application/json:
+     *          schema:
+     *              $ref: '#/components/schemas/new_user'
+     *   security: []
+     *   responses:
+     *       201:
+     *          description: Success
+     *       400:
+     *          description: Invalid new user
+     *       401:
+     *          description: Unauthorized
+     */
+    this.router.post("/new", this.createUser.bind(this));
+
+    /**
+     * @swagger
      * /users:
      *  get:
      *   tags:
@@ -153,31 +177,6 @@ class UserController {
      */
     this.router.get("/email/:email", Authorize(LevelThere), this.getUserByEmail.bind(this));
 
-
-    /**
-     * @swagger
-     * /users/new:
-     *  post:
-     *   tags:
-     *     - Users
-     *   summary: API to create new user
-     *   description: create a user for valid user object
-     *   requestBody:
-     *      content:
-     *        application/json:
-     *          schema:
-     *              $ref: '#/components/schemas/new_user'
-     *   security: []
-     *   responses:
-     *       201:
-     *          description: Success
-     *       400:
-     *          description: Invalid new user
-     *       401:
-     *          description: Unauthorized
-     */
-    this.router.post("/new", this.createUser.bind(this));
-
     /**
      * @swagger
      * /users/update/{userName}:
@@ -209,6 +208,35 @@ class UserController {
     this.router.put("/update/:userName", Authorize(LevelTwo), this.updateUser.bind(this))
 
   }
+
+
+  /**
+   * Controller to handle API requests for creating new user
+   * 
+   * @route POST /users/new
+   * 
+   * @param {Request} req - Express request object
+   * @param {Response} res - Express response object
+   * @param {NextFunction} next - Express next middleware function
+   * @returns {Promise<void>} - Returns a promise that resolves with void when the function completes.
+   */
+  private async createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      // Validate request body against newUserSchema
+      const validNewUser: NewUserDTO = await JoiValidator(newUserSchema, req.body, { abortEarly: false, stripUnknown: true });
+
+      // Call userService.createUser() method to create new user
+      const createdUser: UserDTO = await this.userService.createUser(validNewUser);
+
+      // Send response with code 201 and createdUser to client
+      res.status(201).json(createdUser);
+
+    } catch (error) {
+      // Pass error to next() function in chain, probably an error-handler or logger
+      next(error)
+    }
+  }
+
 
   /**
   * Controller method for handling GET requests to retrieve all users
@@ -319,34 +347,6 @@ class UserController {
       res.status(HttpCodes.OK).json(userDTO)
     } catch (error) {
       // Pass any errors to the error handling middleware
-      next(error)
-    }
-  }
-
-
-  /**
-   * Controller to handle API requests for creating new user
-   * 
-   * @route POST /users/new
-   * 
-   * @param {Request} req - Express request object
-   * @param {Response} res - Express response object
-   * @param {NextFunction} next - Express next middleware function
-   * @returns {Promise<void>} - Returns a promise that resolves with void when the function completes.
-   */
-  private async createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      // Validate request body against newUserSchema
-      const validNewUser: NewUserDTO = await JoiValidator(newUserSchema, req.body, { abortEarly: false, stripUnknown: true });
-
-      // Call userService.createUser() method to create new user
-      const createdUser: UserDTO = await this.userService.createUser(validNewUser);
-
-      // Send response with code 201 and createdUser to client
-      res.status(201).json(createdUser);
-
-    } catch (error) {
-      // Pass error to next() function in chain, probably an error-handler or logger
       next(error)
     }
   }
