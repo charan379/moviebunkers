@@ -10,4 +10,6 @@ export interface ISeason {
     name: string;
     overview: string;
     poster_path: string;
+    createdAt: Date;
+    updatedAt: Date;
 }

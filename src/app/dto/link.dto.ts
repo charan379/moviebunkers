@@ -32,7 +32,7 @@ export default LinkDTO;
 export function ilinkToLinkDTOMapper(link: ILink): LinkDTO {
     const linkDTO: LinkDTO = {
         _id: link._id?.toString(),
-        parentId: link?.parentId.toString(),
+        parentId: link?.parentId?.toString(),
         contentType: link?.contentType,
         languages: link?.languages,
         linkType: link?.linkType,

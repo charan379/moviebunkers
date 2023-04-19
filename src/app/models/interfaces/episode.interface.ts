@@ -12,4 +12,6 @@ export interface IEpisode {
     runtime: number;
     still_path: string;
     directors: string[];
+    createdAt: Date;
+    updatedAt: Date;
 }
