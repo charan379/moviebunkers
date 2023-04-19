@@ -2,7 +2,7 @@ import EpisodeDTO, { iEpisodeToEpisodeDTOMapper } from "@dto/episode.dto";
 import { IEpisode } from "@models/interfaces/episode.interface";
 import IEpisodeService from "./interfaces/episode.service.interface";
 import EpisodeRepository from "@repositories/episode.repository";
-import { Inject } from "typedi";
+import { Inject, Service } from "typedi";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
 import EpisodeException from "@exceptions/episode.exception";
 import HttpCodes from "@constants/http.codes.enum";
@@ -15,6 +15,7 @@ import { Types } from "mongoose";
  * @class EpisodeService
  * @implements IEpisodeService
  */
+@Service()
 class EpisodeService implements IEpisodeService {
 
     private episodeRepository: EpisodeRepository;
