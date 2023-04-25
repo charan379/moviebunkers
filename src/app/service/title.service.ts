@@ -46,6 +46,9 @@ class TitleService implements ITitleService {
         seasonService: SeasonService,
         episodeService: EpisodeService) {
         this.titleRepository = titleRepository;
+        this.linkService = linkService;
+        this.seasonService = seasonService;
+        this.episodeService = episodeService;
     }
 
     /**
