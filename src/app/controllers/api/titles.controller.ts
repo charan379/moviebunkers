@@ -440,8 +440,8 @@ class TitleController {
             // Create a new title DTO object
             const newTitle: TitleDTO = await this.titleService.createTitle(ititle, userDto);
 
-            // Send success response with newly created title ID and success message
-            res.status(201).json({ message: "New Title Added Successfully", new_title_id: newTitle._id });
+            // Send success response with newly created title and success message
+            res.status(201).json({ message: "New Title Added Successfully", title: newTitle });
 
         } catch (error) {
             // Catch any errors that occur and pass them to the next middleware function in the chain (e.g. error-handler or logger)
