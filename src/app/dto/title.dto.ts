@@ -51,7 +51,42 @@ interface TitleDTO {
     favouriteByUser?: boolean;
     createdAt: Date;
     updatedAt: Date;
+}
 
+export default TitleDTO;
+
+export function ititleToTitleDTOMapperMinimal(iTitle: ITitle): Partial<TitleDTO> {
+    try {
+        const titleDTO: Partial<TitleDTO> = {
+            _id: iTitle?._id?.toString() ?? "",
+            title_type: iTitle?.title_type ?? "",
+            imdb_id: iTitle?.imdb_id ?? "",
+            tmdb_id: iTitle?.tmdb_id ?? "",
+            title: iTitle?.title ?? "",
+            poster_path: iTitle?.poster_path ?? "",
+            year: iTitle?.year ?? "",
+            runtime: iTitle?.runtime ?? "",
+            ratting: iTitle?.ratting ?? "",
+            // age_rattings: iTitle?.age_rattings ?? "",
+            genres: iTitle?.genres ?? "",
+            overview: iTitle?.overview ?? "",
+            status: iTitle?.status ?? "",
+            seenByUser: iTitle?.seenByUser,
+            unseenByUser: iTitle?.unseenByUser,
+            starredByUser: iTitle?.starredByUser,
+            favouriteByUser: iTitle?.favouriteByUser,
+            number_of_seasons: iTitle?.number_of_seasons ?? 0,
+            number_of_episodes: iTitle?.number_of_episodes ?? 0,
+        }
+
+        return titleDTO;
+    } catch (error: any) {
+        throw new TitleException(
+            `Title DTO Mapping Failed`,
+            HttpCodes.CONFLICT,
+            error?.message,
+            `ititleToTitleDTOMapperMinimal.function()`)
+    }
 }
 
 export function ititleToTitleDTOMapper(iTitle: ITitle): TitleDTO {
@@ -110,7 +145,6 @@ export function ititleToTitleDTOMapper(iTitle: ITitle): TitleDTO {
             `ititleToTitleDTOMapper.function()`)
     }
 }
-export default TitleDTO;
 
 export interface FindAllTitlesQueryDTO {
     search: string;

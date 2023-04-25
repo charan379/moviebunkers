@@ -9,9 +9,9 @@ interface ITitleService {
 
     createTitle(titleDTO: Partial<ITitle>, userDTO: UserDTO): Promise<TitleDTO>;
     getTitleById(id: string): Promise<TitleDTO>;
-    getAllTitles(queryDTO: FindAllTitlesQueryDTO): Promise<Page<TitleDTO>>;
+    getAllTitles(queryDTO: FindAllTitlesQueryDTO): Promise<Page<Partial<TitleDTO>>>;
     getTitleByIdWithUserData(titleId: string, userId: string): Promise<TitleDTO>
-    getAllTitlesWithUserData(queryDTO: FindAllTitlesQueryDTO, userId: string, userData: UserDataDTO): Promise<Page<TitleDTO>>;
+    getAllTitlesWithUserData(queryDTO: FindAllTitlesQueryDTO, userId: string, userData: UserDataDTO): Promise<Page<Partial<TitleDTO>>>;
     getAllAvailableLanguages(): Promise<Language[]>;
     getAllAvailableGenres(): Promise<string[]>;
     deleteTitleById(titleId: string): Promise<void>;

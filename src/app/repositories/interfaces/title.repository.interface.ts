@@ -9,9 +9,9 @@ interface ITitleRepository {
     findById(id: mongoose.Types.ObjectId, projection: ProjectionFields<ITitle>): Promise<ITitle | null>;
     findByTmdbId(tmdbId: number, projection: ProjectionFields<ITitle>): Promise<ITitle | null>;
     findByImdbId(imdbId: string, projection: ProjectionFields<ITitle>): Promise<ITitle | null>;
-    findAll({ query, sort, limit, page }: FindAllQuery<ITitle>, projection: ProjectionFields<ITitle>): Promise<Page<TitleDTO>>;
+    findAll({ query, sort, limit, page }: FindAllQuery<ITitle>, projection: ProjectionFields<ITitle>): Promise<Page<Partial<TitleDTO>>>;
     findByIdWithUserData(titleId: mongoose.Types.ObjectId, userId: mongoose.Types.ObjectId, projection: ProjectionFields<ITitle>): Promise<ITitle | null>;
-    findAllWithUserData({ query, sort, limit, page }: FindAllQuery<ITitle>, userId: mongoose.Types.ObjectId, projection: ProjectionFields<ITitle>): Promise<Page<TitleDTO>>;
+    findAllWithUserData({ query, sort, limit, page }: FindAllQuery<ITitle>, userId: mongoose.Types.ObjectId, projection: ProjectionFields<ITitle>): Promise<Page<Partial<TitleDTO>>>;
     fetchAllAvailableGenres(): Promise<Array<string>>;
     fetchAllAvailableLanguages(): Promise<Language[]>;
     updateTitleById(titleId: mongoose.Types.ObjectId, update: Partial<ITitle>): Promise<ITitle | null>;

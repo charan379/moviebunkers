@@ -199,7 +199,7 @@ class TitleService implements ITitleService {
      * @returns A Promise that resolves to a Page of TitleDTOs
      * @throws TitleException if there was an error while retrieving the titles
      */
-    async getAllTitles(queryDTO: FindAllTitlesQueryDTO): Promise<Page<TitleDTO>> {
+    async getAllTitles(queryDTO: FindAllTitlesQueryDTO): Promise<Page<Partial<TitleDTO>>> {
         try {
             // Construct an array of title types based on the 'movie' and 'tv' query parameters
             const title_types = [{ type: "movie", include: queryDTO?.movie ?? 0 }, { type: "tv", include: queryDTO?.tv ?? 0 }];
@@ -230,11 +230,20 @@ class TitleService implements ITitleService {
             const minimalProjection: ProjectionFields<ITitle> = {
                 _id: 1,
                 title_type: 1,
+                tmdb_id: 1,
+                imdb_id: 1,
                 title: 1,
-                ratting: 1,
-                year: 1,
                 poster_path: 1,
+                year: 1,
+                runtime: 1,
+                ratting: 1,
+                age_rattings: 1,
                 genres: 1,
+                overview: 1,
+                status: 1,
+                number_of_seasons: 1,
+                number_of_episodes: 1,
+
             }
             const normalProjection: ProjectionFields<ITitle> = {
                 __v: 0,
@@ -250,7 +259,7 @@ class TitleService implements ITitleService {
             }
 
             // Retrieve the titles from the repository and return a Page of TitleDTOs
-            const page: Page<TitleDTO> = await this.titleRepository.findAll(q, queryDTO.minimal ? minimalProjection : normalProjection);
+            const page: Page<Partial<TitleDTO>> = await this.titleRepository.findAll(q, queryDTO.minimal ? minimalProjection : normalProjection);
             return page;
 
         } catch (error: any) {
@@ -316,7 +325,7 @@ class TitleService implements ITitleService {
      * @returns {Promise<Page<TitleDTO>>} A page of TitleDTO objects containing all titles with user data based on the given query parameters.
      * @throws {TitleException} If an error occurs while retrieving the titles.
      */
-    async getAllTitlesWithUserData(queryDTO: FindAllTitlesQueryDTO, userId: string, userData: UserDataDTO): Promise<Page<TitleDTO>> {
+    async getAllTitlesWithUserData(queryDTO: FindAllTitlesQueryDTO, userId: string, userData: UserDataDTO): Promise<Page<Partial<TitleDTO>>> {
         try {
 
             // An array of title types to be queried for.
@@ -425,10 +434,16 @@ class TitleService implements ITitleService {
                 tmdb_id: 1,
                 imdb_id: 1,
                 title: 1,
-                ratting: 1,
-                year: 1,
                 poster_path: 1,
+                year: 1,
+                runtime: 1,
+                ratting: 1,
+                age_rattings: 1,
                 genres: 1,
+                overview: 1,
+                status: 1,
+                number_of_seasons: 1,
+                number_of_episodes: 1,
                 seenByUser: 1,
                 unseenByUser: 1,
                 starredByUser: 1,
@@ -452,7 +467,7 @@ class TitleService implements ITitleService {
             }
 
             // Run the query with the given options and projection fields
-            const page: Page<TitleDTO> = await this.titleRepository.findAllWithUserData(q, new mongoose.Types.ObjectId(userId), queryDTO.minimal ? minimalProjection : normalProjection);
+            const page: Page<Partial<TitleDTO>> = await this.titleRepository.findAllWithUserData(q, new mongoose.Types.ObjectId(userId), queryDTO.minimal ? minimalProjection : normalProjection);
 
             // Return the results
             return page;

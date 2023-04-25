@@ -347,7 +347,7 @@ class TitleController {
             const userData: UserDataDTO = await this.userDataService.getUserData(userDto._id);
 
             // Get a paginated list of all titles with user data
-            const page: Page<TitleDTO> = await this.titleService.getAllTitlesWithUserData(validQuery, userDto?._id, userData);
+            const page: Page<Partial<TitleDTO>> = await this.titleService.getAllTitlesWithUserData(validQuery, userDto?._id, userData);
 
             // Send the page of titles as the HTTP response
             res.status(HttpCodes.OK).json(page);

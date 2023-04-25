@@ -1,4 +1,4 @@
-import TitleDTO, { ititleToTitleDTOMapper } from "@dto/title.dto";
+import TitleDTO, { ititleToTitleDTOMapper, ititleToTitleDTOMapperMinimal } from "@dto/title.dto";
 import ITitle from "@models/interfaces/title.interface";
 import TitleModel from "@models/title.model";
 import mongoose, {
@@ -223,7 +223,7 @@ class TitleRepository implements ITitleRepository {
      * @param {ProjectionFields<ITitle>} projection - The projection fields for the query. Defaults to { __v: 0 }.
      * @returns {Promise<Page<TitleDTO>>} A page of TitleDTO objects that match the given query.
      */
-    async findAll({ query, sort, limit, page }: FindAllQuery<ITitle>, projection: ProjectionFields<ITitle> = { __v: 0 }): Promise<Page<TitleDTO>> {
+    async findAll({ query, sort, limit, page }: FindAllQuery<ITitle>, projection: ProjectionFields<ITitle> = { __v: 0 }): Promise<Page<Partial<TitleDTO>>> {
         try {
             // get the count of total_documnets that match with given query
             const total_results: any = await this.titleModel
@@ -241,11 +241,11 @@ class TitleRepository implements ITitleRepository {
                 .lean()
                 .exec();
 
-            const titleDTOs: TitleDTO[] = titlesList.map((iTitle) => {
-                return ititleToTitleDTOMapper(iTitle);
+            const titleDTOs: Partial<TitleDTO>[] = titlesList.map((iTitle) => {
+                return ititleToTitleDTOMapperMinimal(iTitle);
             });
 
-            const result: Page<TitleDTO> = {
+            const result: Page<Partial<TitleDTO>> = {
                 page: page,
                 total_pages: Math.ceil(total_results / limit),
                 total_results: total_results,
@@ -476,7 +476,7 @@ class TitleRepository implements ITitleRepository {
      * @param {ProjectionFields<ITitle>} projection - Projection criteria for filtering the fields to return.
      * @returns {Promise<Page<TitleDTO>>} A page of title DTOs.
      */
-    async findAllWithUserData({ query, sort, limit, page }: FindAllQuery<ITitle>, userId: mongoose.Types.ObjectId, projection: ProjectionFields<ITitle>): Promise<Page<TitleDTO>> {
+    async findAllWithUserData({ query, sort, limit, page }: FindAllQuery<ITitle>, userId: mongoose.Types.ObjectId, projection: ProjectionFields<ITitle>): Promise<Page<Partial<TitleDTO>>> {
         try {
             // This pipeline stage is a MongoDB aggregation lookup stage.
             // It performs a left outer join between the "titles" and "userData" collections.
@@ -645,13 +645,13 @@ class TitleRepository implements ITitleRepository {
 
 
             // Map title documents to title DTOs using a mapper function
-            const titleDTOs: TitleDTO[] = titlesList.map((titleDoc) => {
-                return ititleToTitleDTOMapper(titleDoc);
+            const titleDTOs: Partial<TitleDTO>[] = titlesList.map((titleDoc) => {
+                return ititleToTitleDTOMapperMinimal(titleDoc);
             });
 
 
             // Create a new `Page` object of type `TitleDTO`.
-            let result: Page<TitleDTO> = {
+            let result: Page<Partial<TitleDTO>> = {
                 // Set the `page` property to the current page number.
                 page: page,
                 // Calculate the `total_pages` property by dividing the total number of results by the `limit` parameter and rounding up to the nearest integer.
