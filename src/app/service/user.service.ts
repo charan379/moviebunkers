@@ -1,6 +1,4 @@
-import PageDTO from "@dto/page.dto";
 import IUser from "@models/interfaces/user.interface";
-import { FindAllQuery } from "@repositories/interfaces/custom.types.interfaces";
 import { generateHash } from "@utils/bcrypt";
 import MongoSortBuilder from "@utils/mongo.sort.builder";
 import { FilterQuery } from "mongoose";
@@ -11,6 +9,7 @@ import UserException from "../exceptions/user.exception";
 import UserRepository from "../repositories/user.repository";
 import IUserService from "./interfaces/user.service.interface";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
+import { FindAllQuery, Page } from "src/@types";
 
 /**
  * The `UserService` class is responsible for handling the business logic for
@@ -41,29 +40,42 @@ export class UserService implements IUserService {
   async createUser(newUserDTO: NewUserDTO): Promise<UserDTO> {
     try {
       // Check if user name already exists.
-      const userNameAlreadyExists = await this.userRepository.findByUserName(newUserDTO.userName);
+      const userNameAlreadyExists: IUser | null = await this.userRepository.findByUserName(newUserDTO.userName);
       if (userNameAlreadyExists) {
-        throw new UserException("User Name already exits", HttpCodes.BAD_REQUEST, `UserName: ${newUserDTO.userName} is already taken`);
+        throw new UserException(
+          "User Name already exits",
+          HttpCodes.BAD_REQUEST,
+          `UserName: ${newUserDTO.userName} is already taken`,
+          `@UserService.class: createUser.method()`);
       }
 
       // Check if email already exists.
-      const emailAlreadyExits = await this.userRepository.findByEmail(newUserDTO.email);
+      const emailAlreadyExits: IUser | null = await this.userRepository.findByEmail(newUserDTO.email);
       if (emailAlreadyExits) {
-        throw new UserException("Email already exits", HttpCodes.BAD_REQUEST, `Email: ${newUserDTO.email} is already taken`);
+        throw new UserException(
+          "Email already exits",
+          HttpCodes.BAD_REQUEST,
+          `Email: ${newUserDTO.email} is already taken`,
+          `@UserService.class: createUser.method()`);
+
       }
 
       // Hash the user's password.
-      const hashedPassword = await generateHash(newUserDTO.password);
+      const hashedPassword: string = await generateHash(newUserDTO.password);
 
       // Create a new user DTO with the hashed password.
       const newUserDTOWithHashedPassword = { ...newUserDTO, password: hashedPassword };
 
       // Create the new user.
-      const user = await this.userRepository.create(newUserDTOWithHashedPassword);
+      const user: IUser | null = await this.userRepository.create(newUserDTOWithHashedPassword);
 
       // Throw an exception if user creation failed.
       if (!user) {
-        throw new UserException("User creation failed", HttpCodes.INTERNAL_SERVER_ERROR, `Unknown Reason contact developer`);
+        throw new UserException(
+          "User creation failed",
+          HttpCodes.CONFLICT,
+          `Unknown Reason contact developer`,
+          `@UserService.class: createUser.method()`);
       }
 
       // Return the newly created user DTO.
@@ -74,7 +86,11 @@ export class UserService implements IUserService {
       if (error instanceof MoviebunkersException) {
         throw error;
       } else {
-        throw new UserException("Unexpected error occurred", HttpCodes.INTERNAL_SERVER_ERROR, error.message);
+        throw new UserException(
+          "Unexpected error occurred",
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          error.message,
+          `@UserService.class: createUser.method()`);
       }
     }
   }
@@ -89,11 +105,15 @@ export class UserService implements IUserService {
   async getUserById(id: string): Promise<UserDTO> {
     try {
       // Get the user by ID.
-      const user = await this.userRepository.findById(id);
+      const user: IUser | null = await this.userRepository.findById(id);
 
       // Throw an exception if the user is not found.
       if (!user) {
-        throw new UserException("User not found", HttpCodes.NOT_FOUND, `User not found for ID: ${id}`);
+        throw new UserException(
+          "User not found",
+          HttpCodes.BAD_REQUEST,
+          `User not found for ID: ${id}`,
+          `@UserService.class: getUserById.method()`);
       }
 
       // Return the user DTO.
@@ -104,7 +124,11 @@ export class UserService implements IUserService {
       if (error instanceof MoviebunkersException) {
         throw error;
       } else {
-        throw new UserException("Unexpected error occurred", HttpCodes.INTERNAL_SERVER_ERROR, error.message);
+        throw new UserException(
+          "Unexpected error occurred",
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          error.message,
+          `@UserService.class: getUserById.method()`);
       }
     }
   }
@@ -119,15 +143,15 @@ export class UserService implements IUserService {
   async getUserByUserName(userName: string, withPassword: boolean = false): Promise<UserDTO> {
     try {
       // Get the user from the repository by their username.
-      const user = await this.userRepository.findByUserName(userName);
+      const user: IUser | null = await this.userRepository.findByUserName(userName);
 
       // Throw an exception if the user is not found.
       if (!user) {
         throw new UserException(
           "User not found",
-          HttpCodes.NOT_FOUND,
+          HttpCodes.BAD_REQUEST,
           `User not found for username: ${userName}`,
-          "@UserService.class: getUserByUserName method"
+          "@UserService.class: getUserByUserName.method()"
         );
       }
 
@@ -139,7 +163,11 @@ export class UserService implements IUserService {
       if (error instanceof MoviebunkersException) {
         throw error;
       } else {
-        throw new UserException("Unexpected error occurred", HttpCodes.INTERNAL_SERVER_ERROR, error.message);
+        throw new UserException(
+          "Unexpected error occurred",
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          error.message,
+          "@UserService.class: getUserByUserName.method()");
       }
     }
   }
@@ -154,7 +182,7 @@ export class UserService implements IUserService {
   async getUserByEmail(email: string): Promise<UserDTO> {
     try {
       // Get the user from the repository by their email.
-      const user = await this.userRepository.findByEmail(email);
+      const user: IUser | null = await this.userRepository.findByEmail(email);
 
       // Throw an exception if the user is not found.
       if (!user) {
@@ -173,7 +201,11 @@ export class UserService implements IUserService {
       if (error instanceof MoviebunkersException) {
         throw error;
       } else {
-        throw new UserException("Unexpected error occurred", HttpCodes.INTERNAL_SERVER_ERROR, error.message);
+        throw new UserException(
+          "Unexpected error occurred",
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          error.message,
+          "@UserService.class: getUserByEmail.method()");
       }
     }
   }
@@ -186,7 +218,7 @@ export class UserService implements IUserService {
  * @returns {Promise<PageDTO>} - A Promise that resolves to a page of user information.
  * @throws {UserException} - Throws an exception if an unexpected error occurs.
  */
-  async getAllUsers(queryDTO: FindAllUsersQueryDTO): Promise<PageDTO> {
+  async getAllUsers(queryDTO: FindAllUsersQueryDTO): Promise<Page<UserDTO>> {
     try {
       // Build the filter query using the provided query parameters.
       const query: FilterQuery<IUser> = {
@@ -202,7 +234,7 @@ export class UserService implements IUserService {
 
       // Build the findAll query object using the filter query, sort options, and pagination parameters.
       const sort = queryDTO.sort_by ? await MongoSortBuilder(queryDTO.sort_by) : { createdAt: "desc" };
-      const q: FindAllQuery = {
+      const q: FindAllQuery<IUser> = {
         query,
         sort,
         limit: queryDTO?.limit ?? 5,
@@ -210,7 +242,7 @@ export class UserService implements IUserService {
       };
 
       // Retrieve a page of users information using the findAll query.
-      const page: PageDTO = await this.userRepository.findAll(q);
+      const page: Page<UserDTO> = await this.userRepository.findAll(q);
 
       // Return the page of users information.
       return page;
@@ -219,7 +251,11 @@ export class UserService implements IUserService {
       if (error instanceof MoviebunkersException) {
         throw error;
       } else {
-        throw new UserException("Unexpected error occurred", HttpCodes.INTERNAL_SERVER_ERROR, error.message);
+        throw new UserException(
+          "Unexpected error occurred",
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          error.message,
+          "@UserService.class: getAllUsers.method()");
       }
     }
   }
@@ -236,7 +272,7 @@ export class UserService implements IUserService {
   async updateUserByUserName(userName: string, userUpdateDTO: UpdateUserDTO): Promise<UserDTO> {
     try {
       // Get the user from the repository by their username.
-      const user = await this.userRepository.findByUserName(userName);
+      const user: IUser | null = await this.userRepository.findByUserName(userName);
 
       // Throw an exception if the user is not found.
       if (!user) {
@@ -244,20 +280,20 @@ export class UserService implements IUserService {
           "User not found",
           HttpCodes.NOT_FOUND,
           `User not found for username: ${userName}`,
-          "@UserService.class: updateUserByUserName method"
+          "@UserService.class: updateUserByUserName.method()"
         );
       }
 
       // Update the user's role and/or status.
-      const updatedUser = await this.userRepository.update(user.userName, userUpdateDTO);
+      const updatedUser: IUser | null = await this.userRepository.update(user.userName, userUpdateDTO);
 
       // Throw an exception if the update fails.
       if (!updatedUser) {
         throw new UserException(
           "User update failed",
-          HttpCodes.INTERNAL_SERVER_ERROR,
+          HttpCodes.CONFLICT,
           "Unknown reason - contact developer",
-          `@UserService.class: updateUserByUserName method - username: ${userName}, user: ${JSON.stringify(user)}, updateDTO: ${JSON.stringify(userUpdateDTO)}`
+          `@UserService.class: updateUserByUserName.method() - username: ${userName}, user: ${JSON.stringify(user)}, updateDTO: ${JSON.stringify(userUpdateDTO)}`
         );
       }
 
@@ -268,7 +304,11 @@ export class UserService implements IUserService {
       if (error instanceof UserException) {
         throw error;
       } else {
-        throw new UserException("Unexpected error occurred", HttpCodes.INTERNAL_SERVER_ERROR, error.message);
+        throw new UserException(
+          "Unexpected error occurred",
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          error.message,
+          `@UserService.class: updateUserByUserName.method()`);
       }
     }
   }

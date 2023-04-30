@@ -1,6 +1,7 @@
 import Joi from "joi";
 import UserRoles from "@constants/user.roles.enum";
 import UserStatus from "@constants/user.status.enum";
+import IUser from "@models/interfaces/user.interface";
 
 export const userNameSchema: Joi.StringSchema = Joi.string().min(5).max(16).example("user00001");
 export const emailSchema: Joi.StringSchema = Joi.string().email().example("user00001@gmail.com");
@@ -10,13 +11,13 @@ export const passwordSchema: Joi.StringSchema = Joi.string()
   .max(16)
   .example("!5tr0ng@pa55w0rd");
 
-export const userRegistrationSchema: Joi.ObjectSchema<any> = Joi.object({
+export const userRegistrationSchema: Joi.ObjectSchema<IUser> = Joi.object({
   userName: userNameSchema.required(),
   email: emailSchema.required(),
   password: passwordSchema.required(),
 });
 
-export const newUserSchema: Joi.ObjectSchema<any> = Joi.object({
+export const newUserSchema: Joi.ObjectSchema<IUser> = Joi.object({
   userName: userNameSchema.required(),
   email: emailSchema.required(),
   password: passwordSchema.required(),
@@ -35,12 +36,12 @@ export const findAllUserQuerySchema: Joi.ObjectSchema<any> = Joi.object({
   sort_by: Joi.string().example("role.desc"),
 })
 
-export const userUpdateSchema: Joi.ObjectSchema = Joi.object({
+export const userUpdateSchema: Joi.ObjectSchema<IUser> = Joi.object({
   status: Joi.string().valid(...Object.values(UserStatus)),
   role: Joi.string().valid(...[UserRoles.GUEST, UserRoles.USER, UserRoles.MODERATOR]),
 });
 
-export const lgoinSchema: Joi.ObjectSchema = Joi.object({
+export const lgoinSchema: Joi.ObjectSchema<IUser> = Joi.object({
   userName: userNameSchema.required(),
   password: passwordSchema.required(),
 })

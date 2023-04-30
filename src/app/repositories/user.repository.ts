@@ -1,13 +1,13 @@
-import PageDTO from "@dto/page.dto";
 import { UserDTO, iuserToUserDTOMapper } from "@dto/user.dto";
 import IUserRepository from "@repositories/interfaces/user.repository.interface";
 import { Model, ProjectionFields } from "mongoose";
 import { Service } from "typedi";
 import IUser from "@models/interfaces/user.interface";
 import UserModel from "@models/user.model";
-import { FindAllQuery } from "./interfaces/custom.types.interfaces";
 import RepositoryException from "@exceptions/repository.exception";
 import HttpCodes from "@constants/http.codes.enum";
+import { FindAllQuery, Page } from "src/@types";
+import MoviebunkersException from "@exceptions/moviebunkers.exception";
 
 /**
  * Repository class for User model
@@ -29,18 +29,25 @@ class UserRepository implements IUserRepository {
    * @returns A promise that resolves to the new user object
    * @throws {RepositoryException} - Throws an exception if there's an error creating the new user in the database
    */
-  async create(user: Partial<IUser>): Promise<IUser> {
+  async create(user: Partial<IUser>): Promise<IUser | null> {
     try {
       // create a new user in the database and return the result
-      return await this.userModel.create<Partial<IUser>>(user);
+      const newUser: IUser | null = await this.userModel.create<Partial<IUser>>(user);
+      // Return the user document if created, otherwise null
+      return newUser;
     } catch (error: any) {
-      // if an error occurs, catch it and throw a custom exception with relevant details
-      throw new RepositoryException(
-        `Not able to create new user: ${error?.message}`,
-        HttpCodes.INTERNAL_SERVER_ERROR,
-        `${JSON.stringify(error)}`,
-        `UserRepository.class: create.method()`
-      );
+      // If the error is a known exception, re-throw it
+      if (error instanceof MoviebunkersException) {
+        throw error
+      } else {
+        // Otherwise, wrap the error in a repository exception and re-throw it
+        throw new RepositoryException(
+          `Not able to create new user: ${error?.message}`,
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          `${JSON.stringify(error)}`,
+          `UserRepository.class: create.method()`
+        );
+      }
     }
   }
 
@@ -56,15 +63,23 @@ class UserRepository implements IUserRepository {
       // Use the Mongoose model's `findById()` method to find the user with the given ID
       // `projection` is an optional parameter that specifies the fields to be returned in the result
       // `lean()` is used to return a plain JavaScript object instead of a Mongoose document
-      return await this.userModel.findById(id, projection).lean().exec();
+      const user: IUser | null = await this.userModel.findById(id, projection).lean().exec();
+      // Return the user document if found, otherwise null
+      return user;
     } catch (error: any) {
-      // If there's an error, wrap it in a `RepositoryException` with a custom message, HTTP status code, error details, and method name
-      throw new RepositoryException(
-        `Unable to find user with ID: ${id}, error: ${error?.message}`,
-        HttpCodes.INTERNAL_SERVER_ERROR,
-        `${JSON.stringify(error)}`,
-        `UserRepository.class: findById.method()`
-      );
+      // If the error is a known exception, re-throw it
+      if (error instanceof MoviebunkersException) {
+        throw error
+      } else {
+        // Otherwise, wrap the error in a repository exception and re-throw it
+        // If there's an error, wrap it in a `RepositoryException` with a custom message, HTTP status code, error details, and method name
+        throw new RepositoryException(
+          `Unable to find user with ID: ${id}, error: ${error?.message}`,
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          `${JSON.stringify(error)}`,
+          `UserRepository.class: findById.method()`
+        );
+      }
     }
   }
 
@@ -79,21 +94,26 @@ class UserRepository implements IUserRepository {
     try {
       // Find the user in the database by their username
       // Exclude the __v field from the result
-      const user = await this.userModel
+      const user: IUser | null = await this.userModel
         .findOne({ userName: userName }, { __v: 0 })
         .lean()
         .exec();
 
-      // Return the user object if found, otherwise null
+      // Return the user document if found, otherwise null
       return user;
     } catch (error: any) {
-      // If there was an error, throw a custom RepositoryException
-      throw new RepositoryException(
-        `Not able to complete request: ${error?.message}`,
-        HttpCodes.INTERNAL_SERVER_ERROR,
-        `${JSON.stringify(error)}`,
-        `UserRepository.class: findByUserName.method()`
-      );
+      // If the error is a known exception, re-throw it
+      if (error instanceof MoviebunkersException) {
+        throw error
+      } else {
+        // Otherwise, wrap the error in a repository exception and re-throw it
+        throw new RepositoryException(
+          `Not able to complete request: ${error?.message}`,
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          `${JSON.stringify(error)}`,
+          `UserRepository.class: findByUserName.method()`
+        );
+      }
     }
   }
 
@@ -110,21 +130,28 @@ class UserRepository implements IUserRepository {
       // Use the findOne method to find a user with a matching email address
       // Use a case-insensitive regular expression to search for the email address
       // Exclude the password and version fields from the result by default
-      return await this.userModel
+      const user: IUser | null = await this.userModel
         .findOne(
           { email: { $regex: new RegExp(`^${email}$`, "i") } },
           projection
         )
         .lean()
         .exec();
+      // Return the user document if found, otherwise null
+      return user;
     } catch (error: any) {
-      // If an error occurs, wrap it in a RepositoryException and throw it with an appropriate error message
-      throw new RepositoryException(
-        `Not able to complete request: ${error?.message}`,
-        HttpCodes.INTERNAL_SERVER_ERROR,
-        `${JSON.stringify(error)}`,
-        `UserRepository.class: findByEmail.method()`
-      );
+      // If the error is a known exception, re-throw it
+      if (error instanceof MoviebunkersException) {
+        throw error
+      } else {
+        // Otherwise, wrap the error in a repository exception and re-throw it
+        throw new RepositoryException(
+          `Not able to complete request: ${error?.message}`,
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          `${JSON.stringify(error)}`,
+          `UserRepository.class: findByEmail.method()`
+        );
+      }
     }
   }
 
@@ -136,10 +163,10 @@ class UserRepository implements IUserRepository {
   * @param limit - The maximum number of users to return.
   * @param page - The page number to return.
   * @param projection - The fields to be returned in the result. By default, includes all fields except _id, password, and __v.
-  * @returns A promise that resolves to a PageDTO object.
+  * @returns A promise that resolves to a Page object.
   * @throws {RepositoryException} If there was an error while executing the query
   */
-  async findAll({ query, sort, limit, page }: FindAllQuery, projection: ProjectionFields<IUser> = { _id: 0, password: 0, __v: 0 }): Promise<PageDTO> {
+  async findAll({ query, sort, limit, page }: FindAllQuery<IUser>, projection: ProjectionFields<IUser> = { _id: 0, password: 0, __v: 0 }): Promise<Page<UserDTO>> {
     try {
       // Get the total number of results based on the query.
       const total_results = await this.userModel
@@ -159,8 +186,8 @@ class UserRepository implements IUserRepository {
         iuserToUserDTOMapper(iuser)
       ));
 
-      // Return a PageDTO object with the results.
-      const result: PageDTO = {
+      // Return a Page object with the results.
+      const result: Page<UserDTO> = {
         page,
         total_pages: Math.ceil(total_results / limit),
         total_results,
@@ -170,13 +197,18 @@ class UserRepository implements IUserRepository {
 
       return result;
     } catch (error: any) {
-      // Throw a custom RepositoryException if an error occurs.
-      throw new RepositoryException(
-        `Unable to complete request: ${error?.message}`,
-        HttpCodes.INTERNAL_SERVER_ERROR,
-        `${JSON.stringify(error)}`,
-        `UserRepository.class: findAll.method()`
-      );
+      // If the error is a known exception, re-throw it
+      if (error instanceof MoviebunkersException) {
+        throw error
+      } else {
+        // Otherwise, wrap the error in a repository exception and re-throw it
+        throw new RepositoryException(
+          `Unable to complete request: ${error?.message}`,
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          `${JSON.stringify(error)}`,
+          `UserRepository.class: findAll.method()`
+        );
+      }
     }
   }
 
@@ -192,7 +224,7 @@ class UserRepository implements IUserRepository {
     try {
       // Use findByIdAndUpdate to find the user by userName and update its properties
       // $set is used to update only the specified fields in the user object
-      const updatedUser = await this.userModel
+      const updatedUser: IUser | null = await this.userModel
         .findOneAndUpdate(
           { userName },
           { $set: user },
@@ -206,15 +238,21 @@ class UserRepository implements IUserRepository {
         .lean()
         .exec();
 
+      // Return the user document if updated, otherwise null
       return updatedUser;
     } catch (error: any) {
-      // Catch any errors and throw a RepositoryException with relevant information
-      throw new RepositoryException(
-        `Not able to complete request: ${error?.message}`,
-        HttpCodes.INTERNAL_SERVER_ERROR,
-        `${JSON.stringify(error)}`,
-        `UserRepository.class: update.method()`
-      );
+      // If the error is a known exception, re-throw it
+      if (error instanceof MoviebunkersException) {
+        throw error
+      } else {
+        // Otherwise, wrap the error in a repository exception and re-throw it
+        throw new RepositoryException(
+          `Not able to complete request: ${error?.message}`,
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          `${JSON.stringify(error)}`,
+          `UserRepository.class: update.method()`
+        );
+      }
     }
   }
 
@@ -230,13 +268,18 @@ class UserRepository implements IUserRepository {
       // Find and delete the user with the specified ID
       await this.userModel.findByIdAndDelete(id).lean().exec();
     } catch (error: any) {
-      // If an error occurs, throw a RepositoryException with details about the error
-      throw new RepositoryException(
-        `Not able to complete request: ${error?.message}`,
-        HttpCodes.INTERNAL_SERVER_ERROR,
-        `${JSON.stringify(error)}`,
-        `UserRepository.class: delete.method()`
-      );
+      // If the error is a known exception, re-throw it
+      if (error instanceof MoviebunkersException) {
+        throw error
+      } else {
+        // Otherwise, wrap the error in a repository exception and re-throw it
+        throw new RepositoryException(
+          `Not able to complete request: ${error?.message}`,
+          HttpCodes.INTERNAL_SERVER_ERROR,
+          `${JSON.stringify(error)}`,
+          `UserRepository.class: delete.method()`
+        );
+      }
     }
   }
 

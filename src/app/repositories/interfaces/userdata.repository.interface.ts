@@ -1,4 +1,4 @@
-import IUserData from "@models/interfaces/IUserData";
+import IUserData from "@models/interfaces/user.data.interface";
 import mongoose, { UpdateQuery } from "mongoose";
 
 

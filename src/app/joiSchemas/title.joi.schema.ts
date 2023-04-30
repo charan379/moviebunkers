@@ -1,10 +1,11 @@
-import TitleType from "@constants/titile.types.enum";
-import TitleSource from "@constants/title.souces.enum";
+import ITitle from "@models/interfaces/title.interface";
 import Joi from "joi";
-import { castSchema, countryCertification, languageSchema } from "./common.title.joi.schemas";
+import { castSchema, countryCertification, episodeSchema, languageSchema } from "./common.title.joi.schemas";
+import TitleSource from "@constants/title.souces.enum";
+import TitleType from "@constants/titile.types.enum";
 
 
-const baseTitleSchema: Joi.ObjectSchema = Joi.object({
+const titleSchema: Joi.ObjectSchema<ITitle> = Joi.object({
     // titile_type
     title_type: Joi.string()
         .valid(...[...Object.values(TitleType)])
@@ -63,6 +64,26 @@ const baseTitleSchema: Joi.ObjectSchema = Joi.object({
         .items(Joi.string().example("David Fincher")).allow(null),
     // cast
     cast: Joi.array().items(castSchema),
+    //  in_production
+    in_production: Joi.boolean().example(false),
+    //  created_by
+    created_by: Joi.array()
+        .items(Joi.string().example("David Benioff")).allow(null),
+    //  last_aired_date
+    last_aired_date: Joi.date().example("2019-05-19").allow(null).allow(""),
+
+    //  last_episode_aired
+    last_episode_aired: episodeSchema.allow(null),
+
+    //  next_episode_to_air
+    next_episode_to_air: episodeSchema.allow(null),
+
+    //  networks
+    networks: Joi.array().items(Joi.string().example("HBO")).allow(null),
+    // number_of_seasons
+    number_of_seasons: Joi.number().integer().example(8),
+    //  number_of_episodes
+    number_of_episodes: Joi.number().integer().example(73),
 })
 
-export default baseTitleSchema;
+export default titleSchema;

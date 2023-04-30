@@ -1,19 +1,20 @@
-import LanguageDTO from "@dto/language.dto";
-import PageDTO from "@dto/page.dto";
 import ITitle from "@models/interfaces/title.interface";
-import mongoose, { ObjectId, ProjectionFields } from "mongoose";
-import { FindAllQuery } from "./custom.types.interfaces";
+import mongoose, { ProjectionFields } from "mongoose";
+import TitleDTO from "@dto/title.dto";
+import { FindAllQuery, Language, Page } from "src/@types";
 
 
 interface ITitleRepository {
-    findById(id: string, projection: ProjectionFields<ITitle>): Promise<ITitle | null>;
+    create(title: Partial<ITitle>): Promise<ITitle | null>
+    findById(id: mongoose.Types.ObjectId, projection: ProjectionFields<ITitle>): Promise<ITitle | null>;
     findByTmdbId(tmdbId: number, projection: ProjectionFields<ITitle>): Promise<ITitle | null>;
     findByImdbId(imdbId: string, projection: ProjectionFields<ITitle>): Promise<ITitle | null>;
-    findAll({ query, sort, limit, page }: FindAllQuery, projection: ProjectionFields<ITitle>): Promise<PageDTO>;
+    findAll({ query, sort, limit, page }: FindAllQuery<ITitle>, projection: ProjectionFields<ITitle>): Promise<Page<Partial<TitleDTO>>>;
     findByIdWithUserData(titleId: mongoose.Types.ObjectId, userId: mongoose.Types.ObjectId, projection: ProjectionFields<ITitle>): Promise<ITitle | null>;
-    findAllWithUserData({ query, sort, limit, page }: FindAllQuery, userId: mongoose.Types.ObjectId, projection: ProjectionFields<ITitle>): Promise<PageDTO>;
+    findAllWithUserData({ query, sort, limit, page }: FindAllQuery<ITitle>, userId: mongoose.Types.ObjectId, projection: ProjectionFields<ITitle>): Promise<Page<Partial<TitleDTO>>>;
     fetchAllAvailableGenres(): Promise<Array<string>>;
-    fetchAllAvailableLanguages(): Promise<LanguageDTO[]>;
+    fetchAllAvailableLanguages(): Promise<Language[]>;
+    updateTitleById(titleId: mongoose.Types.ObjectId, update: Partial<ITitle>): Promise<ITitle | null>;
     deleteTitleById(titleId: mongoose.Types.ObjectId): Promise<void>;
 }
 

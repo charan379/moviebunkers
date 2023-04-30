@@ -1,8 +1,9 @@
 import LinkDTO from "@dto/link.dto";
-import ILink from "@models/interfaces/ILinks";
+import ILink from "@models/interfaces/link.interface";
 
 interface ILinksService {
   create(linkDto: Partial<ILink>): Promise<LinkDTO>;
+  getLinkById(id: string): Promise<LinkDTO>;
   getLinksByParentId(parentId: string): Promise<LinkDTO[]>;
   deleteById(id: string): Promise<void>;
   updateById(id: string, update: Partial<ILink>): Promise<LinkDTO>;

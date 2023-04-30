@@ -1,5 +1,5 @@
-import IUserData from "@models/interfaces/IUserData";
-import UserDataModel from "@models/UserData.model";
+import IUserData from "@models/interfaces/user.data.interface";
+import UserDataModel from "@models/user.data.model";
 import mongoose, { Model, UpdateQuery } from "mongoose";
 import { Service } from "typedi";
 import IUserDataRepository from "./interfaces/userdata.repository.interface";
@@ -38,7 +38,7 @@ class UserDataRepository implements IUserDataRepository {
             if (!newUserdata) {
                 throw new RepositoryException(
                     `Unable to initialize new userData`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `Error while initializing userdata`,
                     `UserDataRepository.class: create.method()`
                 );
@@ -53,7 +53,7 @@ class UserDataRepository implements IUserDataRepository {
                 // Otherwise, wrap the error in a repository exception and re-throw it
                 throw new RepositoryException(
                     `${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${error?.stack}`,
                     `UserDataRepository.class: create.method()`
                 );
@@ -83,7 +83,7 @@ class UserDataRepository implements IUserDataRepository {
                 // Otherwise, wrap the error in a repository exception and re-throw it
                 throw new RepositoryException(
                     `${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${error?.stack}`,
                     `UserDataRepository.class: findByUserId.method()`
                 );
@@ -117,7 +117,7 @@ class UserDataRepository implements IUserDataRepository {
                 // Otherwise, wrap the error in a repository exception and re-throw it
                 throw new RepositoryException(
                     `${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${error?.stack}`,
                     `UserDataRepository.class: updateUserData.method()`
                 );
@@ -133,13 +133,15 @@ class UserDataRepository implements IUserDataRepository {
     async findAll(): Promise<IUserData[]> {
         try {
             // Find all user data objects and populate them with associated user information
-            const userData = await this.userDataModel.find({}, { __v: 0 }).populate({
-                path: 'userId',
-                model: 'user',
-                localField: 'userId',
-                foreignField: '_id',
-                select: "userName email status role createdAt",
-            }).exec();
+            const userData = await this.userDataModel.find({}, { __v: 0 })
+                // .populate({
+                //     path: 'userId',
+                //     model: 'user',
+                //     localField: 'userId',
+                //     foreignField: '_id',
+                //     select: "userName email status role createdAt",
+                // })
+                .exec();
 
             return userData;
         } catch (error: any) {
@@ -150,7 +152,7 @@ class UserDataRepository implements IUserDataRepository {
                 // Otherwise, wrap the error in a repository exception and re-throw it
                 throw new RepositoryException(
                     `${error?.message}`,
-                    HttpCodes.INTERNAL_SERVER_ERROR,
+                    HttpCodes.CONFLICT,
                     `${error?.stack}`,
                     `UserDataRepository.class: findAll.method()`
                 );

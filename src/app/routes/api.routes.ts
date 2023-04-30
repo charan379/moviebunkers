@@ -1,5 +1,7 @@
 import AuthController from "@controllers/api/auth.controller";
+import EpisodeController from "@controllers/api/episode.controller";
 import LinksController from "@controllers/api/links.controller";
+import SeasonController from "@controllers/api/season.controller";
 import TitleController from "@controllers/api/titles.controller";
 import UserDataController from "@controllers/api/userdata.controller";
 import UserController from "@controllers/api/users.controller";
@@ -24,6 +26,12 @@ router.use("/userdata", userDataController.router);
 
 const linksController = Container.get(LinksController);
 router.use("/links", linksController.router)
+
+const seasonController = Container.get(SeasonController);
+router.use("/seasons", seasonController.router)
+
+const episodeController = Container.get(EpisodeController);
+router.use("/episodes", episodeController.router)
 router.use("/health-check", (req, res, next) => {
     try {
         const data = {

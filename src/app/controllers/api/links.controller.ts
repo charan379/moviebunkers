@@ -3,7 +3,7 @@ import LinkDTO from "@dto/link.dto";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
 import linkSchema from "@joiSchemas/linkSchema";
 import Authorize from "@middlewares/authorization.middleware";
-import ILink from "@models/interfaces/ILinks";
+import ILink from "@models/interfaces/link.interface";
 import LinksService from "@service/links.service";
 import JoiValidator from "@utils/joi.validator";
 import { NextFunction, Request, Response, Router } from "express";
@@ -34,7 +34,7 @@ class LinksController {
      *      content:
      *        application/json:
      *          schema:
-     *              $ref: '#/components/schemas/new_link'
+     *              $ref: '#/components/schemas/link'
      *   responses:
      *       201:
      *          description: Success
@@ -44,6 +44,31 @@ class LinksController {
      *          description: Unauthorized
      */
     this.router.post("/new", Authorize(LevelOne), this.newLink.bind(this));
+
+    /**
+     * Endpoint for getting Link by its ID
+     * @swagger
+     * /links/id/{id}:
+     *  get:
+     *   tags:
+     *     - Links
+     *   summary: API to get link by its id
+     *   description: returns a link found for given id
+     *   parameters:
+     *     - in: path
+     *       name: id
+     *       schema:
+     *          type: string
+     *   responses:
+     *       200:
+     *          description: Success
+     *       400:
+     *          description: Invalid id
+     *       401:
+     *          description: Unauthorized
+     */
+    this.router.get("/id/:id", Authorize(LevelOne), this.getLinkByid.bind(this));
+
 
     /**
      * Endpoint for getting Links by Parent ID
@@ -60,14 +85,14 @@ class LinksController {
      *       schema:
      *          type: string
      *   responses:
-     *       201:
+     *       200:
      *          description: Success
      *       400:
      *          description: Invalid parentId
      *       401:
      *          description: Unauthorized
      */
-    this.router.get("/parent/:parentId", Authorize(LevelOne), this.getByParentId.bind(this));
+    this.router.get("/parent/:parentId", Authorize(LevelOne), this.getLinksByParentId.bind(this));
 
     /**
      * Endpoint for updating an existing new Link
@@ -82,7 +107,7 @@ class LinksController {
      *      content:
      *        application/json:
      *          schema:
-     *              $ref: '#/components/schemas/new_link'
+     *              $ref: '#/components/schemas/link'
      *   parameters:
      *     - in: path
      *       name: id
@@ -120,7 +145,7 @@ class LinksController {
      *       401:
      *          description: Unauthorized
      */
-    this.router.delete("/delete/:id", Authorize(LevelThere), this.delete.bind(this));
+    this.router.delete("/delete/:id", Authorize(LevelThere), this.deleteLink.bind(this));
 
     /**
      * Endpoint for deleting all links by Parent ID
@@ -144,7 +169,7 @@ class LinksController {
      *       401:
      *          description: Unauthorized
      */
-    this.router.delete("/delete-many/:parentId", Authorize(LevelThere), this.deleteMany.bind(this));
+    this.router.delete("/delete-many/:parentId", Authorize(LevelThere), this.deleteManyLinks.bind(this));
   }
 
   /**
@@ -178,6 +203,39 @@ class LinksController {
   }
 
   /**
+   * Controller method to get link associated with  ID.
+   *
+   * @route POST /links/id/:id
+   * 
+   * @param req - Express Request object.
+   * @param res - Express Response object.
+   * @param next - Express NextFunction object.
+   * @returns void
+   */
+  private async getLinkByid(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      // Validate  ID using Joi.
+      const linkId: string = await JoiValidator(
+        ObjectIdSchema,
+        req?.params?.id,
+        { allowUnknown: false, stripUnknown: true, abortEarly: false }
+      );
+
+      // Retrieve link associated with the link ID using the LinksService.
+      const linkDTO: LinkDTO = await this.linksService.getLinkById(
+        linkId
+      );
+
+      // Send a response containing the linkDTO in JSON format.
+      res.status(200).json(linkDTO);
+    } catch (error) {
+      // Forward any errors to the Express error handler.
+      next(error);
+    }
+  }
+
+
+  /**
    * Controller method to get all links associated with a parent ID.
    *
    * @route POST /links/parent/:parentId
@@ -187,7 +245,7 @@ class LinksController {
    * @param next - Express NextFunction object.
    * @returns void
    */
-  private async getByParentId(req: Request, res: Response, next: NextFunction): Promise<void> {
+  private async getLinksByParentId(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       // Validate parent ID using Joi.
       const parentId: string = await JoiValidator(
@@ -202,7 +260,7 @@ class LinksController {
       );
 
       // Send a response containing the linkDTOs array in JSON format.
-      res.status(201).json(linkDTOs);
+      res.status(200).json(linkDTOs);
     } catch (error) {
       // Forward any errors to the Express error handler.
       next(error);
@@ -259,7 +317,7 @@ class LinksController {
    * @param next - Express NextFunction object.
    * @returns void
    */
-  private async delete(req: Request, res: Response, next: NextFunction) {
+  private async deleteLink(req: Request, res: Response, next: NextFunction) {
     try {
       // Validate object ID using Joi.
       const objectId: string = await JoiValidator(
@@ -289,7 +347,7 @@ class LinksController {
    * @param next - Express NextFunction object.
    * @returns void
    */
-  private async deleteMany(req: Request, res: Response, next: NextFunction) {
+  private async deleteManyLinks(req: Request, res: Response, next: NextFunction) {
     try {
       // Validate parent ID using Joi.
       const parentId: string = await JoiValidator(

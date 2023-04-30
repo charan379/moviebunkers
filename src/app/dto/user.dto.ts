@@ -1,5 +1,7 @@
+import HttpCodes from "@constants/http.codes.enum";
 import UserRoles from "@constants/user.roles.enum";
 import UserStatus from "@constants/user.status.enum";
+import UserException from "@exceptions/user.exception";
 import IUser from "@models/interfaces/user.interface";
 
 /**
@@ -66,31 +68,40 @@ export interface LoginDTO {
  * If true, maps the `password` field to the UserDTO instance.
  * Default is false.
  * @returns A new UserDTO instance with data from the provided IUser instance.
+ * @throws {UserException} If DTO mapping failed
  */
-export function iuserToUserDTOMapper(iuser: IUser, options: { withPassword: boolean } = { withPassword: false }): UserDTO {
-    let userDTO: UserDTO;
-    if (options.withPassword) {
-        userDTO = {
-            _id: iuser?._id.toString(),
-            userName: iuser?.userName,
-            email: iuser?.email,
-            status: iuser?.status,
-            password: iuser?.password,
-            role: iuser?.role,
-            createdAt: iuser?.createdAt,
-            updatedAt: iuser?.updatedAt,
+export function iuserToUserDTOMapper(iuser: IUser | any, options: { withPassword: boolean } = { withPassword: false }): UserDTO {
+    try {
+        let userDTO: UserDTO;
+        if (options.withPassword) {
+            userDTO = {
+                _id: iuser?._id?.toString() ?? "",
+                userName: iuser?.userName ?? "",
+                email: iuser?.email ?? "",
+                status: iuser?.status ?? "",
+                password: iuser?.password ?? "",
+                role: iuser?.role ?? "",
+                createdAt: iuser?.createdAt ?? "",
+                updatedAt: iuser?.updatedAt ?? "",
+            }
+        } else {
+            userDTO = {
+                _id: iuser?._id?.toString() ?? "",
+                userName: iuser?.userName ?? "",
+                email: iuser?.email ?? "",
+                status: iuser?.status ?? "",
+                role: iuser?.role ?? "",
+                createdAt: iuser?.createdAt ?? "",
+                updatedAt: iuser?.updatedAt ?? "",
+            }
         }
-    } else {
-        userDTO = {
-            _id: iuser?._id.toString(),
-            userName: iuser?.userName,
-            email: iuser?.email,
-            status: iuser?.status,
-            role: iuser?.role,
-            createdAt: iuser?.createdAt,
-            updatedAt: iuser?.updatedAt,
-        }
-    }
 
-    return userDTO
+        return userDTO
+    } catch (error: any) {
+        throw new UserException(
+            `USER DTO Mapping Failed`,
+            HttpCodes.CONFLICT,
+            error?.message,
+            `iuserToUserDTOMapper.function()`)
+    }
 }

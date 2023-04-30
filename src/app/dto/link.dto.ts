@@ -2,7 +2,7 @@ import ContentQuality from "@constants/contenetQuality.enum";
 import ContentType from "@constants/contentTypes.enum";
 import LinkType from "@constants/linkTypes.enum";
 import LanguageDTO from "./language.dto";
-import ILink from "@models/interfaces/ILinks";
+import ILink from "@models/interfaces/link.interface";
 
 /**
  * Represents a data transfer object for a link document.
@@ -32,7 +32,7 @@ export default LinkDTO;
 export function ilinkToLinkDTOMapper(link: ILink): LinkDTO {
     const linkDTO: LinkDTO = {
         _id: link._id?.toString(),
-        parentId: link?.parentId.toString(),
+        parentId: link?.parentId?.toString(),
         contentType: link?.contentType,
         languages: link?.languages,
         linkType: link?.linkType,
