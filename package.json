@@ -1,6 +1,6 @@
 {
   "name": "moviebunkers",
-  "version": "2.0.7",
+  "version": "2.1.0",
   "private": true,
   "scripts": {
     "start": "ts-node --files -r tsconfig-paths/register server.ts ",
