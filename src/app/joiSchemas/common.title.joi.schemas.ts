@@ -4,6 +4,36 @@ import TitleSource from "@constants/title.souces.enum";
 import Joi from "joi";
 import { ObjectIdSchema } from "./common.joi.schemas";
 
+export const externalIdsSchema: Joi.ObjectSchema = Joi.object({
+    imdb_id: Joi.string().allow(null).allow(""),
+    freebase_mid: Joi.string().allow(null).allow(""),
+    freebase_id: Joi.string().allow(null).allow(""),
+    tvdb_id: Joi.number().integer().allow(null).allow(""),
+    tvrage_id: Joi.number().integer().allow(null).allow(""),
+    wikidata_id: Joi.string().allow(null).allow(""),
+    facebook_id: Joi.string().allow(null).allow(""),
+    instagram_id: Joi.string().allow(null).allow(""),
+    twitter_id: Joi.string().allow(null).allow(""),
+});
+
+export const vedioSchema: Joi.ObjectSchema = Joi.object({
+    name: Joi.string().example("GAME OF THRONES - SEASON 1- TRAILER"),
+    site: Joi.string().example("YouTube"),
+    key: Joi.string().example("bjqEWgDVPe0"),
+    size: Joi.number().integer().example(1080),
+    type: Joi.string().example("Trailer"),
+    official: Joi.boolean().example(true),
+    published_at: Joi.date().example("2017-02-20"),
+});
+
+export const imageSchema: Joi.ObjectSchema = Joi.object({
+    aspect_ratio: Joi.number().example(1.778),
+    height: Joi.number().integer().example(1080),
+    width: Joi.number().integer().example(1920),
+    type: Joi.string().example("backdrop"),
+    file_path: Joi.string().example('https://image.tmdb.org/t/p/original/gfLe4nKLyYl4V5x62QZ6jRGEolA.jpg'),
+});
+
 export const languageSchema: Joi.ObjectSchema = Joi.object({
     ISO_639_1_code: Joi.string().required().example("en"),
     english_name: Joi.string().required().example("English"),

@@ -1,7 +1,7 @@
 import Country from "@constants/country.enum";
 import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
-import { AgeRatting, Cast, Language } from "src/@types";
+import { AgeRatting, Cast, Image, Language, Video } from "src/@types";
 import EpisodeDTO, { iEpisodeToEpisodeDTOMapper } from "./episode.dto";
 import { UserDTO, iuserToUserDTOMapper } from "./user.dto";
 import ITitle from "@models/interfaces/title.interface";
@@ -41,6 +41,10 @@ interface TitleDTO {
     networks: string[]; // tv specific
     number_of_seasons: number; // tv specific
     number_of_episodes: number; // tv specific
+    external_ids: object,
+    videos: Video[];
+    images: Image[];
+    // 
     added_by: string;
     last_modified_by: string;
     title_owner?: UserDTO
@@ -124,6 +128,10 @@ export function ititleToTitleDTOMapper(iTitle: ITitle): TitleDTO {
             networks: iTitle?.networks ?? "",
             number_of_seasons: iTitle?.number_of_seasons ?? "",
             number_of_episodes: iTitle?.number_of_episodes ?? "",
+            external_ids: iTitle?.external_ids ?? {},
+            videos: iTitle?.videos ?? [],
+            images: iTitle?.images ?? [],
+            // 
             added_by: iTitle?.added_by?.toString() ?? "",
             last_modified_by: iTitle?.last_modified_by?.toString() ?? "",
             title_owner: iuserToUserDTOMapper(iTitle?.title_owner, { withPassword: false }) ?? "",

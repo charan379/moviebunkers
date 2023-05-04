@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Image, Video } from "src/@types";
 
 export interface IEpisode {
     _id: mongoose.Types.ObjectId;
@@ -12,6 +13,9 @@ export interface IEpisode {
     runtime: number;
     still_path: string;
     directors: string[];
+    videos: Video[];
+    images: Image[];
+    // 
     createdAt: Date;
     updatedAt: Date;
 }

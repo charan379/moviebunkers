@@ -1,6 +1,7 @@
 import { ISeason } from "@models/interfaces/season.interface";
 import Joi from "joi";
 import { ObjectIdSchema } from "./common.joi.schemas";
+import { imageSchema, vedioSchema } from "./common.title.joi.schemas";
 
 
 export const seasonSchema: Joi.ObjectSchema<ISeason> = Joi.object({
@@ -20,4 +21,8 @@ export const seasonSchema: Joi.ObjectSchema<ISeason> = Joi.object({
         )
         .allow(null)
         .allow(""),
+
+    videos: Joi.array().items(vedioSchema).allow(null).allow(""),
+    
+    images: Joi.array().items(imageSchema).allow(null).allow(""),
 })
