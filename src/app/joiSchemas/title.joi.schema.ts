@@ -1,6 +1,6 @@
 import ITitle from "@models/interfaces/title.interface";
 import Joi from "joi";
-import { castSchema, countryCertification, episodeSchema, languageSchema } from "./common.title.joi.schemas";
+import { castSchema, countryCertification, episodeSchema, externalIdsSchema, imageSchema, languageSchema, vedioSchema } from "./common.title.joi.schemas";
 import TitleSource from "@constants/title.souces.enum";
 import TitleType from "@constants/titile.types.enum";
 
@@ -15,7 +15,7 @@ const titleSchema: Joi.ObjectSchema<ITitle> = Joi.object({
         .valid(...[...Object.values(TitleSource)])
         .required(),
     // imdb_id
-    imdb_id: Joi.string().example("tt0137523"),
+    imdb_id: Joi.string().example("tt0137523").allow(null).allow(""),
     // tmdb_id
     tmdb_id: Joi.number().integer().example(550),
     // title
@@ -84,6 +84,12 @@ const titleSchema: Joi.ObjectSchema<ITitle> = Joi.object({
     number_of_seasons: Joi.number().integer().example(8),
     //  number_of_episodes
     number_of_episodes: Joi.number().integer().example(73),
+
+    external_ids: externalIdsSchema.allow(null).allow(""),
+
+    videos: Joi.array().items(vedioSchema).allow(null).allow(""),
+
+    images: Joi.array().items(imageSchema).allow(null).allow(""),
 })
 
 export default titleSchema;

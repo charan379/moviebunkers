@@ -1,6 +1,7 @@
 import HttpCodes from "@constants/http.codes.enum";
 import TitleException from "@exceptions/title.exeception";
 import { IEpisode } from "@models/interfaces/episode.interface";
+import { Image, Video } from "src/@types";
 
 
 interface EpisodeDTO {
@@ -15,6 +16,8 @@ interface EpisodeDTO {
     runtime: number;
     still_path: string;
     directors: string[];
+    videos: Video[];
+    images: Image[];
 }
 export default EpisodeDTO;
 
@@ -31,7 +34,10 @@ export function iEpisodeToEpisodeDTOMapper(iEpisode: IEpisode): EpisodeDTO {
             overview: iEpisode?.overview ?? "",
             runtime: iEpisode?.runtime ?? "",
             still_path: iEpisode?.still_path ?? "",
-            directors: iEpisode?.directors ?? []
+            directors: iEpisode?.directors ?? [],
+            videos: iEpisode?.videos ?? [],
+            images: iEpisode?.images ?? [],
+
         }
         return episodeDTO;
     } catch (error: any) {

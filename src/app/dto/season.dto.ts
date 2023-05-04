@@ -1,6 +1,7 @@
 import HttpCodes from "@constants/http.codes.enum";
 import TitleException from "@exceptions/title.exeception";
 import { ISeason } from "@models/interfaces/season.interface";
+import { Image, Video } from "src/@types";
 
 
 interface SeasonDTO {
@@ -12,6 +13,8 @@ interface SeasonDTO {
     name: string;
     overview: string;
     poster_path: string;
+    videos: Video[];
+    images: Image[];
 }
 
 export default SeasonDTO;
@@ -27,6 +30,8 @@ export function iSeasonToSeasonDTOMapper(iSeason: ISeason): SeasonDTO {
             name: iSeason?.name ?? "",
             overview: iSeason?.overview ?? "",
             poster_path: iSeason?.poster_path ?? "",
+            videos: iSeason?.videos ?? [],
+            images: iSeason?.images ?? [],
         }
         return seasonDTO;
     } catch (error: any) {

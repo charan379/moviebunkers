@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import TitleType from "@constants/titile.types.enum";
 import TitleSource from "@constants/title.souces.enum";
 import { IEpisode } from "./episode.interface";
-import { AgeRatting, Cast, Language } from "src/@types";
+import { AgeRatting, Cast, Image, Language, Video } from "src/@types";
 import IUser from "./user.interface";
 
 interface ITitle {
@@ -38,6 +38,10 @@ interface ITitle {
     networks: string[]; // tv specific
     number_of_seasons: number; // tv specific
     number_of_episodes: number; // tv specific
+    external_ids: object,
+    videos: Video[];
+    images: Image[];
+    // 
     added_by: Types.ObjectId;
     last_modified_by: Types.ObjectId;
     title_owner?: IUser;

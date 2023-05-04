@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Image, Video } from "src/@types";
 
 
 export interface ISeason {
@@ -10,6 +11,9 @@ export interface ISeason {
     name: string;
     overview: string;
     poster_path: string;
+    videos: Video[];
+    images: Image[];
+    // 
     createdAt: Date;
     updatedAt: Date;
 }

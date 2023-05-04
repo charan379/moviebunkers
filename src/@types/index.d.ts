@@ -1,4 +1,5 @@
 import { FilterQuery } from "mongoose";
+import { type } from "os";
 
 type NonNullableObject<T> = {
     [K in keyof T as T[K] extends null ? never : K]: T[K];
@@ -45,4 +46,22 @@ type FindAllQuery<T> = {
     limit: number,
     page: number,
 
+}
+
+type Video = {
+    name: string,
+    site: string,
+    key: string,
+    size: number,
+    type: string,
+    official: boolean,
+    published_at: Date,
+}
+
+type Image = {
+    aspect_ratio: number,
+    height: number,
+    width: number,
+    type: string,
+    file_path: string,
 }

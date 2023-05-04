@@ -28,7 +28,68 @@ const seasonSchema: Schema<ISeason> = new Schema<ISeason>(
         },
         poster_path: {
             type: String,
-        }
+        },
+
+        // videos
+        videos: {
+            type: [{
+                name: {
+                    type: String,
+                    default: ""
+                },
+                site: {
+                    type: String,
+                    default: ""
+                },
+                key: {
+                    type: String,
+                    default: ""
+                },
+                size: {
+                    type: Number,
+                    default: 0
+                },
+                type: {
+                    type: String,
+                    default: ""
+                },
+                official: {
+                    type: Boolean,
+                    default: false
+                },
+                published_at: {
+                    type: Date,
+                }
+            }],
+            _id: false,
+        },
+
+        // images
+        images: {
+            type: [{
+                aspect_ratio: {
+                    type: Number,
+                    default: 0,
+                },
+                height: {
+                    type: Number,
+                    default: 0,
+                },
+                width: {
+                    type: Number,
+                    default: 0,
+                },
+                type: {
+                    type: String,
+                    default: ""
+                },
+                file_path: {
+                    type: String,
+                    default: ""
+                }
+            }],
+            _id: false,
+        },
     },
     {
         timestamps: {

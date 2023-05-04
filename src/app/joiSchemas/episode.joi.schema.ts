@@ -1,6 +1,7 @@
 import { IEpisode } from "@models/interfaces/episode.interface";
 import Joi from "joi";
 import { ObjectIdSchema } from "./common.joi.schemas";
+import { imageSchema, vedioSchema } from "./common.title.joi.schemas";
 
 
 export const episodeSchema: Joi.ObjectSchema<IEpisode> = Joi.object({
@@ -18,4 +19,8 @@ export const episodeSchema: Joi.ObjectSchema<IEpisode> = Joi.object({
     ).allow(null).allow(""),
     runtime: Joi.number().integer().example(57).allow("").allow(null),
     directors: Joi.array().items(Joi.string().example("Alex Graves")).allow(null).allow(""),
+
+    videos: Joi.array().items(vedioSchema).allow(null).allow(""),
+
+    images: Joi.array().items(imageSchema).allow(null).allow("")
 })
