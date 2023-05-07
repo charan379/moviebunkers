@@ -1,6 +1,7 @@
 import HttpCodes from "@constants/http.codes.enum";
 import EpisodeDTO from "@dto/episode.dto";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
+import { sortSkipLimitSchema } from "@joiSchemas/common.title.joi.schemas";
 import { episodeSchema } from "@joiSchemas/episode.joi.schema";
 import { IEpisode } from "@models/interfaces/episode.interface";
 import EpisodeService from "@service/episode.service";
@@ -88,6 +89,22 @@ class EpisodeController {
           *       name: seasonId
           *       schema:
           *          type: string
+          *     - in: query
+          *       name: limit
+          *       schema:
+          *          type: integer
+          *     - in: query
+          *       name: skip
+          *       schema:
+          *          type: integer
+          *          example: 3
+          *          default: 0
+          *          minimum: 0
+          *     - in: query
+          *       name: sort_by
+          *       schema:
+          *          type: string
+          *          example: air_date.desc
           *   responses:
           *       200:
           *          description: Success
@@ -258,8 +275,18 @@ class EpisodeController {
                 stripUnknown: true
             })
 
+            //  validate skip, sort, limit options in query
+            const validSkipSortLimitQuery = await JoiValidator(sortSkipLimitSchema, req?.query, {
+                abortEarly: false,
+                stripUnknown: true
+            })
+
             // call getEpisodesByTvSeasonId method of seasonService class to get array of episodeDTOs
-            const episodeDTOs: EpisodeDTO[] = await this.episodeService.getEpisodesByTvSeasonId(tvShowId, seasonId);
+            const episodeDTOs: EpisodeDTO[] = await this.episodeService.getEpisodesByTvSeasonId(tvShowId, seasonId, {
+                limit: validSkipSortLimitQuery?.limit ?? 0,
+                skip: validSkipSortLimitQuery?.skip ?? 0,
+                sortBy: validSkipSortLimitQuery?.sort_by ?? "createdAt.desc",
+            });
 
             // respond with status code 200 with an array of SeasonDTOs to client
             res.status(HttpCodes.OK).json(episodeDTOs);

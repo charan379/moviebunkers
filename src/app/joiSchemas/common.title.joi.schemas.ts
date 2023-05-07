@@ -4,6 +4,12 @@ import TitleSource from "@constants/title.souces.enum";
 import Joi from "joi";
 import { ObjectIdSchema } from "./common.joi.schemas";
 
+export const sortSkipLimitSchema: Joi.ObjectSchema = Joi.object({
+    sort_by: Joi.string().example("createdAt.desc"),
+    limit: Joi.number().integer().example(5),
+    skip: Joi.number().integer().example(2),
+})
+
 export const externalIdsSchema: Joi.ObjectSchema = Joi.object({
     imdb_id: Joi.string().allow(null).allow(""),
     freebase_mid: Joi.string().allow(null).allow(""),

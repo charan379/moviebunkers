@@ -6,6 +6,7 @@ import { Inject, Service } from "typedi";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
 import EpisodeException from "@exceptions/episode.exception";
 import HttpCodes from "@constants/http.codes.enum";
+import MongoSortBuilder from "@utils/mongo.sort.builder";
 import { Types } from "mongoose";
 
 /**
@@ -79,16 +80,24 @@ class EpisodeService implements IEpisodeService {
      * @async
      * @param {string} tvShowId - The ID of the TV show to retrieve episodes for.
      * @param {string} seasonId - The ID of the season to retrieve episodes for.
+     * @param {object} options - An optional object containing pagination and sorting options.
+     * @param {number} options.limit - The maximum number of episodes to retrieve (default: 0, meaning no limit).
+     * @param {number} options.skip - The number of episodes to skip (default: 0).
+     * @param {object} options.sortBy - An object specifying the field to sort by and the sort order (default: { createdAt: "desc" }).
      * @returns {Promise<EpisodeDTO[]>} A promise that resolves to an array of EpisodeDTO objects.
      * @throws {EpisodeException} If an error occurs while retrieving the episodes.
      */
-    async getEpisodesByTvSeasonId(tvShowId: string, seasonId: string): Promise<EpisodeDTO[]> {
+    async getEpisodesByTvSeasonId(tvShowId: string, seasonId: string, options: { limit: number, skip: number, sortBy: string } = { limit: 0, skip: 0, sortBy: "createdAt.desc" }): Promise<EpisodeDTO[]> {
         try {
             // Declare an empty array to hold the resulting EpisodeDTO objects
             let episodeDTOs: EpisodeDTO[];
 
             // Call the `findByTvSeasonId` method of the `episodeRepository` object to retrieve the IEpisode objects
-            const iepisodes: IEpisode[] = await this.episodeRepository.findByTvSeasonId(new Types.ObjectId(tvShowId), new Types.ObjectId(seasonId));
+            const iepisodes: IEpisode[] = await this.episodeRepository.findByTvSeasonId(new Types.ObjectId(tvShowId), new Types.ObjectId(seasonId), {
+                limit: options.limit,
+                skip: options.skip,
+                sortBy: MongoSortBuilder(options.sortBy),
+            });
 
             // Map the IEpisode objects to EpisodeDTO objects using the `iEpisodeToEpisodeDTOMapper` function
             episodeDTOs = iepisodes.map(iepisode => iEpisodeToEpisodeDTOMapper(iepisode));
