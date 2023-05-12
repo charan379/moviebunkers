@@ -71,16 +71,18 @@ export function ititleToTitleDTOMapperMinimal(iTitle: ITitle): Partial<TitleDTO>
             year: iTitle?.year ?? "",
             runtime: iTitle?.runtime ?? "",
             ratting: iTitle?.ratting ?? "",
-            // age_rattings: iTitle?.age_rattings ?? "",
+            tagline: iTitle?.tagline ?? "",
             genres: iTitle?.genres ?? "",
             overview: iTitle?.overview ?? "",
             status: iTitle?.status ?? "",
+            number_of_seasons: iTitle?.number_of_seasons ?? "",
+            number_of_episodes: iTitle?.number_of_episodes ?? "",
+            videos: iTitle?.videos ?? [],
             seenByUser: iTitle?.seenByUser,
             unseenByUser: iTitle?.unseenByUser,
             starredByUser: iTitle?.starredByUser,
             favouriteByUser: iTitle?.favouriteByUser,
-            number_of_seasons: iTitle?.number_of_seasons ?? 0,
-            number_of_episodes: iTitle?.number_of_episodes ?? 0,
+            updatedAt: iTitle?.updatedAt ?? "",
         }
 
         return titleDTO;
