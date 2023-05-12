@@ -6,6 +6,7 @@ import { ISeason } from "@models/interfaces/season.interface";
 import SeasonException from "@exceptions/season.exception";
 import HttpCodes from "@constants/http.codes.enum";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
+import MongoSortBuilder from "@utils/mongo.sort.builder";
 import { Types } from "mongoose";
 
 /**
@@ -110,20 +111,29 @@ class SeasonService implements ISeasonService {
 
 
     /**
-     * Retrieves all seasons belonging to a TV show with the specified ID.
+     * Retrieves all seasons belonging to a TV show with the specified ID, with optional pagination and sorting.
      *
      * @async
      * @param {string} tvShowId - The ID of the TV show to retrieve seasons for.
+     * @param {object} options - An optional object containing pagination and sorting options.
+     * @param {number} options.limit - The maximum number of seasons to retrieve (default: 0, meaning no limit).
+     * @param {number} options.skip - The number of seasons to skip (default: 0).
+     * @param {object} options.sortBy - An object specifying the field to sort by and the sort order (default: { createdAt: "desc" }).
      * @returns {Promise<SeasonDTO[]>} A Promise that resolves to an array of SeasonDTO objects.
      * @throws {SeasonException} If there is an error retrieving the seasons.
      */
-    async getSeasonsByTvShowId(tvShowId: string): Promise<SeasonDTO[]> {
+    async getSeasonsByTvShowId(tvShowId: string, options: { limit: number, skip: number, sortBy: string } = { limit: 0, skip: 0, sortBy: "createdAt.desc" }): Promise<SeasonDTO[]> {
         try {
             // Declare a variable to store the resulting SeasonDTO array
             let seasonDTOs: SeasonDTO[];
 
             // Call the findByTvShowId method of the season repository and pass in the TV show ID as an ObjectId
-            const iseasons: ISeason[] = await this.seasonRepository.findByTvShowId(new Types.ObjectId(tvShowId));
+            // and query options { limit, skip, sort}
+            const iseasons: ISeason[] = await this.seasonRepository.findByTvShowId(new Types.ObjectId(tvShowId), {
+                limit: options.limit,
+                skip: options.skip,
+                sortBy: MongoSortBuilder(options.sortBy),
+            });
 
             // Map each ISeason object to a SeasonDTO object and store the resulting array in seasonDTOs
             seasonDTOs = iseasons.map(iseason => iSeasonToSeasonDTOMapper(iseason));

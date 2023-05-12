@@ -102,13 +102,21 @@ class SeasonRepository implements ISeasonRepository {
      * @method
      * 
      * @param {Types.ObjectId} tvShowId - The ID of the TV show.
+     * @param {Object} options - An optional object containing pagination and sorting options.
+     * @param {number} options.limit - The maximum number of documents to return.
+     * @param {number} options.skip - The number of documents to skip.
+     * @param {SortObject} options.sortBy - An object specifying the sorting criteria.
      * @returns {Promise<ISeason[]>} - A promise that resolves to an array of all seasons associated with the TV show ID.
      * @throws {RepositoryException} - If an error occurs while retrieving the seasons.
      */
-    async findByTvShowId(tvShowId: Types.ObjectId): Promise<ISeason[]> {
+    async findByTvShowId(tvShowId: Types.ObjectId, options: { limit: number, skip: number, sortBy: any }): Promise<ISeason[]> {
         try {
             // Find all seasons associated with the given TV show ID, excluding the "__v" field
-            const season: ISeason[] = await this.seasonModel.find({ tv_show_id: tvShowId }, { __v: 0 }).lean().exec();
+            const season: ISeason[] = await this.seasonModel.find({ tv_show_id: tvShowId }, { __v: 0 })
+                .limit(options.limit)
+                .skip(options.skip)
+                .sort(options.sortBy)
+                .lean().exec();
             // Return the found seasons
             return season;
         } catch (error: any) {

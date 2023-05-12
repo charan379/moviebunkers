@@ -94,20 +94,30 @@ class EpisodeRepository implements IEpisodeRepository {
 
 
     /**
-     * Finds all episodes that match the given tvShowId and seasonId.
-     * 
-     * @param {Types.ObjectId} tvShowId - The id of the TV show to filter by.
-     * @param {Types.ObjectId} seasonId - The id of the season to filter by.
+     * Finds all episodes that match the given TV show ID and season ID.
+     *
+     * @async
+     * @function findByTvSeasonId
+     * @param {Types.ObjectId} tvShowId - The ID of the TV show to filter by.
+     * @param {Types.ObjectId} seasonId - The ID of the season to filter by.
+     * @param {Object} options - Additional options to limit, skip, and sort the results.
+     * @param {number} options.limit - The maximum number of results to return.
+     * @param {number} options.skip - The number of results to skip before returning.
+     * @param {Object} options.sortBy - The field and direction to sort the results by.
      * @returns {Promise<IEpisode[]>} - A promise that resolves with an array of episodes that match the given filters.
      * @throws {RepositoryException} - If an error occurs while retrieving the episodes.
      */
-    async findByTvSeasonId(tvShowId: Types.ObjectId, seasonId: Types.ObjectId): Promise<IEpisode[]> {
+    async findByTvSeasonId(tvShowId: Types.ObjectId, seasonId: Types.ObjectId, options: { limit: number, skip: number, sortBy: any }): Promise<IEpisode[]> {
         try {
             // Find all episodes that match the given tvShowId and seasonId
             const episodes = await this.episodeModel.find({
                 tv_show_id: tvShowId,
                 season_id: seasonId,
-            }).lean().exec();
+            })
+                .limit(options.limit)
+                .skip(options.skip)
+                .sort(options.sortBy)
+                .lean().exec();
             // Return the episodes found
             return episodes
 

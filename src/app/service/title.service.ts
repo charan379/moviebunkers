@@ -240,9 +240,12 @@ class TitleService implements ITitleService {
                 age_rattings: 1,
                 genres: 1,
                 overview: 1,
+                tagline: 1,
+                videos: 1,
                 status: 1,
                 number_of_seasons: 1,
                 number_of_episodes: 1,
+                updatedAt: 1,
 
             }
             const normalProjection: ProjectionFields<ITitle> = {
@@ -441,13 +444,16 @@ class TitleService implements ITitleService {
                 age_rattings: 1,
                 genres: 1,
                 overview: 1,
+                tagline: 1,
                 status: 1,
                 number_of_seasons: 1,
                 number_of_episodes: 1,
+                videos: 1,
                 seenByUser: 1,
                 unseenByUser: 1,
                 starredByUser: 1,
                 favouriteByUser: 1,
+                updatedAt: 1,
             }
 
             const normalProjection: ProjectionFields<ITitle> = {

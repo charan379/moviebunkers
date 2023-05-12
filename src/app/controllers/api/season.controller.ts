@@ -1,6 +1,7 @@
 import HttpCodes from "@constants/http.codes.enum";
 import SeasonDTO from "@dto/season.dto";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
+import { sortSkipLimitSchema } from "@joiSchemas/common.title.joi.schemas";
 import { seasonSchema } from "@joiSchemas/season.joi.schema";
 import { ISeason } from "@models/interfaces/season.interface";
 import SeasonService from "@service/season.service";
@@ -84,6 +85,22 @@ class SeasonController {
           *       name: id
           *       schema:
           *          type: string
+          *     - in: query
+          *       name: limit
+          *       schema:
+          *          type: integer
+          *     - in: query
+          *       name: skip
+          *       schema:
+          *          type: integer
+          *          example: 3
+          *          default: 0
+          *          minimum: 0
+          *     - in: query
+          *       name: sort_by
+          *       schema:
+          *          type: string
+          *          example: air_date.desc
           *   responses:
           *       200:
           *          description: Success
@@ -247,8 +264,18 @@ class SeasonController {
                 stripUnknown: true
             })
 
+            //  validate skip, sort, limit options in query
+            const validSkipSortLimitQuery = await JoiValidator(sortSkipLimitSchema, req?.query, {
+                abortEarly: false,
+                stripUnknown: true
+            })
+
             // call getSeasonsByTvShowId method of seasonService class to get array of seasonDTOs
-            const seasonDTOs: SeasonDTO[] = await this.seasonService.getSeasonsByTvShowId(validId);
+            const seasonDTOs: SeasonDTO[] = await this.seasonService.getSeasonsByTvShowId(validId, {
+                limit: validSkipSortLimitQuery?.limit ?? 0,
+                skip: validSkipSortLimitQuery?.skip ?? 0,
+                sortBy: validSkipSortLimitQuery?.sort_by ?? "createdAt.desc",
+            });
 
             // respond with status code 200 with an array of SeasonDTOs to client
             res.status(HttpCodes.OK).json(seasonDTOs);
