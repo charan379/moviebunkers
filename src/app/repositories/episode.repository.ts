@@ -95,7 +95,7 @@ class EpisodeRepository implements IEpisodeRepository {
 
     /**
      * Finds all episodes that match the given TV show ID and season ID.
-     *
+     * @deprecated
      * @async
      * @function findByTvSeasonId
      * @param {Types.ObjectId} tvShowId - The ID of the TV show to filter by.
@@ -137,6 +137,48 @@ class EpisodeRepository implements IEpisodeRepository {
         }
     }
 
+    /**
+     * Finds all episodes that match the given TV show ID and season number.
+     * @async
+     * @function findByTvShowId
+     * @param {Types.ObjectId} tvShowId - The ID of the TV show to filter by.
+     * @param {number} seasonNumber - The season_number of the season to filter by.
+     * @param {Object} options - Additional options to limit, skip, and sort the results.
+     * @param {number} options.limit - The maximum number of results to return.
+     * @param {number} options.skip - The number of results to skip before returning.
+     * @param {Object} options.sortBy - The field and direction to sort the results by.
+     * @returns {Promise<IEpisode[]>} - A promise that resolves with an array of episodes that match the given filters.
+     * @throws {RepositoryException} - If an error occurs while retrieving the episodes.
+     */
+    async findByTvShowId(tvShowId: Types.ObjectId, seasonNumber: number, options: { limit: number, skip: number, sortBy: any }): Promise<IEpisode[]> {
+        try {
+            // Find all episodes that match the given tvShowId and seasonNumber
+            const episodes = await this.episodeModel.find({
+                tv_show_id: tvShowId,
+                season_number: seasonNumber,
+            })
+                .limit(options.limit)
+                .skip(options.skip)
+                .sort(options.sortBy)
+                .lean().exec();
+            // Return the episodes found
+            return episodes
+
+        } catch (error: any) {
+            // If the error is a known exception, re-throw it
+            if (error instanceof MoviebunkersException) {
+                throw error;
+            } else {
+                // Otherwise, wrap the error in a repository exception and re-throw it
+                throw new RepositoryException(
+                    `${error?.message}`,
+                    HttpCodes.CONFLICT,
+                    `${error?.stack}`,
+                    `EpisodeRepository.class: findByTvShowId.method()`
+                );
+            }
+        }
+    }
 
     /**
       * Update an episode document by the given tv show and season ids with the given update object
