@@ -1,8 +1,10 @@
 import HttpCodes from "@constants/http.codes.enum";
+import { LevelOne, LevelThere, LevelTwo } from "@constants/user.roles.enum";
 import EpisodeDTO from "@dto/episode.dto";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
 import { sortSkipLimitSchema } from "@joiSchemas/common.title.joi.schemas";
 import { episodeSchema } from "@joiSchemas/episode.joi.schema";
+import Authorize from "@middlewares/authorization.middleware";
 import { IEpisode } from "@models/interfaces/episode.interface";
 import EpisodeService from "@service/episode.service";
 import JoiValidator from "@utils/joi.validator";
@@ -48,7 +50,7 @@ class EpisodeController {
          *       401:
          *          description: Unauthorized
          */
-        this.router.post("/new", this.createEpisode.bind(this));
+        this.router.post("/new", Authorize(LevelTwo), this.createEpisode.bind(this));
 
         /**
           * @swagger
@@ -71,7 +73,7 @@ class EpisodeController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.get("/:id", this.getEpisodeById.bind(this));
+        this.router.get("/:id", Authorize(LevelOne), this.getEpisodeById.bind(this));
 
         /**
           * @swagger
@@ -116,7 +118,7 @@ class EpisodeController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.get("/tv/:tvShowId/season/:seasonNumber", this.getEpisodesByTvShowIdAndSeasonNumber.bind(this));
+        this.router.get("/tv/:tvShowId/season/:seasonNumber", Authorize(LevelOne), this.getEpisodesByTvShowIdAndSeasonNumber.bind(this));
 
         /**
           * @swagger
@@ -144,7 +146,7 @@ class EpisodeController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.put("/update/:id", this.updateEpisodeById.bind(this));
+        this.router.put("/update/:id", Authorize(LevelTwo), this.updateEpisodeById.bind(this));
 
         /**
           * @swagger
@@ -167,7 +169,7 @@ class EpisodeController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.delete("/delete/:id", this.deleteEpisodeById.bind(this));
+        this.router.delete("/delete/:id", Authorize(LevelThere), this.deleteEpisodeById.bind(this));
 
         /**
           * @swagger
@@ -190,7 +192,7 @@ class EpisodeController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.delete("/delete-by-tv/:tvShowId", this.deleteEpisodesByTvShowId.bind(this));
+        this.router.delete("/delete-by-tv/:tvShowId", Authorize(LevelThere), this.deleteEpisodesByTvShowId.bind(this));
     }
 
     /**
