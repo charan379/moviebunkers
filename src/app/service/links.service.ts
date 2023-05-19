@@ -6,6 +6,7 @@ import ILink from "@models/interfaces/link.interface";
 import mongoose, { Types } from "mongoose";
 import LinkException from "@exceptions/link.exception";
 import HttpCodes from "@constants/http.codes.enum";
+import MongoSortBuilder from "@utils/mongo.sort.builder";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
 
 /**
@@ -106,16 +107,24 @@ class LinksService implements ILinksService {
    * Retrieves an array of link DTOs that belong to the specified parent ID.
    *
    * @param {string} parentId - ID of the parent document to filter by.
+   * @param {object} options - An optional object containing pagination and sorting options.
+   * @param {number} options.limit - The maximum number of links to retrieve (default: 0, meaning no limit).
+   * @param {number} options.skip - The number of links to skip (default: 0).
+   * @param {object} options.sortBy - An object specifying the field to sort by and the sort order (default: { createdAt: "desc" }).
    * @returns {Promise<LinkDTO[]>} Array of link documents with the given parentId as DTOs.
    * @throws {LinkException} If the retrieval fails for any reason.
    */
-  async getLinksByParentId(parentId: string): Promise<LinkDTO[]> {
+  async getLinksByParentId(parentId: string, options: { limit: number, skip: number, sortBy: string } = { limit: 0, skip: 0, sortBy: "createdAt.desc" }): Promise<LinkDTO[]> {
     try {
       // Initialize an empty array to hold the resulting link DTOs
       let linkDTOs: LinkDTO[] = [];
       // Call the getAllByParentId method of the links repository, passing in the parent ID as an ObjectID
       const links: ILink[] = await this.linksRepository.findAllByParentId(
-        new mongoose.Types.ObjectId(parentId)
+        new mongoose.Types.ObjectId(parentId), {
+        limit: options.limit,
+        skip: options.skip,
+        sortBy: MongoSortBuilder(options.sortBy),
+      }
       );
       // Map each link document to a LinkDTO and add it to the result array
       links.map((ilink) => {
