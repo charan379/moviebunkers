@@ -1,5 +1,5 @@
 import HttpCodes from "@constants/http.codes.enum";
-import { LevelOne, LevelThere, LevelTwo } from "@constants/user.roles.enum";
+import { LevelOne, LevelThere, LevelTwo, LevelZero } from "@constants/user.roles.enum";
 import SeasonDTO from "@dto/season.dto";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
 import { sortSkipLimitSchema } from "@joiSchemas/common.title.joi.schemas";
@@ -72,7 +72,7 @@ class SeasonController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.get("/:id", Authorize(LevelOne), this.getSeasonById.bind(this));
+        this.router.get("/:id", Authorize(LevelZero), this.getSeasonById.bind(this));
 
         /**
           * @swagger
@@ -111,7 +111,7 @@ class SeasonController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.get("/tv/:id", Authorize(LevelOne), this.getSeasonsByTvShowId.bind(this));
+        this.router.get("/tv/:id", Authorize(LevelZero), this.getSeasonsByTvShowId.bind(this));
 
         /**
           * @swagger
