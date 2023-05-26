@@ -10,6 +10,17 @@ type AgeCertification = {
     age: number[]
 }
 
+type AuthenticatedUser = {
+    userId: string,
+    userName: string,
+    email: string,
+    status: UserStatus,
+    role: UserRoles,
+    createdAt: Date,
+    updatedAt: Date,
+    token: string,
+}
+
 type AgeRatting = {
     country: string,
     ratting: string,

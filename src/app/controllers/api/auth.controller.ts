@@ -7,6 +7,7 @@ import Authorize from "@middlewares/authorization.middleware";
 import { AuthService } from "@service/auth.service";
 import JoiValidator from "@utils/joi.validator";
 import { CookieOptions, NextFunction, Request, Response, Router } from "express";
+import { AuthenticatedUser } from "src/@types";
 import { Inject, Service } from "typedi";
 
 /**
@@ -132,7 +133,7 @@ class AuthController {
             const validLoginDTO: LoginDTO = await JoiValidator(lgoinSchema, req?.body, { allowUnknown: false, stripUnknown: true, abortEarly: false });
 
             // Generate a JWT token and store it in a cookie
-            const token: string = await this.authService.login(validLoginDTO);
+            const { token }: AuthenticatedUser = await this.authService.login(validLoginDTO);
             res.cookie("auth", `Bearer ${token}`, {
                 maxAge: 30 * 24 * 60 * 60 * 1000,
                 httpOnly: true,
@@ -166,11 +167,13 @@ class AuthController {
             const validLoginDTO: LoginDTO = await JoiValidator(lgoinSchema, req?.body, { allowUnknown: false, stripUnknown: true, abortEarly: false });
 
             // Attempt to authenticate the user with the provided credentials and retrieve a token
-            const token: string = await this.authService.login(validLoginDTO);
+            const { userId, userName, email, role, status, updatedAt, createdAt, token }: AuthenticatedUser = await this.authService.login(validLoginDTO);
 
             // Send a success response with the authentication token
             res.status(HttpCodes.OK)
-                .json({ message: "Successfully authenticated", token: token });
+                .json({
+                    userId, userName, email, role, status, updatedAt, createdAt, token
+                });
 
         } catch (error) {
             // If an error occurs, pass it to the next middleware function in the request chain

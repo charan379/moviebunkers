@@ -7,6 +7,7 @@ import { Inject, Service } from "typedi";
 import IAuthService from "./interfaces/auth.service.interface";
 import { UserService } from "./user.service";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
+import { AuthenticatedUser } from "src/@types";
 
 /**
  * AuthService - Service responsible for authentication and authorization of users.
@@ -32,7 +33,7 @@ export class AuthService implements IAuthService {
      * @returns {string} - A JWT token string on successful authentication.
      * @throws {AuthorizationException} - If the user is not found or the password is incorrect.
      */
-    public async login(loginDTO: LoginDTO): Promise<string> {
+    public async login(loginDTO: LoginDTO): Promise<AuthenticatedUser> {
         try {
             // Get user details by username.
             const userDTO: UserDTO = await this.userService.getUserByUserName(loginDTO.userName, true);
@@ -63,8 +64,19 @@ export class AuthService implements IAuthService {
             // Generate a JWT token for the user.
             const token: string = await generateJwtToken(userDTO);
 
-            // Return the JWT token.
-            return token;
+            const { _id, userName, email, status, role, createdAt, updatedAt } = userDTO;
+
+            const authenticatedUser: AuthenticatedUser = {
+                userId: _id,
+                userName: userName,
+                email: email, status: status,
+                role: role,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                token: token,
+            }
+            // Return the authenticatedUser.
+            return authenticatedUser
         } catch (error: any) {
             // Catch any exception and re-throw it as an AuthorizationException.
             if (error instanceof MoviebunkersException) {
