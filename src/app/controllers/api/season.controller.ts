@@ -1,8 +1,10 @@
 import HttpCodes from "@constants/http.codes.enum";
+import { LevelOne, LevelThere, LevelTwo, LevelZero } from "@constants/user.roles.enum";
 import SeasonDTO from "@dto/season.dto";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
 import { sortSkipLimitSchema } from "@joiSchemas/common.title.joi.schemas";
 import { seasonSchema } from "@joiSchemas/season.joi.schema";
+import Authorize from "@middlewares/authorization.middleware";
 import { ISeason } from "@models/interfaces/season.interface";
 import SeasonService from "@service/season.service";
 import JoiValidator from "@utils/joi.validator";
@@ -47,7 +49,7 @@ class SeasonController {
          *       401:
          *          description: Unauthorized
          */
-        this.router.post("/new", this.createSeason.bind(this));
+        this.router.post("/new", Authorize(LevelTwo), this.createSeason.bind(this));
 
         /**
           * @swagger
@@ -70,7 +72,7 @@ class SeasonController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.get("/:id", this.getSeasonById.bind(this));
+        this.router.get("/:id", Authorize(LevelZero), this.getSeasonById.bind(this));
 
         /**
           * @swagger
@@ -109,7 +111,7 @@ class SeasonController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.get("/tv/:id", this.getSeasonsByTvShowId.bind(this));
+        this.router.get("/tv/:id", Authorize(LevelZero), this.getSeasonsByTvShowId.bind(this));
 
         /**
           * @swagger
@@ -137,7 +139,7 @@ class SeasonController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.put("/update/:id", this.updateSeasonById.bind(this));
+        this.router.put("/update/:id", Authorize(LevelTwo), this.updateSeasonById.bind(this));
 
         /**
           * @swagger
@@ -160,7 +162,7 @@ class SeasonController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.delete("/delete/:id", this.deleteSeasonById.bind(this));
+        this.router.delete("/delete/:id", Authorize(LevelThere), this.deleteSeasonById.bind(this));
 
         /**
           * @swagger
@@ -183,7 +185,7 @@ class SeasonController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.delete("/delete-many/:id", this.deleteSeasonsByTvShowId.bind(this));
+        this.router.delete("/delete-many/:id", Authorize(LevelThere), this.deleteSeasonsByTvShowId.bind(this));
     }
 
     /**

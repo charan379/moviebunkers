@@ -1,12 +1,15 @@
 import HttpCodes from "@constants/http.codes.enum";
+import { LevelOne, LevelThere, LevelTwo, LevelZero } from "@constants/user.roles.enum";
 import EpisodeDTO from "@dto/episode.dto";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
 import { sortSkipLimitSchema } from "@joiSchemas/common.title.joi.schemas";
 import { episodeSchema } from "@joiSchemas/episode.joi.schema";
+import Authorize from "@middlewares/authorization.middleware";
 import { IEpisode } from "@models/interfaces/episode.interface";
 import EpisodeService from "@service/episode.service";
 import JoiValidator from "@utils/joi.validator";
 import { NextFunction, Request, Response, Router } from "express";
+import Joi from "joi";
 import { Inject, Service } from "typedi";
 
 /**
@@ -47,7 +50,7 @@ class EpisodeController {
          *       401:
          *          description: Unauthorized
          */
-        this.router.post("/new", this.createEpisode.bind(this));
+        this.router.post("/new", Authorize(LevelTwo), this.createEpisode.bind(this));
 
         /**
           * @swagger
@@ -70,25 +73,27 @@ class EpisodeController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.get("/:id", this.getEpisodeById.bind(this));
+        this.router.get("/:id", Authorize(LevelZero), this.getEpisodeById.bind(this));
 
         /**
           * @swagger
-          * /episodes/tv/{tvShowId}/season/{seasonId}:
+          * /episodes/tv/{tvShowId}/season/{seasonNumber}:
           *  get:
           *   tags:
           *     - Episodes
-          *   summary: API to fetch episodes based on tvShow id and season Id
-          *   description: fetches episodes with tvShow id and season Id
+          *   summary: API to fetch episodes based on tvShowId and seasonNumber
+          *   description: fetches episodes with tvShowId and seasonNumber
           *   parameters:
           *     - in: path
           *       name: tvShowId
           *       schema:
           *          type: string
           *     - in: path
-          *       name: seasonId
+          *       name: seasonNumber
           *       schema:
-          *          type: string
+          *          type: integer
+          *          example: 1
+          *          minimum: 1
           *     - in: query
           *       name: limit
           *       schema:
@@ -113,7 +118,7 @@ class EpisodeController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.get("/tv/:tvShowId/season/:seasonId", this.getEpisodesByTvSeasonId.bind(this));
+        this.router.get("/tv/:tvShowId/season/:seasonNumber", Authorize(LevelZero), this.getEpisodesByTvShowIdAndSeasonNumber.bind(this));
 
         /**
           * @swagger
@@ -141,7 +146,7 @@ class EpisodeController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.put("/update/:id", this.updateEpisodeById.bind(this));
+        this.router.put("/update/:id", Authorize(LevelTwo), this.updateEpisodeById.bind(this));
 
         /**
           * @swagger
@@ -164,7 +169,7 @@ class EpisodeController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.delete("/delete/:id", this.deleteEpisodeById.bind(this));
+        this.router.delete("/delete/:id", Authorize(LevelThere), this.deleteEpisodeById.bind(this));
 
         /**
           * @swagger
@@ -187,7 +192,7 @@ class EpisodeController {
           *       401:
           *          description: Unauthorized
           */
-        this.router.delete("/delete-by-tv/:tvShowId", this.deleteEpisodesByTvShowId.bind(this));
+        this.router.delete("/delete-by-tv/:tvShowId", Authorize(LevelThere), this.deleteEpisodesByTvShowId.bind(this));
     }
 
     /**
@@ -253,7 +258,7 @@ class EpisodeController {
 
     /**
        * Controller to handle API requests for getting episodes by tvshow id and season id
-       * 
+       * @deprecated
        * @route GET /episodes/tv/:tvShowId/season/:seasonId
        * 
        * @param {Request} req - Express request object
@@ -283,6 +288,51 @@ class EpisodeController {
 
             // call getEpisodesByTvSeasonId method of seasonService class to get array of episodeDTOs
             const episodeDTOs: EpisodeDTO[] = await this.episodeService.getEpisodesByTvSeasonId(tvShowId, seasonId, {
+                limit: validSkipSortLimitQuery?.limit ?? 0,
+                skip: validSkipSortLimitQuery?.skip ?? 0,
+                sortBy: validSkipSortLimitQuery?.sort_by ?? "createdAt.desc",
+            });
+
+            // respond with status code 200 with an array of SeasonDTOs to client
+            res.status(HttpCodes.OK).json(episodeDTOs);
+        } catch (error) {
+            // pass error to next() function in chain, probably an error-handler or logger
+            next(error)
+        }
+    }
+
+    /**
+       * Controller to handle API requests for getting episodes by tvshow id and seasonNumber
+       * 
+       * @route GET /episodes/tv/:tvShowId/season/:seasonNumber
+       * 
+       * @param {Request} req - Express request object
+       * @param {Response} res - Express response object
+       * @param {NextFunction} next - Express next middleware function
+       * @returns {Promise<void>} - Returns a promise that resolves with void when the function completes.
+       */
+    private async getEpisodesByTvShowIdAndSeasonNumber(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            // Validate tvShowId
+            const tvShowId = await JoiValidator(ObjectIdSchema, req?.params?.tvShowId, {
+                abortEarly: false,
+                stripUnknown: true
+            });
+
+            // Validate tvShowId
+            const seasonNumber = await JoiValidator(Joi.number().required(), req?.params?.seasonNumber, {
+                abortEarly: false,
+                stripUnknown: true
+            })
+
+            //  validate skip, sort, limit options in query
+            const validSkipSortLimitQuery = await JoiValidator(sortSkipLimitSchema, req?.query, {
+                abortEarly: false,
+                stripUnknown: true
+            })
+
+            // call getEpisodesByTvSeasonId method of seasonService class to get array of episodeDTOs
+            const episodeDTOs: EpisodeDTO[] = await this.episodeService.getEpisodesByTvShowIdAndSeasonNumber(tvShowId, seasonNumber, {
                 limit: validSkipSortLimitQuery?.limit ?? 0,
                 skip: validSkipSortLimitQuery?.skip ?? 0,
                 sortBy: validSkipSortLimitQuery?.sort_by ?? "createdAt.desc",

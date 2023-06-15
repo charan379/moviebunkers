@@ -99,16 +99,23 @@ class LinksRepository implements ILinksRespository {
   /**
    * Fetches all links from the database that have a given parentId value
    * @param {Types.ObjectId} parentId - The ObjectId value to search for in the parentId field
+   * @param {Object} options - Additional options to limit, skip, and sort the results.
+   * @param {number} options.limit - The maximum number of results to return.
+   * @param {number} options.skip - The number of results to skip before returning.
+   * @param {Object} options.sortBy - The field and direction to sort the results by.
    * @returns {Promise<ILink[]>} A Promise that resolves to an array of ILink objects that match the search criteria
    * @throws {RepositoryException} Throws an RepositoryException if an error occurs while fetching the documents
    */
-  async findAllByParentId(parentId: Types.ObjectId): Promise<ILink[]> {
+  async findAllByParentId(parentId: Types.ObjectId, options: { limit: number, skip: number, sortBy: any }): Promise<ILink[]> {
     try {
       // Use Mongoose's find method to fetch all documents that have the given parentId value
       // The lean method is used to return plain JavaScript objects instead of Mongoose documents
       // An empty object is passed as the second argument to include all fields in the returned documents
       const links: ILink[] = await this.linkModel
         .find({ parentId: parentId }, {})
+        .limit(options.limit)
+        .skip(options.skip)
+        .sort(options.sortBy)
         .lean()
         .exec();
 

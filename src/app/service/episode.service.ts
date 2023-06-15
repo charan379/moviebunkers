@@ -76,7 +76,7 @@ class EpisodeService implements IEpisodeService {
 
     /**
      * Retrieves all episodes for a given TV show and season.
-     *
+     * @deprecated
      * @async
      * @param {string} tvShowId - The ID of the TV show to retrieve episodes for.
      * @param {string} seasonId - The ID of the season to retrieve episodes for.
@@ -118,6 +118,55 @@ class EpisodeService implements IEpisodeService {
                     HttpCodes.CONFLICT,
                     `${JSON.stringify(error)}`,
                     `@EpisodeService.class: @getEpisodesByTvSeasonId.method()`
+                );
+            }
+        }
+    }
+
+    /**
+     * Retrieves all episodes for a given TV show id and season number.
+     *
+     * @async
+     * @param {string} tvShowId - The ID of the TV show to retrieve episodes for.
+     * @param {string} seasonNumber - The season_number of the season to retrieve episodes for.
+     * @param {object} options - An optional object containing pagination and sorting options.
+     * @param {number} options.limit - The maximum number of episodes to retrieve (default: 0, meaning no limit).
+     * @param {number} options.skip - The number of episodes to skip (default: 0).
+     * @param {object} options.sortBy - An object specifying the field to sort by and the sort order (default: { createdAt: "desc" }).
+     * @returns {Promise<EpisodeDTO[]>} A promise that resolves to an array of EpisodeDTO objects.
+     * @throws {EpisodeException} If an error occurs while retrieving the episodes.
+     */
+    async getEpisodesByTvShowIdAndSeasonNumber(tvShowId: string, seasonNumber: number, options: { limit: number, skip: number, sortBy: string } = { limit: 0, skip: 0, sortBy: "createdAt.desc" }): Promise<EpisodeDTO[]> {
+        try {
+            // Declare an empty array to hold the resulting EpisodeDTO objects
+            let episodeDTOs: EpisodeDTO[];
+
+            // Call the `findByTvShowId` method of the `episodeRepository` class to retrieve the array of IEpisode objects
+            const iepisodes: IEpisode[] = await this.episodeRepository.findByTvShowId(new Types.ObjectId(tvShowId), seasonNumber, {
+                limit: options.limit,
+                skip: options.skip,
+                sortBy: MongoSortBuilder(options.sortBy),
+            });
+
+            // Map the IEpisode objects to EpisodeDTO objects using the `iEpisodeToEpisodeDTOMapper` function
+            episodeDTOs = iepisodes.map(iepisode => iEpisodeToEpisodeDTOMapper(iepisode));
+
+            // Return the resulting EpisodeDTO array
+            return episodeDTOs
+
+        } catch (error: any) {
+            // If an error occurs during the execution of the `getEpisodesByTvShowIdAndSeasonNumber` method, catch the error and handle it appropriately
+
+            if (error instanceof MoviebunkersException) {
+                // If the error is already an instance of the `MoviebunkersException` class, simply rethrow it
+                throw error;
+            } else {
+                // Otherwise, wrap the error in a new instance of the `EpisodeException` class with the appropriate error message, HTTP status code, and error details, and rethrow it
+                throw new EpisodeException(
+                    `${error?.message}`,
+                    HttpCodes.CONFLICT,
+                    `${JSON.stringify(error)}`,
+                    `@EpisodeService.class: @getEpisodesByTvShowIdAndSeasonNumber.method()`
                 );
             }
         }

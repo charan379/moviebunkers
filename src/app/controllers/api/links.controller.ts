@@ -1,6 +1,7 @@
 import { LevelOne, LevelThere, LevelTwo } from "@constants/user.roles.enum";
 import LinkDTO from "@dto/link.dto";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
+import { sortSkipLimitSchema } from "@joiSchemas/common.title.joi.schemas";
 import linkSchema from "@joiSchemas/linkSchema";
 import Authorize from "@middlewares/authorization.middleware";
 import ILink from "@models/interfaces/link.interface";
@@ -84,6 +85,22 @@ class LinksController {
      *       name: parentId
      *       schema:
      *          type: string
+     *     - in: query
+     *       name: limit
+     *       schema:
+     *          type: integer
+     *     - in: query
+     *       name: skip
+     *       schema:
+     *          type: integer
+     *          example: 3
+     *          default: 0
+     *          minimum: 0
+     *     - in: query
+     *       name: sort_by
+     *       schema:
+     *          type: string
+     *          example: createdAt.desc
      *   responses:
      *       200:
      *          description: Success
@@ -254,9 +271,19 @@ class LinksController {
         { allowUnknown: false, stripUnknown: true, abortEarly: false }
       );
 
+      //  validate skip, sort, limit options in query
+      const validSkipSortLimitQuery = await JoiValidator(sortSkipLimitSchema, req?.query, {
+        abortEarly: false,
+        stripUnknown: true
+      })
+
       // Retrieve all links associated with the parent ID using the LinksService.
       const linkDTOs: LinkDTO[] = await this.linksService.getLinksByParentId(
-        parentId
+        parentId, {
+        limit: validSkipSortLimitQuery?.limit ?? 0,
+        skip: validSkipSortLimitQuery?.skip ?? 0,
+        sortBy: validSkipSortLimitQuery?.sort_by ?? "createdAt.desc",
+      }
       );
 
       // Send a response containing the linkDTOs array in JSON format.
