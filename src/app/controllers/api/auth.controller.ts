@@ -2,7 +2,7 @@ import Config from "@Config";
 import HttpCodes from "@constants/http.codes.enum";
 import { LevelZero } from "@constants/user.roles.enum";
 import { LoginDTO, UserDTO } from "@dto/user.dto";
-import { lgoinSchema } from "@joiSchemas/user.joi.schemas";
+import { loginSchema } from "@joiSchemas/user.joi.schemas";
 import Authorize from "@middlewares/authorization.middleware";
 import { AuthService } from "@service/auth.service";
 import JoiValidator from "@utils/joi.validator";
@@ -130,7 +130,7 @@ class AuthController {
     private async cookieAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             // Validate user login information using the login schema
-            const validLoginDTO: LoginDTO = await JoiValidator(lgoinSchema, req?.body, { allowUnknown: false, stripUnknown: true, abortEarly: false });
+            const validLoginDTO: LoginDTO = await JoiValidator(loginSchema, req?.body, { allowUnknown: false, stripUnknown: true, abortEarly: false });
 
             // Generate a JWT token and store it in a cookie
             const { token }: AuthenticatedUser = await this.authService.login(validLoginDTO);
@@ -164,7 +164,7 @@ class AuthController {
     private async tokenAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             // Validate the login credentials sent in the request body
-            const validLoginDTO: LoginDTO = await JoiValidator(lgoinSchema, req?.body, { allowUnknown: false, stripUnknown: true, abortEarly: false });
+            const validLoginDTO: LoginDTO = await JoiValidator(loginSchema, req?.body, { allowUnknown: false, stripUnknown: true, abortEarly: false });
 
             // Attempt to authenticate the user with the provided credentials and retrieve a token
             const { userId, userName, email, role, status, updatedAt, createdAt, token }: AuthenticatedUser = await this.authService.login(validLoginDTO);
