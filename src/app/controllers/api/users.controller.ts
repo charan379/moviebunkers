@@ -171,6 +171,7 @@ class UserController {
      *       name: id
      *       schema:
      *          type: string
+     *   security: []
      *   responses:
      *       200:
      *          description: Success
