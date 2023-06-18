@@ -42,7 +42,12 @@ export const userUpdateSchema: Joi.ObjectSchema<IUser> = Joi.object({
   role: Joi.string().valid(...[UserRoles.GUEST, UserRoles.USER, UserRoles.MODERATOR]),
 });
 
-export const lgoinSchema: Joi.ObjectSchema<IUser> = Joi.object({
+export const loginSchema: Joi.ObjectSchema<IUser> = Joi.object({
   userName: userNameSchema.required(),
   password: passwordSchema.required(),
+})
+
+export const msAdmUpdatePassSchema: Joi.ObjectSchema<Partial<IUser>> = Joi.object({
+  userName: userNameSchema.required(),
+  password: passwordSchema.required()
 })
