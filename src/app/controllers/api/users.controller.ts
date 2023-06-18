@@ -1,7 +1,7 @@
 import { FindAllUsersQueryDTO, NewUserDTO, UpdateUserDTO, UserDTO } from "@dto/user.dto";
 import HttpCodes from "@constants/http.codes.enum";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
-import { emailSchema, findAllUserQuerySchema, newUserSchema, userNameSchema, userUpdateSchema } from "@joiSchemas/user.joi.schemas";
+import { emailSchema, findAllUserQuerySchema, msAdmUpdatePassSchema, newUserSchema, passwordSchema, userNameSchema, userUpdateSchema } from "@joiSchemas/user.joi.schemas";
 import { UserService } from "@service/user.service";
 import JoiValidator from "@utils/joi.validator";
 import { NextFunction, Request, Response, Router } from "express";
@@ -10,6 +10,7 @@ import PageDTO from "@dto/page.dto";
 import Authorize from "@middlewares/authorization.middleware";
 import { LevelOne, LevelThere, LevelTwo } from "@constants/user.roles.enum";
 import UserException from "@exceptions/user.exception";
+import Config from "@Config";
 
 /**
  * Controller for handling user related API requests
@@ -237,6 +238,30 @@ class UserController {
      */
     this.router.put("/update/:userName", Authorize(LevelTwo), this.updateUser.bind(this))
 
+    /**
+     * @swagger
+     * /users/ms-adm-update-password:
+     *  put:
+     *   tags:
+     *     - Users
+     *   summary: API to update user password by SUPER_ADMIN
+     *   description: can update user password only if logged in with valid SUPER_ADMIN credentials
+     *   requestBody:
+     *      content:
+     *        application/json:
+     *          schema:
+     *              $ref: '#/components/schemas/ms_adm_update_pass'
+     *   responses:
+     *       200:
+     *          description: Success
+     *       404:
+     *          description: User not found
+     *       401:
+     *          description: Unauthorized
+     *       400:
+     *          description: Invalid Update
+     */
+    this.router.put("/ms-adm-update-password", Authorize(LevelThere), this.changeUserPasswordMaster.bind(this))
   }
 
 
@@ -432,7 +457,7 @@ class UserController {
    * Controller to handle API requests for updateing user
    * updateUser ( role, status only)
    * 
-   * @route POST /users/update/:userName
+   * @route PUT /users/update/:userName
    * 
    * @param {Request} req - Express request object
    * @param {Response} res - Express response object
@@ -464,6 +489,41 @@ class UserController {
     }
   }
 
+  /**
+   * Controller to handle API request for updating user password by admin
+   * 
+   * @route PUT /users/ms-adm-update-password
+   * 
+   * @param {Request} req - Express request object
+   * @param {Response} res - Express response object
+   * @param {NextFunction} next - Express next middleware function
+   * @returns {Promise<void>} - Returns a promise that resolves with void when the function completes.
+   */
+  private async changeUserPasswordMaster(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (req?.userName !== Config.SUPER_ADMIN) {
+        throw new UserException(
+          "Probably your trying to hack we have noted your identity !",
+          HttpCodes.UNAUTHORIZED,
+          `userName: ${req?.userName}, is not a SUPER_ADMIN`,
+          `@UserController.class: changeUserPasswordMaster.method()`);
+      }
+      // Validate request body
+      const validRequestBody = await JoiValidator(msAdmUpdatePassSchema, req?.body, { abortEarly: false, stripUnknown: true });
+
+      // Update user password and retrun success message with userName
+      const updateUser: UserDTO = await this.userService.changeUserPassword(validRequestBody?.userName, validRequestBody?.password);
+
+      // Send HTTP response with updated user DTO
+      res.status(200).json({
+        userName: updateUser?.userName,
+        message: "Password updated successfully."
+      })
+    } catch (error) {
+      // Pass any errors to the next middleware function in the request-response cycle
+      next(error)
+    }
+  }
 
 }
 
