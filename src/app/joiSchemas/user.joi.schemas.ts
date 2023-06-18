@@ -3,12 +3,13 @@ import UserRoles from "@constants/user.roles.enum";
 import UserStatus from "@constants/user.status.enum";
 import IUser from "@models/interfaces/user.interface";
 
-export const userNameSchema: Joi.StringSchema = Joi.string().min(5).max(16).example("user00001");
+export const userNameSchema: Joi.StringSchema = Joi.string().min(5).max(22).example("user00001");
 export const emailSchema: Joi.StringSchema = Joi.string().email().example("user00001@gmail.com");
 
 export const passwordSchema: Joi.StringSchema = Joi.string()
   .min(8)
-  .max(16)
+  .max(26)
+  .regex(/((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8,26})/)
   .example("!5tr0ng@pa55w0rd");
 
 export const userRegistrationSchema: Joi.ObjectSchema<IUser> = Joi.object({
