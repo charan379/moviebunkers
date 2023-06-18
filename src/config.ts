@@ -10,6 +10,7 @@ const Config = Object.freeze({
   CORS_ORIGINS: process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(",").map((origin) => origin)
     : ["http://localhost:3000"],
+  SUPER_ADMIN: process.env.SUPER_ADMIN,
   NODE_ENV: process.env?.NODE_ENV ?? "development"
 });
 
