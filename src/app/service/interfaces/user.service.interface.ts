@@ -8,6 +8,7 @@ interface IUserService {
   getAllUsers(queryDTO: FindAllUsersQueryDTO): Promise<PageDTO>;
   updateUserByUserName(userName: string, userUpdateDTO: UpdateUserDTO): Promise<UserDTO>;
   createUser(newUserDTO: NewUserDTO): Promise<UserDTO>;
+  changeUserPassword(userName: string, newPassword: string): Promise<UserDTO>;
 }
 
 export default IUserService;

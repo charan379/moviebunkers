@@ -95,6 +95,35 @@ export class UserService implements IUserService {
     }
   }
 
+  /**
+   * Update user password with userName and new password.
+   * @param {string} userName - userName of the user to be update.
+   * @param {string} newPassword - New password of the user to be updated with.
+   * @returns {Promise<UserDTO>} - A Promise that resolves to the user's information.
+   * @throws {UserException} - Throws an exception if the user is not found.
+   */
+  async changeUserPassword(userName: string, newPassword: string): Promise<UserDTO> {
+
+    try {
+      // Hash the user's password.
+      const newHashedPassword: string = await generateHash(newPassword);
+      // update with password
+      const update: Partial<IUser> = { password: newHashedPassword };
+      const updatedUser: IUser | null = await this.userRepository.update(userName, update);
+
+      if (!updatedUser) {
+        throw new UserException(
+          "User Password Updation Failed",
+          HttpCodes.BAD_REQUEST,
+          `userName: ${userName}, got null from userRepository.update()`,
+          `@UserService.class: changeUserPassword.method()`);
+      }
+
+      return iuserToUserDTOMapper(updatedUser, { withPassword: false });
+    } catch (error) {
+      throw error
+    }
+  }
 
   /**
      * Gets a user by ID.
