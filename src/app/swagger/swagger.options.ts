@@ -43,6 +43,15 @@ export const swaggerOptions = {
       {
         name: "UserData",
       },
+      {
+        name: "Episodes"
+      },
+      {
+        name: "Seasons"
+      },
+      {
+        name: "Links"
+      }
     ],
 
     components: {
