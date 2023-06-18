@@ -9,6 +9,7 @@ import { Inject, Service } from "typedi";
 import PageDTO from "@dto/page.dto";
 import Authorize from "@middlewares/authorization.middleware";
 import { LevelOne, LevelThere, LevelTwo } from "@constants/user.roles.enum";
+import UserException from "@exceptions/user.exception";
 
 /**
  * Controller for handling user related API requests
@@ -151,6 +152,35 @@ class UserController {
      *          description: Unauthorized
      */
     this.router.get("/:userName", Authorize(LevelOne), this.getUserByUserName.bind(this));
+
+    /**
+     * @swagger
+     * /users/account-status/{idtype}/{id}:
+     *  get:
+     *   tags:
+     *     - Users
+     *   summary: API to get user account status by userName / email
+     *   description: returns username, account status
+     *   parameters:
+     *     - in: path
+     *       name: idtype
+     *       schema:
+     *          type: string
+     *          enum: [userName, email]
+     *     - in: path
+     *       name: id
+     *       schema:
+     *          type: string
+     *   security: []
+     *   responses:
+     *       200:
+     *          description: Success
+     *       404:
+     *          description: User not found
+     *       400:
+     *          description: Invalid id type
+     */
+    this.router.get("/account-status/:idtype/:id", this.getUserAccountStatus.bind(this));
 
     /**
      * @swagger
@@ -351,6 +381,52 @@ class UserController {
     }
   }
 
+  /**
+   * Controller to handle API requests for getting account status by username / email
+   * 
+   * @route GET /users/account-status/:idtype/:id
+   * 
+   * @param {Request} req - Express request object
+   * @param {Response} res - Express response object
+   * @param {NextFunction} next - Express next middleware function
+   * @returns {Promise<void>} - Returns a promise that resolves with void when the function completes.
+   */
+  private async getUserAccountStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      let id;
+      let userDTO: UserDTO;
+      switch (req?.params?.idtype) {
+        case "userName":
+          // validate username
+          id = await JoiValidator(userNameSchema, req?.params?.id, { abortEarly: false, stripUnknown: true });
+          // ask userService.getUserByUserName() method to return user for given username 
+          userDTO = await this.userService.getUserByUserName(id);
+          // respond with code 200 and userDTO to client 
+          res.status(HttpCodes.OK).json({ userName: userDTO.userName, status: userDTO.status });
+          break;
+        case "email":
+          // validate username
+          id = await JoiValidator(emailSchema, req?.params?.id, { abortEarly: false, stripUnknown: true });
+          // ask userService.getUserByEmail() method to return user for given email 
+          userDTO = await this.userService.getUserByEmail(id);
+          // respond with code 200 and userDTO to client 
+          res.status(HttpCodes.OK).json({ userName: userDTO.userName, status: userDTO.status });
+          break;
+        default:
+          throw new UserException(
+            `Invalid Id Type: ${req.params?.idtype}`,
+            HttpCodes.BAD_REQUEST,
+            `Provided Id Type is Invalid: ${req.params?.idtype}`,
+            "@UserController.class: getUserAccountStatus.controller()"
+          );
+      }
+    } catch (error) {
+      // catch any errors that may occur during the process
+
+      // pass error to next() function in chain, probably an error-handler or logger
+      next(error)
+    }
+  }
 
   /**
    * Controller to handle API requests for updateing user
