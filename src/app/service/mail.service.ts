@@ -68,19 +68,19 @@ class MailService implements IMailService {
             const email: EMail = {
                 from: { name: "Team MBDB", address: "admin@moviebunkers.com" },
                 to: userEmailAddress,
-                subject: `Hey,${userName} 💞 ! Your Movie Adventure Awaits. Verify Your Account and Start Exploring🎬`,
+                subject: `Hey, ${userName} 💞 ! Your Movie Adventure Awaits. Verify Your Account and Start Exploring🎬`,
                 html: `
-                <div
-                  class="container"
-                  style="max-width: 90%; margin: auto; padding-top: 20px"
-                >
+                <div class="container" style="max-width: 90%; margin: auto; padding-top: 20px">
                   <h2>Hi ${userName} 💞 !,<br/>Congratulations! 💐 Your account has been successfully created.</h2>
-                  <h3>Please verify email using otp <code style="font-size: 1.2rem">${otp?.code}</code> to activate your account. Once your account is activated🔓,
-                  you'll be able to access all the features and benefits of our website 💻 .</h3>
+                  <p style="font-size: 1rem">Please verify email using otp <code style="font-size: 1.3rem; font-weight:bold">${otp?.code}</code> to activate your account. Once your account is activated🔓,
+                  you'll be able to access all the features and benefits of our website 💻 .</p>
                   <p style="margin-bottom: 10px;">Please use the below sign up OTP to get started,</p>
                   <p style="margin-bottom: 30px;">OTP Expires at :⏳ ${getDateTime(otp?.expiryDate)}</p>
                   <h1 style="font-size: 40px; letter-spacing: 2px; text-align:center;">${otp?.code}</h1>
-             </div>
+                  <h3 style="font-size: 25px; letter-spacing: 1px; text-align:center;">Thank you for joining us 🤗.</h3>
+                  <p style="font-size: 1.1rem; letter-spacing: 1px; text-align:left; margin-top: 50px; margin-block-end: 1px;"><b>Regards,</b></p>
+                  <p style="font-size: 1.1rem; letter-spacing: 1px; text-align:left; margin-top: 0px; margin-block-start: 1px;"><b>Team MBDB.</b></p>
+                </div>
               `,
 
             }
