@@ -9,7 +9,10 @@ import UserException from "../exceptions/user.exception";
 import UserRepository from "../repositories/user.repository";
 import IUserService from "./interfaces/user.service.interface";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
-import { FindAllQuery, Page } from "src/@types";
+import { FindAllQuery, OTP, Page } from "src/@types";
+import generateOTP from "@utils/generateOTP";
+import OTPtype from "@constants/otpType.enum";
+import addHoursToDate from "@utils/addHoursToDate";
 
 /**
  * The `UserService` class is responsible for handling the business logic for
@@ -62,12 +65,16 @@ export class UserService implements IUserService {
 
       // Hash the user's password.
       const hashedPassword: string = await generateHash(newUserDTO.password);
-
-      // Create a new user DTO with the hashed password.
-      const newUserDTOWithHashedPassword = { ...newUserDTO, password: hashedPassword };
+      // Generate Verification OTP
+      const otp: OTP = {
+        code: generateOTP(8, OTPtype.ALPHA_NUMERIC_CASE_UP),
+        expiryDate: addHoursToDate(new Date(), 12)
+      }
+      // Create a new user DTO with the hashed password and OTP.
+      const newUserDTOWithHashedPasswordAndOtp = { ...newUserDTO, password: hashedPassword, otp };
 
       // Create the new user.
-      const user: IUser | null = await this.userRepository.create(newUserDTOWithHashedPassword);
+      const user: IUser | null = await this.userRepository.create(newUserDTOWithHashedPasswordAndOtp);
 
       // Throw an exception if user creation failed.
       if (!user) {
