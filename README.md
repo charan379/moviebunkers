@@ -13,7 +13,13 @@ To run this project, you will need to add the following environment variables to
 `HTTPS`  
 `COOKIE_SECRET`  
 `JWT_SECRET`  
-`CORS_ORIGINS`  
+`CORS_ORIGINS`
+`SUPER_ADMIN`
+`MAIL_SERVICE_PROVIDER`
+`MAIL_SERVICE_HOST`
+`MAIL_SERVICE_PORT`
+`MAIL_SERVICE_AUTH_USER`
+`MAIL_SERVICE_AUTH_PASSWORD`
 `PORT`  
 `NODE_ENV`
 
