@@ -38,6 +38,14 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
       enum: [UserRoles.GUEST, UserRoles.USER, UserRoles.MODERATOR],
       default: UserRoles.GUEST,
     },
+    otp: {
+      code: {
+        type: String
+      },
+      expiryDate: {
+        type: Date
+      }
+    },
     last_modified_by: {
       type: String,
     },
