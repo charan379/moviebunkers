@@ -11,6 +11,7 @@ import Authorize from "@middlewares/authorization.middleware";
 import { LevelOne, LevelThere, LevelTwo } from "@constants/user.roles.enum";
 import UserException from "@exceptions/user.exception";
 import Config from "@Config";
+import MailService from "@service/mail.service";
 
 /**
  * Controller for handling user related API requests
@@ -20,13 +21,15 @@ import Config from "@Config";
 class UserController {
   public router: Router;
   private userService: UserService;
+  private mailService: MailService;
 
   /**
   * Constructor of UserController class
   * @param userService An instance of UserService class
   */
-  constructor(@Inject() userService: UserService) {
+  constructor(@Inject() userService: UserService, mailService: MailService) {
     this.userService = userService;
+    this.mailService = mailService;
     this.router = Router();
 
     /**
@@ -283,8 +286,26 @@ class UserController {
       // Call userService.createUser() method to create new user
       const createdUser: UserDTO = await this.userService.createUser(validNewUser);
 
+      // to track if mail sent or not
+      let mailSentMessage: string = "";
+
+      try {
+        const info: any = await this.mailService.sendNewUserVerificationOtp(createdUser.userName, { name: createdUser.userName, address: createdUser.email }, createdUser.otp)
+        if (info?.accepted?.includes(createdUser?.email)) {
+          mailSentMessage = "Verification OTP successfully sent to your registered email !, from Team MBDB."
+        }
+      } catch (error) {
+        mailSentMessage = "Sorry, can't send you verification OTP at this time please get in touch with our team for account activation !"
+      }
       // Send response with code 201 and createdUser to client
-      res.status(201).json(createdUser);
+      res.status(201).json({
+        user: {
+          userName: createdUser?.userName,
+          email: createdUser?.email,
+          status: createdUser?.status,
+        },
+        otpMailStatus: mailSentMessage
+      });
 
     } catch (error) {
       // Pass error to next() function in chain, probably an error-handler or logger
