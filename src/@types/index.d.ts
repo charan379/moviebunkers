@@ -1,4 +1,5 @@
 import { FilterQuery } from "mongoose";
+import { Address } from "nodemailer/lib/mailer";
 import { type } from "os";
 
 type NonNullableObject<T> = {
@@ -75,4 +76,34 @@ type Image = {
     width: number,
     type: string,
     file_path: string,
+}
+
+type NodeMailSettings = {
+    service?: string,
+    host?: string,
+    port?: any,
+    secure?: boolean,
+    requireTLS?: boolean,
+    auth: {
+        user: string,
+        pass: string,
+    },
+    tls?: {
+        ciphers: string
+    }
+}
+
+type EMail = {
+    from: Address;
+    to: Address[] | Address;
+    cc?: Address[] | Address;
+    bcc?: Address[] | Address;
+    subject: string;
+    html?: string;
+    text?: string;
+}
+
+type OTP = {
+    code: string,
+    expiryDate: Date
 }

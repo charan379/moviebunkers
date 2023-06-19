@@ -11,6 +11,11 @@ const Config = Object.freeze({
     ? process.env.CORS_ORIGINS.split(",").map((origin) => origin)
     : ["http://localhost:3000"],
   SUPER_ADMIN: process.env.SUPER_ADMIN,
+  MAIL_SERVICE_PROVIDER: process.env.MAIL_SERVICE_PROVIDER,
+  MAIL_SERVICE_HOST: process.env.MAIL_SERVICE_HOST,
+  MAIL_SERVICE_PORT: process.env.MAIL_SERVICE_PORT,
+  MAIL_SERVICE_AUTH_USER: process.env.MAIL_SERVICE_AUTH_USER,
+  MAIL_SERVICE_AUTH_PASSWORD: process.env.MAIL_SERVICE_AUTH_PASSWORD,
   NODE_ENV: process.env?.NODE_ENV ?? "development"
 });
 
