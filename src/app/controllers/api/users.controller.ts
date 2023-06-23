@@ -546,7 +546,7 @@ class UserController {
           // ask userService.getUserByUserName() method to return user for given username 
           userDTO = await this.userService.getUserByUserName(id);
           // respond with code 200 and userDTO to client 
-          res.status(HttpCodes.OK).json({ userName: userDTO.userName, status: userDTO.status, emailVerified: userDTO.emailVerified });
+          res.status(HttpCodes.OK).json({ userName: userDTO.userName, status: userDTO.status, emailVerified: userDTO.emailVerified, otpExpiration: userDTO.otp.expiryDate });
           break;
         case "email":
           // validate username
@@ -554,7 +554,7 @@ class UserController {
           // ask userService.getUserByEmail() method to return user for given email 
           userDTO = await this.userService.getUserByEmail(id);
           // respond with code 200 and userDTO to client 
-          res.status(HttpCodes.OK).json({ userName: userDTO.userName, status: userDTO.status });
+          res.status(HttpCodes.OK).json({ userName: userDTO.userName, status: userDTO.status, emailVerified: userDTO.emailVerified, otpExpiration: userDTO.otp.expiryDate });
           break;
         default:
           throw new UserException(
@@ -678,6 +678,7 @@ class UserController {
           userName: details?.userName,
           email: details?.email,
           status: details?.status,
+          otpExpiration: details?.otp.expiryDate
         },
         otpMailStatus: mailSentMessage
       });
@@ -722,6 +723,7 @@ class UserController {
           userName: details?.userName,
           email: details?.email,
           status: details?.status,
+          otpExpiration: details?.otp.expiryDate
         },
         otpMailStatus: mailSentMessage
       });
