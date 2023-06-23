@@ -107,3 +107,14 @@ type OTP = {
     code: string,
     expiryDate: Date
 }
+
+type UserPasswordResetRequestBody = {
+    userName: string,
+    newPassword: string,
+    otp: string,
+}
+
+type VerifyUserRequestBody = {
+    userName: string,
+    otp: string,
+}
