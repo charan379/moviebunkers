@@ -2,7 +2,7 @@ import { episodeSchema } from "@joiSchemas/episode.joi.schema";
 import linkSchema from "@joiSchemas/linkSchema";
 import { seasonSchema } from "@joiSchemas/season.joi.schema";
 import titleSchema from "@joiSchemas/title.joi.schema";
-import { loginSchema, msAdmUpdatePassSchema, newUserSchema, userUpdateSchema } from "@joiSchemas/user.joi.schemas";
+import { loginSchema, msAdmUpdatePassSchema, newUserSchema, resetUserPasswordSchema, userUpdateSchema, verifyUserSchema } from "@joiSchemas/user.joi.schemas";
 import joiToSwagger from "joi-to-swagger";
 
 const swaggerSchemas = {
@@ -14,6 +14,8 @@ const swaggerSchemas = {
     episode: joiToSwagger(episodeSchema).swagger,
     season: joiToSwagger(seasonSchema).swagger,
     ms_adm_update_pass: joiToSwagger(msAdmUpdatePassSchema).swagger,
+    reset_password: joiToSwagger(resetUserPasswordSchema).swagger,
+    verify_user: joiToSwagger(verifyUserSchema).swagger,
 }
 
 export default swaggerSchemas;
