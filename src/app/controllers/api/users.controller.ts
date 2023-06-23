@@ -1,7 +1,7 @@
 import { FindAllUsersQueryDTO, NewUserDTO, UpdateUserDTO, UserDTO } from "@dto/user.dto";
 import HttpCodes from "@constants/http.codes.enum";
 import { ObjectIdSchema } from "@joiSchemas/common.joi.schemas";
-import { emailSchema, findAllUserQuerySchema, msAdmUpdatePassSchema, newUserSchema, passwordSchema, userNameSchema, userUpdateSchema } from "@joiSchemas/user.joi.schemas";
+import { emailSchema, findAllUserQuerySchema, msAdmUpdatePassSchema, newUserSchema, passwordSchema, resetUserPasswordSchema, userNameSchema, userUpdateSchema, verifyUserSchema } from "@joiSchemas/user.joi.schemas";
 import { UserService } from "@service/user.service";
 import JoiValidator from "@utils/joi.validator";
 import { NextFunction, Request, Response, Router } from "express";
@@ -12,6 +12,8 @@ import { LevelOne, LevelThere, LevelTwo } from "@constants/user.roles.enum";
 import UserException from "@exceptions/user.exception";
 import Config from "@Config";
 import MailService from "@service/mail.service";
+import OTPtype from "@constants/otpType.enum";
+import { UserPasswordResetRequestBody, VerifyUserRequestBody } from "src/@types";
 
 /**
  * Controller for handling user related API requests
@@ -265,6 +267,102 @@ class UserController {
      *          description: Invalid Update
      */
     this.router.put("/ms-adm-update-password", Authorize(LevelThere), this.changeUserPasswordMaster.bind(this))
+
+    /**
+     * @swagger
+     * /users/resend-verification-mail/{userName}:
+     *  post:
+     *   tags:
+     *     - Users
+     *   summary: API to resend user verification mail
+     *   description: can update user status and role
+     *   parameters:
+     *     - in: path
+     *       name: userName
+     *       schema:
+     *          type: string
+     *   responses:
+     *       200:
+     *          description: Success
+     *       404:
+     *          description: User not found
+     *       401:
+     *          description: Unauthorized
+     *       400:
+     *          description: Invalid 
+     */
+    this.router.post("/resend-verification-mail/:userName", this.resendVerificationMail.bind(this))
+
+
+    /**
+     * @swagger
+     * /users/send-password-reset-mail/{userName}:
+     *  post:
+     *   tags:
+     *     - Users
+     *   summary: API to resend user password reset mail
+     *   description: can update user status and role
+     *   parameters:
+     *     - in: path
+     *       name: userName
+     *       schema:
+     *          type: string
+     *   responses:
+     *       200:
+     *          description: Success
+     *       404:
+     *          description: User not found
+     *       401:
+     *          description: Unauthorized
+     */
+    this.router.post("/send-password-reset-mail/:userName", this.sendPasswordResetMail.bind(this))
+
+    /**
+     * @swagger
+     * /users/reset-password:
+     *  put:
+     *   tags:
+     *     - Users
+     *   summary: API to reset users password
+     *   description: can update user password with valid otp
+     *   requestBody:
+     *      content:
+     *        application/json:
+     *          schema:
+     *              $ref: '#/components/schemas/reset_password'
+     *   responses:
+     *       200:
+     *          description: Success
+     *       404:
+     *          description: User not found
+     *       400:
+     *          description: Invalid Update / OTP
+     */
+    this.router.put("/reset-password", this.resetPassword.bind(this))
+
+    /**
+     * @swagger
+     * /users/verify-user:
+     *  put:
+     *   tags:
+     *     - Users
+     *   summary: API to verify user
+     *   description: can verify user with valid otp
+     *   requestBody:
+     *      content:
+     *        application/json:
+     *          schema:
+     *              $ref: '#/components/schemas/verify_user'
+     *   responses:
+     *       200:
+     *          description: Success
+     *       404:
+     *          description: User not found
+     *       400:
+     *          description: Invalid Update / OTP
+     */
+    this.router.put("/verify-user", this.verifyUser.bind(this))
+
   }
 
 
@@ -448,7 +546,7 @@ class UserController {
           // ask userService.getUserByUserName() method to return user for given username 
           userDTO = await this.userService.getUserByUserName(id);
           // respond with code 200 and userDTO to client 
-          res.status(HttpCodes.OK).json({ userName: userDTO.userName, status: userDTO.status });
+          res.status(HttpCodes.OK).json({ userName: userDTO.userName, status: userDTO.status, emailVerified: userDTO.emailVerified });
           break;
         case "email":
           // validate username
@@ -545,6 +643,163 @@ class UserController {
       next(error)
     }
   }
+
+  /**
+   * Controller to handle API requests for sending verification mail
+   * 
+   * @route POST /users/resend-verification-mail/:userName
+   * 
+   * @param {Request} req - Express request object
+   * @param {Response} res - Express response object
+   * @param {NextFunction} next - Express next middleware function
+   * @returns {Promise<void>} - Returns a promise that resolves with void when the function completes.
+   */
+  private async resendVerificationMail(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+
+      // Validate userName parameter
+      const validUserName = await JoiValidator(userNameSchema, req?.params?.userName, { abortEarly: false, stripUnknown: true });
+
+      const details: UserDTO = await this.userService.generateUserOtp(validUserName, OTPtype.ALPHA_NUMERIC_CASE_UP);
+      // to track if mail sent or not
+      let mailSentMessage: string = "";
+
+      try {
+        const info: any = await this.mailService.sendEmailVerificationOtp(details.userName, { name: details.userName, address: details.email }, details.otp)
+        if (info?.accepted?.includes(details?.email)) {
+          mailSentMessage = "Verification OTP successfully sent to your registered email !, from Team MBDB."
+        }
+      } catch (error) {
+        mailSentMessage = "Sorry, can't send you verification OTP at this time please get in touch with our team for account activation !"
+      }
+      // Send response with code 201 and updated to client
+      res.status(200).json({
+        user: {
+          userName: details?.userName,
+          email: details?.email,
+          status: details?.status,
+        },
+        otpMailStatus: mailSentMessage
+      });
+
+    } catch (error) {
+      // Pass error to next() function in chain, probably an error-handler or logger
+      next(error)
+    }
+  }
+
+  /**
+   * Controller to handle API requests for sending password reset mail
+   * 
+   * @route POST /users/send-password-reset-mail/:userName
+   * 
+   * @param {Request} req - Express request object
+   * @param {Response} res - Express response object
+   * @param {NextFunction} next - Express next middleware function
+   * @returns {Promise<void>} - Returns a promise that resolves with void when the function completes.
+   */
+  private async sendPasswordResetMail(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+
+      // Validate userName parameter
+      const validUserName = await JoiValidator(userNameSchema, req?.params?.userName, { abortEarly: false, stripUnknown: true });
+
+      const details: UserDTO = await this.userService.generateUserOtp(validUserName, OTPtype.ALPHA_NUMERIC_CASE_UP);
+      // to track if mail sent or not
+      let mailSentMessage: string = "";
+
+      try {
+        const info: any = await this.mailService.sendPasswordRecoveryOtp(details.userName, { name: details.userName, address: details.email }, details.otp)
+        if (info?.accepted?.includes(details?.email)) {
+          mailSentMessage = "Verification OTP successfully sent to your registered email !, from Team MBDB."
+        }
+      } catch (error) {
+        mailSentMessage = "Sorry, can't send you verification OTP at this time please get in touch with our team for account recovery !"
+      }
+      // Send response with code 201 and user details to client
+      res.status(200).json({
+        user: {
+          userName: details?.userName,
+          email: details?.email,
+          status: details?.status,
+        },
+        otpMailStatus: mailSentMessage
+      });
+
+    } catch (error) {
+      // Pass error to next() function in chain, probably an error-handler or logger
+      next(error)
+    }
+  }
+
+
+  /**
+   * Controller to handle API requests for resetting user password
+   * 
+   * @route PUT /users/reset-password
+   * 
+   * @param {Request} req - Express request object
+   * @param {Response} res - Express response object
+   * @param {NextFunction} next - Express next middleware function
+   * @returns {Promise<void>} - Returns a promise that resolves with void when the function completes.
+   */
+  private async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+
+      // Validate userName parameter
+      const validRequestBody: UserPasswordResetRequestBody = await JoiValidator(resetUserPasswordSchema, req?.body, { abortEarly: false, stripUnknown: true });
+      // update password
+      const updatedUser: UserDTO = await this.userService.restUserPassword(validRequestBody.userName, validRequestBody.newPassword, validRequestBody.otp);
+
+      // Send response with code 200 and updatedUser to client
+      res.status(200).json({
+        user: {
+          userName: updatedUser?.userName,
+          email: updatedUser?.email,
+          status: updatedUser?.status,
+        },
+      });
+
+    } catch (error) {
+      // Pass error to next() function in chain, probably an error-handler or logger
+      next(error)
+    }
+  }
+
+  /**
+ * Controller to handle API requests for resetting user password
+ * 
+ * @route PUT /users/verify-user
+ * 
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} - Returns a promise that resolves with void when the function completes.
+ */
+  private async verifyUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+
+      // Validate userName parameter
+      const validRequestBody: VerifyUserRequestBody = await JoiValidator(verifyUserSchema, req?.body, { abortEarly: false, stripUnknown: true });
+      // update password
+      const updatedUser: UserDTO = await this.userService.completeUserEmailVerification(validRequestBody.userName, validRequestBody.otp);
+
+      // Send response with code 200 and updatedUser to client
+      res.status(200).json({
+        user: {
+          userName: updatedUser?.userName,
+          email: updatedUser?.email,
+          status: updatedUser?.status,
+          emailVerified: updatedUser.emailVerified,
+        },
+      });
+
+    } catch (error) {
+      // Pass error to next() function in chain, probably an error-handler or logger
+      next(error)
+    }
+  }
+
 
 }
 
