@@ -23,6 +23,10 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
       ],
       index: true,
     },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
     password: {
       type: String,
       required: [true, "password is required"],

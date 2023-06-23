@@ -12,6 +12,7 @@ export interface UserDTO {
     _id: string,
     userName: string;
     email: string;
+    emailVerified: boolean;
     status: UserStatus;
     password?: string;
     role: UserRoles;
@@ -80,6 +81,7 @@ export function iuserToUserDTOMapper(iuser: IUser | any, options: { withPassword
                 _id: iuser?._id?.toString() ?? "",
                 userName: iuser?.userName ?? "",
                 email: iuser?.email ?? "",
+                emailVerified: iuser?.emailVerified ?? false,
                 status: iuser?.status ?? "",
                 password: iuser?.password ?? "",
                 role: iuser?.role ?? "",
@@ -92,6 +94,7 @@ export function iuserToUserDTOMapper(iuser: IUser | any, options: { withPassword
                 _id: iuser?._id?.toString() ?? "",
                 userName: iuser?.userName ?? "",
                 email: iuser?.email ?? "",
+                emailVerified: iuser?.emailVerified ?? false,
                 status: iuser?.status ?? "",
                 role: iuser?.role ?? "",
                 otp: { code: iuser?.otp?.code, expiryDate: iuser?.otp?.expiryDate },
