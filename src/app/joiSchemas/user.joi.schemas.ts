@@ -4,7 +4,7 @@ import UserStatus from "@constants/user.status.enum";
 import IUser from "@models/interfaces/user.interface";
 import { UserPasswordResetRequestBody, VerifyUserRequestBody } from "src/@types";
 
-export const userNameSchema: Joi.StringSchema = Joi.string().min(5).max(22).example("user00001");
+export const userNameSchema: Joi.StringSchema = Joi.string().min(5).max(26).regex(/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{5,26}$/).example("user00001");
 export const emailSchema: Joi.StringSchema = Joi.string().email().example("user00001@gmail.com");
 
 export const passwordSchema: Joi.StringSchema = Joi.string()
