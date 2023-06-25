@@ -143,7 +143,16 @@ export class UserService implements IUserService {
 
     try {
       //  check if user exits
-      await this.getUserByUserName(userName);
+      const userDto: UserDTO = await this.getUserByUserName(userName);
+
+      // if previous OTP not yet expired
+      if (Date.now() < new Date(userDto?.otp?.expiryDate).getTime()) {
+        throw new UserException(
+          "OTP Already Sent",
+          HttpCodes.BAD_REQUEST,
+          `userName: ${userName}, OTP which is sent previously is not yet utilized !`,
+          `@UserService.class: generateUserOtp.method()`);
+      }
       // Generate Verification OTP
       const otp: OTP = {
         code: generateOTP(8, otpType),
