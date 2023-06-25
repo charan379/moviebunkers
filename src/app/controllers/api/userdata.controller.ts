@@ -1,5 +1,5 @@
 import HttpCodes from "@constants/http.codes.enum";
-import { LevelThere, LevelZero } from "@constants/user.roles.enum";
+import { LevelOne, LevelThere } from "@constants/user.roles.enum";
 import { UserDTO } from "@dto/user.dto";
 import UserDataDTO from "@dto/userdata.dto";
 import UserDataException from "@exceptions/userdata.exception";
@@ -57,7 +57,7 @@ class UserDataController {
          *       401:
          *          description: Unauthorized
          */
-        this.router.post("/init", Authorize(LevelZero), this.createUserData.bind(this));
+        this.router.post("/init", Authorize(LevelOne), this.createUserData.bind(this));
 
         /**
          * @swagger
@@ -77,7 +77,7 @@ class UserDataController {
          *       401:
          *          description: Unauthorized
          */
-        this.router.get("/", Authorize(LevelZero), this.getUserData.bind(this));
+        this.router.get("/", Authorize(LevelOne), this.getUserData.bind(this));
 
         /**
          * @swagger
@@ -122,7 +122,7 @@ class UserDataController {
          *       401:
          *          description: Unauthorized
          */
-        this.router.post("/add-to-seen/:titleId", Authorize(LevelZero), this.addToSeenTitles.bind(this));
+        this.router.post("/add-to-seen/:titleId", Authorize(LevelOne), this.addToSeenTitles.bind(this));
 
         /**
          * @swagger
@@ -147,7 +147,7 @@ class UserDataController {
          *       401:
          *          description: Unauthorized
          */
-        this.router.post("/add-to-unseen/:titleId", Authorize(LevelZero), this.addToUnSeenTitles.bind(this));
+        this.router.post("/add-to-unseen/:titleId", Authorize(LevelOne), this.addToUnSeenTitles.bind(this));
 
         /**
         * @swagger
@@ -172,7 +172,7 @@ class UserDataController {
         *       401:
         *          description: Unauthorized
         */
-        this.router.post("/add-to-favourite/:titleId", Authorize(LevelZero), this.addToFavouriteTitles.bind(this));
+        this.router.post("/add-to-favourite/:titleId", Authorize(LevelOne), this.addToFavouriteTitles.bind(this));
 
         /**
          * @swagger
@@ -197,7 +197,7 @@ class UserDataController {
          *       401:
          *          description: Unauthorized
          */
-        this.router.post("/remove-from-favourite/:titleId", Authorize(LevelZero), this.removeFromFavouriteTitles.bind(this));
+        this.router.post("/remove-from-favourite/:titleId", Authorize(LevelOne), this.removeFromFavouriteTitles.bind(this));
 
         /**
          * @swagger
@@ -222,7 +222,7 @@ class UserDataController {
          *       401:
          *          description: Unauthorized
          */
-        this.router.post("/add-to-starred/:titleId", Authorize(LevelZero), this.addToStarredTitles.bind(this));
+        this.router.post("/add-to-starred/:titleId", Authorize(LevelOne), this.addToStarredTitles.bind(this));
 
         /**
          * @swagger
@@ -247,7 +247,7 @@ class UserDataController {
          *       401:
          *          description: Unauthorized
          */
-        this.router.post("/remove-from-starred/:titleId", Authorize(LevelZero), this.removeFromStarredTitles.bind(this));
+        this.router.post("/remove-from-starred/:titleId", Authorize(LevelOne), this.removeFromStarredTitles.bind(this));
     }
 
     /**
