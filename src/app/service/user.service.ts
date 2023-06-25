@@ -14,6 +14,7 @@ import generateOTP from "@utils/generateOTP";
 import OTPtype from "@constants/otpType.enum";
 import addHoursToDate from "@utils/addHoursToDate";
 import UserStatus from "@constants/user.status.enum";
+import UserRoles from "@constants/user.roles.enum";
 
 /**
  * The `UserService` class is responsible for handling the business logic for
@@ -286,7 +287,7 @@ export class UserService implements IUserService {
           "Incorrect OTP",
           HttpCodes.BAD_REQUEST,
           `OTP: ${otp}, is incorrect, User OTP is not generated.`,
-          `@UserService.class: completeUserEmailVerification.method()`);
+          `User: ${userName} , @UserService.class: completeUserEmailVerification.method()`);
       }
 
       if (Date.now() > new Date(user?.otp?.expiryDate).getTime()) {
@@ -294,7 +295,7 @@ export class UserService implements IUserService {
           "OTP Expired",
           HttpCodes.BAD_REQUEST,
           `OTP: ${otp}, is expired`,
-          `@UserService.class: completeUserEmailVerification.method()`);
+          `User: ${userName} ,@UserService.class: completeUserEmailVerification.method()`);
       }
 
       if (user?.otp?.code !== otp) {
@@ -302,7 +303,7 @@ export class UserService implements IUserService {
           "Incorrect OTP",
           HttpCodes.BAD_REQUEST,
           `OTP: ${otp}, is incorrect`,
-          `@UserService.class: completeUserEmailVerification.method()`);
+          `User: ${userName}, @UserService.class: completeUserEmailVerification.method()`);
       }
 
       if (user?.emailVerified) {
@@ -310,14 +311,14 @@ export class UserService implements IUserService {
           "Email already verified",
           HttpCodes.BAD_REQUEST,
           `Duplicate Request`,
-          `@UserService.class: completeUserEmailVerification.method()`);
+          `User: ${userName}, @UserService.class: completeUserEmailVerification.method()`);
       }
 
       // scrap user otp since its already used
       await this.scrapUserOtp(userName);
 
       // update user status
-      const update: Partial<IUser> = { emailVerified: true, status: UserStatus.ACTIVE };
+      const update: Partial<IUser> = { emailVerified: true, status: UserStatus.ACTIVE, role: UserRoles.USER };
       const updatedUser: IUser | null = await this.userRepository.update(userName, update);
 
       if (!updatedUser) {
@@ -325,7 +326,7 @@ export class UserService implements IUserService {
           "User verification Failed",
           HttpCodes.BAD_REQUEST,
           `userName: ${userName}, got null from userRepository.update()`,
-          `@UserService.class: completeUserEmailVerification.method()`);
+          `User: ${userName}, @UserService.class: completeUserEmailVerification.method()`);
       }
 
       return iuserToUserDTOMapper(updatedUser, { withPassword: false });
