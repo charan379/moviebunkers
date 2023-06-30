@@ -3,6 +3,7 @@ import UserRoles from "@constants/user.roles.enum";
 import UserStatus from "@constants/user.status.enum";
 import UserException from "@exceptions/user.exception";
 import IUser from "@models/interfaces/user.interface";
+import { OTP } from "src/@types";
 
 /**
  * Data transfer object for User entities.
@@ -11,9 +12,11 @@ export interface UserDTO {
     _id: string,
     userName: string;
     email: string;
+    emailVerified: boolean;
     status: UserStatus;
     password?: string;
     role: UserRoles;
+    otp: OTP;
     last_modified_by?: string;
     createdAt: Date;
     updatedAt: Date;
@@ -78,9 +81,11 @@ export function iuserToUserDTOMapper(iuser: IUser | any, options: { withPassword
                 _id: iuser?._id?.toString() ?? "",
                 userName: iuser?.userName ?? "",
                 email: iuser?.email ?? "",
+                emailVerified: iuser?.emailVerified ?? false,
                 status: iuser?.status ?? "",
                 password: iuser?.password ?? "",
                 role: iuser?.role ?? "",
+                otp: { code: iuser?.otp?.code, expiryDate: iuser?.otp?.expiryDate },
                 createdAt: iuser?.createdAt ?? "",
                 updatedAt: iuser?.updatedAt ?? "",
             }
@@ -89,8 +94,10 @@ export function iuserToUserDTOMapper(iuser: IUser | any, options: { withPassword
                 _id: iuser?._id?.toString() ?? "",
                 userName: iuser?.userName ?? "",
                 email: iuser?.email ?? "",
+                emailVerified: iuser?.emailVerified ?? false,
                 status: iuser?.status ?? "",
                 role: iuser?.role ?? "",
+                otp: { code: iuser?.otp?.code, expiryDate: iuser?.otp?.expiryDate },
                 createdAt: iuser?.createdAt ?? "",
                 updatedAt: iuser?.updatedAt ?? "",
             }

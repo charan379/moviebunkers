@@ -1,6 +1,6 @@
 # moviebunkers :clapper:
 
-[![VERSION](https://img.shields.io/badge/VERSION-v2.2.1-sucess)](https://github.com/charan379/moviebunkers) [![LAST UPDATE](https://img.shields.io/badge/LAST--UPDATED-18--June--2023-sucess)](https://github.com/charan379/moviebunkers) [![AGPL License](https://img.shields.io/badge/LICENSE-GNU%20AGPLv3-informational)](https://www.gnu.org/licenses/agpl-3.0.en.html)
+[![VERSION](https://img.shields.io/badge/VERSION-v2.2.2-sucess)](https://github.com/charan379/moviebunkers) [![LAST UPDATE](https://img.shields.io/badge/LAST--UPDATED-30--June--2023-sucess)](https://github.com/charan379/moviebunkers) [![AGPL License](https://img.shields.io/badge/LICENSE-GNU%20AGPLv3-informational)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 
 This is REST API application. Developed using Express, Nodejs , Typescript
 
@@ -13,7 +13,13 @@ To run this project, you will need to add the following environment variables to
 `HTTPS`  
 `COOKIE_SECRET`  
 `JWT_SECRET`  
-`CORS_ORIGINS`  
+`CORS_ORIGINS`
+`SUPER_ADMIN`
+`MAIL_SERVICE_PROVIDER`
+`MAIL_SERVICE_HOST`
+`MAIL_SERVICE_PORT`
+`MAIL_SERVICE_AUTH_USER`
+`MAIL_SERVICE_AUTH_PASSWORD`
 `PORT`  
 `NODE_ENV`
 

@@ -23,6 +23,10 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
       ],
       index: true,
     },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
     password: {
       type: String,
       required: [true, "password is required"],
@@ -37,6 +41,14 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
       type: String,
       enum: [UserRoles.GUEST, UserRoles.USER, UserRoles.MODERATOR],
       default: UserRoles.GUEST,
+    },
+    otp: {
+      code: {
+        type: String
+      },
+      expiryDate: {
+        type: Date
+      }
     },
     last_modified_by: {
       type: String,

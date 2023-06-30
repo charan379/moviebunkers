@@ -2,14 +2,15 @@ import Joi from "joi";
 import UserRoles from "@constants/user.roles.enum";
 import UserStatus from "@constants/user.status.enum";
 import IUser from "@models/interfaces/user.interface";
+import { UserPasswordResetRequestBody, VerifyUserRequestBody } from "src/@types";
 
-export const userNameSchema: Joi.StringSchema = Joi.string().min(5).max(22).example("user00001");
+export const userNameSchema: Joi.StringSchema = Joi.string().min(5).max(26).regex(/^[a-zA-Z_](?!.*\.\.)(?!.*\.$)[^\W][\w.]{3,26}$/).example("user00001");
 export const emailSchema: Joi.StringSchema = Joi.string().email().example("user00001@gmail.com");
 
 export const passwordSchema: Joi.StringSchema = Joi.string()
   .min(8)
   .max(26)
-  .regex(/((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8,26})/)
+  .regex(/((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8,26})$/)
   .example("!5tr0ng@pa55w0rd");
 
 export const userRegistrationSchema: Joi.ObjectSchema<IUser> = Joi.object({
@@ -42,7 +43,23 @@ export const userUpdateSchema: Joi.ObjectSchema<IUser> = Joi.object({
   role: Joi.string().valid(...[UserRoles.GUEST, UserRoles.USER, UserRoles.MODERATOR]),
 });
 
-export const lgoinSchema: Joi.ObjectSchema<IUser> = Joi.object({
+export const loginSchema: Joi.ObjectSchema<IUser> = Joi.object({
   userName: userNameSchema.required(),
   password: passwordSchema.required(),
+})
+
+export const msAdmUpdatePassSchema: Joi.ObjectSchema<Partial<IUser>> = Joi.object({
+  userName: userNameSchema.required(),
+  password: passwordSchema.required()
+})
+
+export const resetUserPasswordSchema: Joi.ObjectSchema<UserPasswordResetRequestBody> = Joi.object({
+  userName: userNameSchema.required(),
+  newPassword: passwordSchema.required(),
+  otp: Joi.string().required(),
+})
+
+export const verifyUserSchema: Joi.ObjectSchema<VerifyUserRequestBody> = Joi.object({
+  userName: userNameSchema.required(),
+  otp: Joi.string().required(),
 })

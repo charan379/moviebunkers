@@ -9,7 +9,12 @@ import UserException from "../exceptions/user.exception";
 import UserRepository from "../repositories/user.repository";
 import IUserService from "./interfaces/user.service.interface";
 import MoviebunkersException from "@exceptions/moviebunkers.exception";
-import { FindAllQuery, Page } from "src/@types";
+import { FindAllQuery, OTP, Page } from "src/@types";
+import generateOTP from "@utils/generateOTP";
+import OTPtype from "@constants/otpType.enum";
+import addHoursToDate from "@utils/addHoursToDate";
+import UserStatus from "@constants/user.status.enum";
+import UserRoles from "@constants/user.roles.enum";
 
 /**
  * The `UserService` class is responsible for handling the business logic for
@@ -29,7 +34,6 @@ export class UserService implements IUserService {
   constructor(@Inject() userRepository: UserRepository) {
     this.userRepository = userRepository;
   }
-
 
   /**
      * Creates a new user.
@@ -62,12 +66,16 @@ export class UserService implements IUserService {
 
       // Hash the user's password.
       const hashedPassword: string = await generateHash(newUserDTO.password);
-
-      // Create a new user DTO with the hashed password.
-      const newUserDTOWithHashedPassword = { ...newUserDTO, password: hashedPassword };
+      // Generate Verification OTP
+      const otp: OTP = {
+        code: generateOTP(8, OTPtype.ALPHA_NUMERIC_CASE_UP),
+        expiryDate: addHoursToDate(new Date(), 12)
+      }
+      // Create a new user DTO with the hashed password and OTP.
+      const newUserDTOWithHashedPasswordAndOtp = { ...newUserDTO, password: hashedPassword, otp };
 
       // Create the new user.
-      const user: IUser | null = await this.userRepository.create(newUserDTOWithHashedPassword);
+      const user: IUser | null = await this.userRepository.create(newUserDTOWithHashedPasswordAndOtp);
 
       // Throw an exception if user creation failed.
       if (!user) {
@@ -95,6 +103,237 @@ export class UserService implements IUserService {
     }
   }
 
+  /**
+   * Update user password with userName and new password.
+   * @param {string} userName - userName of the user to be update.
+   * @param {string} newPassword - New password of the user to be updated with.
+   * @returns {Promise<UserDTO>} - A Promise that resolves to the user's information.
+   * @throws {UserException} - Throws an exception if the user is not found.
+   */
+  async changeUserPassword(userName: string, newPassword: string): Promise<UserDTO> {
+
+    try {
+      // Hash the user's password.
+      const newHashedPassword: string = await generateHash(newPassword);
+      // update with password
+      const update: Partial<IUser> = { password: newHashedPassword };
+      const updatedUser: IUser | null = await this.userRepository.update(userName, update);
+
+      if (!updatedUser) {
+        throw new UserException(
+          "User Password Updation Failed",
+          HttpCodes.BAD_REQUEST,
+          `userName: ${userName}, got null from userRepository.update()`,
+          `@UserService.class: changeUserPassword.method()`);
+      }
+
+      return iuserToUserDTOMapper(updatedUser, { withPassword: false });
+    } catch (error) {
+      throw error
+    }
+  }
+
+  /**
+   * Update user OTP with userName.
+   * @param {string} userName - userName of the user to be update.
+   * @param {string} otpType - Type of otp to be generated.
+ * @returns {Promise<UserDTO>} - A Promise that resolves to UserDTO.
+   * @throws {UserException} - Throws an exception if the user is not found.
+   */
+  async generateUserOtp(userName: string, otpType: OTPtype): Promise<UserDTO> {
+
+    try {
+      //  check if user exits
+      const userDto: UserDTO = await this.getUserByUserName(userName);
+
+      // if previous OTP not yet expired
+      if (Date.now() < new Date(userDto?.otp?.expiryDate).getTime()) {
+        throw new UserException(
+          "OTP Already Sent",
+          HttpCodes.BAD_REQUEST,
+          `userName: ${userName}, OTP which is sent previously is not yet utilized !`,
+          `@UserService.class: generateUserOtp.method()`);
+      }
+      // Generate Verification OTP
+      const otp: OTP = {
+        code: generateOTP(8, otpType),
+        expiryDate: addHoursToDate(new Date(), 12)
+      }
+
+      const update: Partial<IUser> = { otp };
+      const updatedUser: IUser | null = await this.userRepository.update(userName, update);
+
+      if (!updatedUser) {
+        throw new UserException(
+          "Failed update user OTP",
+          HttpCodes.BAD_REQUEST,
+          `userName: ${userName}, got null from userRepository.update()`,
+          `@UserService.class: generateUserOtp.method()`);
+      }
+
+      return iuserToUserDTOMapper(updatedUser);
+    } catch (error) {
+      throw error
+    }
+  }
+
+  /**
+ * Scrap user OTP with userName.
+ * @param {string} userName - userName of the user to be update.
+ * @returns {Promise<boolean>} - A Promise that resolves to true/false.
+ * @throws {UserException} - Throws an exception if the user is not found.
+ */
+  async scrapUserOtp(userName: string): Promise<boolean> {
+
+    try {
+      // Generate Verification OTP
+      const otp: OTP = {
+        code: "0",
+        expiryDate: new Date()
+      }
+
+      const update: Partial<IUser> = { otp };
+      const updatedUser: IUser | null = await this.userRepository.update(userName, update);
+
+      if (!updatedUser) {
+        throw new UserException(
+          "Failed scrap user OTP",
+          HttpCodes.BAD_REQUEST,
+          `userName: ${userName}, got null from userRepository.update()`,
+          `@UserService.class: generateUserOtp.method()`);
+      }
+
+      return true;
+    } catch (error) {
+      throw error
+    }
+  }
+
+
+  /**
+   * Update user password with userName and new password.
+   * @param {string} userName - userName of the user to be update.
+   * @param {string} newPassword - New password of the user to be updated with.
+   * @param {string} otp - otp to verify user identity.
+   * @returns {Promise<UserDTO>} - A Promise that resolves to the user's information.
+   * @throws {UserException} - Throws an exception if the user is not found.
+   */
+  async restUserPassword(userName: string, newPassword: string, otp: string): Promise<UserDTO> {
+
+    try {
+      const user: UserDTO = await this.getUserByUserName(userName);
+
+      if (user?.otp?.code === "0" || !user?.otp?.code) {
+        throw new UserException(
+          "Incorrect OTP",
+          HttpCodes.BAD_REQUEST,
+          `OTP: ${otp}, is incorrect, User OTP is not generated.`,
+          `@UserService.class: restUserPassword.method()`);
+      }
+
+      if (Date.now() > new Date(user?.otp?.expiryDate).getTime()) {
+        throw new UserException(
+          "OTP Expired",
+          HttpCodes.BAD_REQUEST,
+          `OTP: ${otp}, is expired`,
+          `@UserService.class: restUserPassword.method()`);
+      }
+
+      if (user?.otp?.code !== otp) {
+        throw new UserException(
+          "Incorrect OTP",
+          HttpCodes.BAD_REQUEST,
+          `OTP: ${otp}, is incorrect.`,
+          `@UserService.class: restUserPassword.method()`);
+      }
+
+      // scrap user otp since its already used
+      await this.scrapUserOtp(userName);
+
+      // Hash the user's password.
+      const newHashedPassword: string = await generateHash(newPassword);
+      // update with password
+      const update: Partial<IUser> = { password: newHashedPassword };
+      const updatedUser: IUser | null = await this.userRepository.update(userName, update);
+
+      if (!updatedUser) {
+        throw new UserException(
+          "User Password Updation Failed",
+          HttpCodes.BAD_REQUEST,
+          `userName: ${userName}, got null from userRepository.update()`,
+          `@UserService.class: restUserPassword.method()`);
+      }
+
+      return iuserToUserDTOMapper(updatedUser, { withPassword: false });
+    } catch (error) {
+      throw error
+    }
+  }
+
+  /**
+   * Update user password with userName and new password.
+   * @param {string} userName - userName of the user to be update.
+   * @param {string} otp - otp to verify user identity.
+   * @returns {Promise<UserDTO>} - A Promise that resolves to the user's information.
+   * @throws {UserException} - Throws an exception if the user is not found.
+   */
+  async completeUserEmailVerification(userName: string, otp: string,): Promise<UserDTO> {
+
+    try {
+      const user: UserDTO = await this.getUserByUserName(userName);
+
+      if (user?.otp?.code === "0" || !user?.otp?.code) {
+        throw new UserException(
+          "Incorrect OTP",
+          HttpCodes.BAD_REQUEST,
+          `OTP: ${otp}, is incorrect, User OTP is not generated.`,
+          `User: ${userName} , @UserService.class: completeUserEmailVerification.method()`);
+      }
+
+      if (Date.now() > new Date(user?.otp?.expiryDate).getTime()) {
+        throw new UserException(
+          "OTP Expired",
+          HttpCodes.BAD_REQUEST,
+          `OTP: ${otp}, is expired`,
+          `User: ${userName} ,@UserService.class: completeUserEmailVerification.method()`);
+      }
+
+      if (user?.otp?.code !== otp) {
+        throw new UserException(
+          "Incorrect OTP",
+          HttpCodes.BAD_REQUEST,
+          `OTP: ${otp}, is incorrect`,
+          `User: ${userName}, @UserService.class: completeUserEmailVerification.method()`);
+      }
+
+      if (user?.emailVerified) {
+        throw new UserException(
+          "Email already verified",
+          HttpCodes.BAD_REQUEST,
+          `Duplicate Request`,
+          `User: ${userName}, @UserService.class: completeUserEmailVerification.method()`);
+      }
+
+      // scrap user otp since its already used
+      await this.scrapUserOtp(userName);
+
+      // update user status
+      const update: Partial<IUser> = { emailVerified: true, status: UserStatus.ACTIVE, role: UserRoles.USER };
+      const updatedUser: IUser | null = await this.userRepository.update(userName, update);
+
+      if (!updatedUser) {
+        throw new UserException(
+          "User verification Failed",
+          HttpCodes.BAD_REQUEST,
+          `userName: ${userName}, got null from userRepository.update()`,
+          `User: ${userName}, @UserService.class: completeUserEmailVerification.method()`);
+      }
+
+      return iuserToUserDTOMapper(updatedUser, { withPassword: false });
+    } catch (error) {
+      throw error
+    }
+  }
 
   /**
      * Gets a user by ID.
