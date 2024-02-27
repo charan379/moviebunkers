@@ -6,23 +6,15 @@
 enum UserRoles {
   ADMIN = "Admin",
   MODERATOR = "Moderator",
-  USER = "User",
-  GUEST = "Guest"
+  USER = "User"
 }
 
 /**
- * LevelZero
+ * LevelOne
  * Represents the roles that all logged in users have.
  * @type {UserRoles[]}
  */
-export const LevelZero: UserRoles[] = [...Object.values(UserRoles)];
-
-/**
- * LevelOne
- * Represents the roles that users with higher privileges have.
- * @type {UserRoles[]}
- */
-export const LevelOne: UserRoles[] = [UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER];
+export const LevelOne: UserRoles[] = [...Object.values(UserRoles)];
 
 /**
  * LevelTwo

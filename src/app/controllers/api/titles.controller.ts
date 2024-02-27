@@ -1,5 +1,5 @@
 import HttpCodes from "@constants/http.codes.enum";
-import { LevelThere, LevelTwo, LevelZero } from "@constants/user.roles.enum";
+import { LevelOne, LevelThere, LevelTwo } from "@constants/user.roles.enum";
 import LanguageDTO from "@dto/language.dto";
 import TitleDTO, { FindAllTitlesQueryDTO } from "@dto/title.dto";
 import { UserDTO } from "@dto/user.dto";
@@ -168,7 +168,7 @@ class TitleController {
          *       400:
          *          description: Invalid query
          */
-        this.router.get("/", Authorize(LevelZero), this.getAllTitles.bind(this));
+        this.router.get("/", Authorize(LevelOne), this.getAllTitles.bind(this));
 
         /**
          * @swagger
@@ -193,7 +193,7 @@ class TitleController {
          *       404:
          *          description: Not Found
          */
-        this.router.get("/id/:id", Authorize(LevelZero), this.getTitleById.bind(this));
+        this.router.get("/id/:id", Authorize(LevelOne), this.getTitleById.bind(this));
 
         /**
          * @swagger

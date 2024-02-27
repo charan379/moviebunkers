@@ -39,8 +39,8 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
     },
     role: {
       type: String,
-      enum: [UserRoles.GUEST, UserRoles.USER, UserRoles.MODERATOR],
-      default: UserRoles.GUEST,
+      enum: [UserRoles.USER, UserRoles.MODERATOR],
+      default: UserRoles.USER,
     },
     otp: {
       code: {
