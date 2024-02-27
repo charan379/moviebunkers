@@ -44,7 +44,7 @@ class LinksController {
      *       401:
      *          description: Unauthorized
      */
-    this.router.post("/new", Authorize(LevelOne), this.newLink.bind(this));
+    this.router.post("/new", Authorize(LevelTwo), this.newLink.bind(this));
 
     /**
      * Endpoint for getting Link by its ID
