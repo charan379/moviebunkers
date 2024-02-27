@@ -1,7 +1,7 @@
 import { generateHash, validateHash } from '@utils/bcrypt';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
-jest.mock('bcrypt');
+jest.mock('bcryptjs');
 
 describe('passwordUtils', () => {
     describe('generateHash', () => {
