@@ -51,7 +51,7 @@ export interface FindAllUsersQueryDTO {
  * Data transfer object for updating User entities.
  */
 export interface UpdateUserDTO {
-    role?: UserRoles.GUEST | UserRoles.USER | UserRoles.MODERATOR,
+    role?: UserRoles.USER | UserRoles.MODERATOR,
     status?: UserStatus,
     last_modified_by?: string,
 }

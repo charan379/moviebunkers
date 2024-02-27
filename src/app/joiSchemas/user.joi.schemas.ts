@@ -23,7 +23,7 @@ export const newUserSchema: Joi.ObjectSchema<IUser> = Joi.object({
   userName: userNameSchema.required(),
   email: emailSchema.required(),
   password: passwordSchema.required(),
-  role: Joi.string().valid(UserRoles.USER, UserRoles.GUEST),
+  role: Joi.string().valid(UserRoles.USER),
   status: Joi.string().valid(UserStatus.ACTIVE, UserStatus.INACTIVE),
 });
 
@@ -40,7 +40,7 @@ export const findAllUserQuerySchema: Joi.ObjectSchema<any> = Joi.object({
 
 export const userUpdateSchema: Joi.ObjectSchema<IUser> = Joi.object({
   status: Joi.string().valid(...Object.values(UserStatus)),
-  role: Joi.string().valid(...[UserRoles.GUEST, UserRoles.USER, UserRoles.MODERATOR]),
+  role: Joi.string().valid(...[UserRoles.USER, UserRoles.MODERATOR]),
 });
 
 export const loginSchema: Joi.ObjectSchema<IUser> = Joi.object({
