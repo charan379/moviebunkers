@@ -14,7 +14,7 @@ export async function generateJwtToken(userDTO: Partial<UserDTO>): Promise<strin
 
     try {
         const signOptions: jwt.SignOptions = {
-            expiresIn: "30d",
+            expiresIn: "8h",
             algorithm: 'HS256',
         };
 
