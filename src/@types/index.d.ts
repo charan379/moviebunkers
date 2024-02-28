@@ -20,6 +20,8 @@ type AuthenticatedUser = {
     createdAt: Date,
     updatedAt: Date,
     token: string,
+    tokenExpiresAt: Date,
+    loggedInAt: Date,
 }
 
 type AgeRatting = {
