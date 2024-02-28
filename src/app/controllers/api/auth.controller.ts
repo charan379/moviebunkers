@@ -135,7 +135,7 @@ class AuthController {
             // Generate a JWT token and store it in a cookie
             const { token }: AuthenticatedUser = await this.authService.login(validLoginDTO);
             res.cookie("auth", `Bearer ${token}`, {
-                maxAge: 30 * 24 * 60 * 60 * 1000,
+                maxAge: 8 * 60 * 60 * 1000,
                 httpOnly: true,
                 secure: Config.HTTPS,
                 signed: true,
@@ -167,12 +167,12 @@ class AuthController {
             const validLoginDTO: LoginDTO = await JoiValidator(loginSchema, req?.body, { allowUnknown: false, stripUnknown: true, abortEarly: false });
 
             // Attempt to authenticate the user with the provided credentials and retrieve a token
-            const { userId, userName, email, role, status, updatedAt, createdAt, token }: AuthenticatedUser = await this.authService.login(validLoginDTO);
+            const { userId, userName, email, role, status, updatedAt, createdAt, token, tokenExpiresAt, loggedInAt }: AuthenticatedUser = await this.authService.login(validLoginDTO);
 
             // Send a success response with the authentication token
             res.status(HttpCodes.OK)
                 .json({
-                    userId, userName, email, role, status, updatedAt, createdAt, token
+                    userId, userName, email, role, status, updatedAt, createdAt, token, tokenExpiresAt, loggedInAt
                 });
 
         } catch (error) {
