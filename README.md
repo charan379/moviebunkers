@@ -1,6 +1,6 @@
 # moviebunkers :clapper:
 
-[![VERSION](https://img.shields.io/badge/VERSION-v2.2.2-sucess)](https://github.com/charan379/moviebunkers) [![LAST UPDATE](https://img.shields.io/badge/LAST--UPDATED-27--February--2024-sucess)](https://github.com/charan379/moviebunkers) [![AGPL License](https://img.shields.io/badge/LICENSE-GNU%20AGPLv3-informational)](https://www.gnu.org/licenses/agpl-3.0.en.html)
+[![VERSION](https://img.shields.io/badge/VERSION-v3-sucess)](https://github.com/charan379/moviebunkers) [![LAST UPDATE](https://img.shields.io/badge/LAST--UPDATED-28--February--2024-sucess)](https://github.com/charan379/moviebunkers) [![AGPL License](https://img.shields.io/badge/LICENSE-GNU%20AGPLv3-informational)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 
 This is REST API application. Developed using Express, Nodejs , Typescript
 
