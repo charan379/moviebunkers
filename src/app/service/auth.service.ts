@@ -66,6 +66,10 @@ export class AuthService implements IAuthService {
 
             const { _id, userName, email, status, role, createdAt, updatedAt } = userDTO;
 
+            const tokenExpiresAt= new Date();
+            // tokenExpiresAt.setHours(tokenExpiresAt.getHours() + 7, tokenExpiresAt.getMinutes() + 30);
+            tokenExpiresAt.setMinutes(tokenExpiresAt.getMinutes() + 1);
+
             const authenticatedUser: AuthenticatedUser = {
                 userId: _id,
                 userName: userName,
@@ -74,6 +78,8 @@ export class AuthService implements IAuthService {
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 token: token,
+                tokenExpiresAt: tokenExpiresAt,
+                loggedInAt: new Date(),
             }
             // Return the authenticatedUser.
             return authenticatedUser
